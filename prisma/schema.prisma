@@ -1,0 +1,200 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  email  String  @unique
+  name   String
+  image  String?
+  status String  @default("created") // created, active, inactive, pending, suspended
+
+  // Better-auth required fields
+  emailVerified Boolean @default(false)
+
+  // twilio details
+  twilioPhoneNumber String? // SID
+
+  // subscription fields
+  hasOnboarded            Boolean   @default(false)
+  subscriptionId          String?
+  subscriptionStatus      String?
+  subscriptionPlan        String?
+  subscriptionStartDate   DateTime?
+  subscriptionEndDate     DateTime?
+  subscriptionRenewalDate DateTime?
+  subscriptionCancelDate  DateTime?
+
+  // Healthcare-specific fields
+  role     UserRole @default(CUSTOMER)
+  isActive Boolean  @default(true)
+
+  // Relationships
+  accounts Account[]
+  sessions Session[]
+  logins   Login[]
+
+  // timestamps
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Reminder  Reminder[]
+
+  // indexing
+  @@index([name])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([role])
+  @@index([isActive])
+  @@map("user")
+}
+
+model Account {
+  id                    String    @id @default(auto()) @map("_id") @db.ObjectId
+  accountId             String    @unique
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relationships
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.ObjectId
+
+  @@map("account")
+}
+
+model Session {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  token     String   @unique
+  userId    String   @db.ObjectId
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Verification {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  value      String? // The missing field that Better Auth is trying to pass
+  token      String?   @unique
+  expires    DateTime?
+  expiresAt  DateTime?
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("verification")
+}
+
+enum UserRole {
+  ADMIN // this me
+  RESIDENT // residents at apartment, given access by staff/vendor, should not see billing page
+  STAFF // staff for apartment management, given access by vendor, should not see billing page
+  VENDOR // for apartment management, should see billing page
+  CUSTOMER // individual customer, should see billing page, just someone who bought a call box
+}
+
+model AuditLog {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String? @db.ObjectId
+  action    String
+  formType  String
+  formId    String? @db.ObjectId
+  patientId String? @db.ObjectId
+  changes   Json?
+  ipAddress String?
+  userAgent String?
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // indexing
+  @@index([userId])
+  @@index([patientId])
+  @@index([formId])
+  @@index([createdAt])
+  // table name
+  @@map("audit_logs")
+}
+
+model Reminder {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  stashId     String? // id of the reminder in qstash
+  description String? // description of the reminder
+
+  // due date
+  type           String   @default("till") // till or from
+  dueDate        DateTime // when the reminder is due
+  isActive       Boolean  @default(true) // is the reminder active?
+  repeat         Boolean? // how often the reminder should be repeated
+  repeatInterval String? // how often the reminder should be repeated
+
+  // notification settings
+  emailNotification Boolean @default(true) // should the reminder be sent via email?
+  smsNotification   Boolean @default(false) // should the reminder be sent via SMS? 
+  // TODO: add mcp stuff here. think about good use cases for this
+
+  // user relationship
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // indexing
+  @@index([userId])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([isActive])
+  @@index([dueDate])
+  @@map("reminders")
+}
+
+model Login {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // user relationship
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+
+  // login details
+  ipAddress String?
+  userAgent String?
+
+  // timestamps
+  createdAt DateTime @default(now())
+
+  // indexing
+  @@index([userId])
+  @@index([createdAt])
+  // table name
+  @@map("logins")
+}
