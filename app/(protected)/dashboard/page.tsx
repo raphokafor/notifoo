@@ -22,7 +22,7 @@ const DashboardPage = async () => {
     type: reminder.type,
   }));
 
-  return <Dashboard reminders={defaultReminders as any} />;
+  return <Dashboard reminders={defaultReminders as any} user={user as any} />;
 };
 
 export default DashboardPage;

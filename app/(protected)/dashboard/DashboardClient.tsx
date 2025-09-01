@@ -10,8 +10,15 @@ import { useRouter } from "next/navigation";
 import { createReminder, deleteReminder } from "@/app/actions/reminders";
 import { toast } from "sonner";
 import HeaderComponent from "@/components/header";
+import { User } from "@prisma/client";
 
-export function Dashboard({ reminders }: { reminders: TimerData[] }) {
+export function Dashboard({
+  reminders,
+  user,
+}: {
+  reminders: TimerData[];
+  user: User;
+}) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -84,7 +91,7 @@ export function Dashboard({ reminders }: { reminders: TimerData[] }) {
         });
 
         router.refresh();
-        handleModalState(false);
+        handleModal();
       } else {
         toast(message, {
           position: "top-right",
@@ -104,10 +111,10 @@ export function Dashboard({ reminders }: { reminders: TimerData[] }) {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <HeaderComponent
           title="Dashboard"
-          description="Create, edit, and delete your reminders"
+          description={`Welcome back, ${user?.name}`}
         />
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center content-center p-4 md:p-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-start content-start p-4 md:p-8"
           layout
         >
           <AnimatePresence>

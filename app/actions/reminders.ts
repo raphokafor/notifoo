@@ -142,6 +142,34 @@ export async function getReminders() {
   }
 }
 
+export async function getReminderById(reminderId: string) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      };
+    }
+
+    const reminder = await prisma.reminder.findUnique({
+      where: { id: reminderId, userId: user.id },
+    });
+    return {
+      success: true,
+      data: reminder,
+    };
+  } catch (error) {
+    console.error("Error getting reminder by id:", error);
+    return {
+      success: false,
+      message: "Failed to get reminder by id",
+      data: null,
+    };
+  }
+}
+
 export async function updateReminder(reminder: TimerData) {
   try {
     const user = await getCurrentUser();

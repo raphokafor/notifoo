@@ -8,9 +8,11 @@ import Logo from "@/public/logo.png";
 import { User } from "@prisma/client";
 import {
   Bell,
+  CalendarIcon,
   ChevronLeft,
   ChevronRight,
   CreditCard,
+  DollarSign,
   FileText,
   LayoutDashboard,
   LogOut,
@@ -29,20 +31,15 @@ const navigation = [
     href: "/dashboard",
     icon: LayoutDashboard,
   },
-  // {
-  //   name: "Reminders",
-  //   href: "/reminders",
-  //   icon: FileText,
-  // },
-  // {
-  //   name: "Call Boxes",
-  //   href: "/callboxes",
-  //   icon: MailboxIcon,
-  // },
+  {
+    name: "Reminders",
+    href: "/reminders",
+    icon: CalendarIcon,
+  },
   {
     name: "Billing",
     href: "/billing",
-    icon: CreditCard,
+    icon: DollarSign,
   },
   // {
   //   name: "Tenants",

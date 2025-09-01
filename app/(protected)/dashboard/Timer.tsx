@@ -24,6 +24,7 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
+import Link from "next/link";
 
 interface TimerProps extends Omit<TimerData, "id"> {
   id: string;
@@ -115,48 +116,52 @@ export function Timer({
       transition={{ type: "spring", stiffness: 300, damping: 25 }}
       className="rounded-3xl"
     >
-      <Card
-        className={`w-[280px] h-[280px] relative ${isExpired && !isHovered ? "opacity-50" : ""} transition-opacity duration-200`}
-        onMouseEnter={() => {
-          setShowDelete(true);
-          setIsHovered(true);
-        }}
-        onMouseLeave={() => {
-          setShowDelete(false);
-          setIsHovered(false);
-        }}
-        style={{ viewTransitionName: `timer-${id}` }}
-      >
-        <CardContent className="p-4 h-full rounded-3xl ">
-          <div className="absolute top-4 left-6 right-4">
-            <div className="flex items-center">
-              <div
-                className={`w-1.5 h-1.5 rounded-full mr-2 ${type === "till" ? "bg-red-500" : "bg-green-500"}`}
-              ></div>
-              <h2 className="text-sm text-muted-foreground truncate font-mono uppercase">
-                {name}
-              </h2>
-            </div>
-            <p
-              className={`text-xs text-muted-foreground mt-1 font-mono uppercase transition-opacity duration-200 ${isHovered ? "opacity-100" : "opacity-0"}`}
-            >
-              {type === "till" ? "Until: " : "Since: "}
-              {dueDate.toLocaleString(undefined, {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
-          </div>
+      <AnimatePresence>
+        <Link href={`/reminders/${id}`}>
+          <Card
+            className={`w-[280px] h-[280px] relative ${isExpired && !isHovered ? "opacity-50" : ""} transition-opacity duration-200`}
+            onMouseEnter={() => {
+              setShowDelete(true);
+              setIsHovered(true);
+            }}
+            onMouseLeave={() => {
+              setShowDelete(false);
+              setIsHovered(false);
+            }}
+            style={{ viewTransitionName: `timer-${id}` }}
+          >
+            <CardContent className="p-4 h-full rounded-3xl ">
+              <div className="absolute top-4 left-6 right-4">
+                <div className="flex items-center">
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full mr-2 ${type === "till" ? "bg-green-500" : "bg-zinc-500"}`}
+                  ></div>
+                  <h2 className="text-sm text-muted-foreground truncate font-mono capitalize">
+                    {name}
+                  </h2>
+                </div>
+                <p
+                  className={`text-xs text-muted-foreground mt-1 font-mono transition-opacity duration-200 ${isHovered ? "opacity-100" : "opacity-0"}`}
+                >
+                  {type === "till" ? "Until: " : "Since: "}
+                  {dueDate.toLocaleString(undefined, {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              </div>
 
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex flex-col -space-y-1">{renderTimeUnits()}</div>
-          </div>
-        </CardContent>
+              <div className="absolute inset-0 flex items-center justify-center mt-12">
+                <div className="flex flex-col -space-y-1">
+                  {renderTimeUnits()}
+                </div>
+              </div>
+            </CardContent>
 
-        <AnimatePresence>
+            {/* <AnimatePresence>
           {showDelete && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
@@ -175,8 +180,10 @@ export function Timer({
               </Button>
             </motion.div>
           )}
-        </AnimatePresence>
-      </Card>
+        </AnimatePresence> */}
+          </Card>
+        </Link>
+      </AnimatePresence>
 
       <AlertDialog open={isOpen}>
         <AlertDialogContent>
