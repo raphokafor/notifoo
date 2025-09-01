@@ -100,7 +100,7 @@ const RemindersClient = ({ reminders }: { reminders: TimerData[] }) => {
           description="Create, edit, and delete your reminders"
         />
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-4 justify-items-start content-start p-4 md:p-8"
+          className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-1 xl:grid-cols-5 justify-items-start content-start p-4 md:p-8"
           layout
         >
           <AnimatePresence>
@@ -116,6 +116,8 @@ const RemindersClient = ({ reminders }: { reminders: TimerData[] }) => {
                     isLoading={isLoading}
                     isOpen={isOpen}
                     handleModal={handleModal}
+                    emailNotification={reminder.emailNotification}
+                    smsNotification={reminder.smsNotification}
                   />
                 </motion.div>
               ))}

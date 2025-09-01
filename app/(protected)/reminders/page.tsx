@@ -13,6 +13,8 @@ const RemindersPage = async () => {
     isActive: reminder.isActive,
     dueDate: reminder.dueDate,
     type: reminder.type,
+    emailNotification: reminder.emailNotification,
+    smsNotification: reminder.smsNotification,
   }));
 
   return <RemindersClient reminders={defaultReminders as any} />;

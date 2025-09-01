@@ -2,7 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, PlusIcon, X } from "lucide-react";
+import { Loader2Icon, PlusIcon, X, Mail, MessageSquare } from "lucide-react";
 import { TimerData } from "@/types/database";
 import { useTime } from "@/contexts/TimeContext";
 import { formatTimeDifference } from "@/lib/utils";
@@ -39,6 +39,8 @@ export function Timer({
   name,
   dueDate,
   type,
+  emailNotification = true,
+  smsNotification = false,
   onDelete,
   isLoading,
   isOpen,
@@ -132,13 +134,29 @@ export function Timer({
           >
             <CardContent className="p-4 h-full rounded-3xl ">
               <div className="absolute top-4 left-6 right-4">
-                <div className="flex items-center">
-                  <div
-                    className={`w-1.5 h-1.5 rounded-full mr-2 ${type === "till" ? "bg-green-500" : "bg-zinc-500"}`}
-                  ></div>
-                  <h2 className="text-sm text-muted-foreground truncate font-mono capitalize">
-                    {name}
-                  </h2>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center flex-1 min-w-0">
+                    <div
+                      className={`w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0 ${type === "till" ? "bg-green-500" : "bg-zinc-500"}`}
+                    ></div>
+                    <h2 className="text-sm text-muted-foreground truncate font-mono capitalize">
+                      {name}
+                    </h2>
+                  </div>
+
+                  {/* Notification indicators */}
+                  <div className="flex items-center gap-1 ml-2 flex-shrink-0">
+                    {emailNotification && (
+                      <div className="p-1 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                        <Mail className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                      </div>
+                    )}
+                    {smsNotification && (
+                      <div className="p-1 rounded-full bg-green-100 dark:bg-green-900/30">
+                        <MessageSquare className="h-3 w-3 text-green-600 dark:text-green-400" />
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <p
                   className={`text-xs text-muted-foreground mt-1 font-mono transition-opacity duration-200 ${isHovered ? "opacity-100" : "opacity-0"}`}

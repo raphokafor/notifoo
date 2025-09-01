@@ -20,6 +20,8 @@ const DashboardPage = async () => {
     isActive: reminder.isActive,
     dueDate: reminder.dueDate,
     type: reminder.type,
+    emailNotification: reminder.emailNotification,
+    smsNotification: reminder.smsNotification,
   }));
 
   return <Dashboard reminders={defaultReminders as any} user={user as any} />;
