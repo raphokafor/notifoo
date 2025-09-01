@@ -18,19 +18,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Clock } from "lucide-react";
+import { Plus, Clock, Loader2Icon } from "lucide-react";
 import { TimerData } from "@/types/database";
+import { FormError } from "@/components/form-error";
 
 interface TimerCreationCardProps {
   onCreateTimer: (timer: Omit<TimerData, "id">) => void;
   handleModalState: (state: boolean) => void;
   modalState: boolean;
+  error: string;
+  isLoading: boolean;
 }
 
 export function TimerCreationCard({
   onCreateTimer,
   handleModalState,
   modalState,
+  error,
+  isLoading,
 }: TimerCreationCardProps) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState({
@@ -103,9 +108,7 @@ export function TimerCreationCard({
         name: timerName,
         dueDate: combinedDateTime,
         type: timerType,
-        isActive: true,
       });
-      handleModalState(false);
     }
   };
 
@@ -132,9 +135,9 @@ export function TimerCreationCard({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          {/* <DialogTitle className="text-center">
+          <DialogTitle className="text-center hidden">
             {step === "date" ? "Select Date & Time" : "Add Description"}
-          </DialogTitle> */}
+          </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center space-y-4">
           {step === "date" && (
@@ -259,8 +262,15 @@ export function TimerCreationCard({
                   Back
                 </Button>
                 <Button onClick={handleConfirm} disabled={!timerName}>
-                  Create Reminder
+                  Create Reminder{" "}
+                  {isLoading && (
+                    <Loader2Icon className="w-4 h-4 animate-spin ml-2" />
+                  )}
                 </Button>
+              </div>
+
+              <div className="w-full">
+                {error && <FormError message={error} className="my-2 w-full" />}
               </div>
             </>
           )}

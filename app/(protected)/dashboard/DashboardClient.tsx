@@ -13,6 +13,7 @@ import { toast } from "sonner";
 export function Dashboard({ reminders }: { reminders: TimerData[] }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState("");
   const [modalState, setModalState] = useState(false);
   const [timers, setTimers] = React.useState<TimerData[]>([]);
@@ -31,6 +32,7 @@ export function Dashboard({ reminders }: { reminders: TimerData[] }) {
   const handleCreateTimer = async (newTimer: TimerData) => {
     try {
       setIsLoading(true);
+      setError("");
       const { success, message } = await createReminder(newTimer);
       if (success) {
         setTimers((prevTimers) => {
@@ -43,6 +45,12 @@ export function Dashboard({ reminders }: { reminders: TimerData[] }) {
         });
 
         router.refresh();
+        handleModalState(false);
+      } else {
+        toast(message, {
+          position: "top-right",
+        });
+        setError(message);
       }
     } catch (error) {
       toast("Error creating timer", {
@@ -53,6 +61,10 @@ export function Dashboard({ reminders }: { reminders: TimerData[] }) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleModal = () => {
+    setIsOpen((prev) => !prev);
   };
 
   const handleDeleteTimer = async (id: string) => {
@@ -71,6 +83,12 @@ export function Dashboard({ reminders }: { reminders: TimerData[] }) {
         });
 
         router.refresh();
+        handleModalState(false);
+      } else {
+        toast(message, {
+          position: "top-right",
+        });
+        setError(message);
       }
     } catch (error) {
       console.error("Error deleting timer:", error);
@@ -101,6 +119,9 @@ export function Dashboard({ reminders }: { reminders: TimerData[] }) {
                   {...timer}
                   onDelete={handleDeleteTimer}
                   id={timer.id?.toString() ?? ""}
+                  isLoading={isLoading}
+                  isOpen={isOpen}
+                  handleModal={handleModal}
                 />
               </motion.div>
             ))}
@@ -109,6 +130,8 @@ export function Dashboard({ reminders }: { reminders: TimerData[] }) {
             onCreateTimer={handleCreateTimer}
             handleModalState={handleModalState}
             modalState={modalState}
+            error={error}
+            isLoading={isLoading}
           />
         </motion.div>
       </div>

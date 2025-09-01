@@ -2,17 +2,47 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { Loader2Icon, PlusIcon, X } from "lucide-react";
 import { TimerData } from "@/types/database";
 import { useTime } from "@/contexts/TimeContext";
 import { formatTimeDifference } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 
 interface TimerProps extends Omit<TimerData, "id"> {
   id: string;
   onDelete: (id: string) => void;
+  isLoading: boolean;
+  isOpen: boolean;
+  handleModal: () => void;
 }
 
-export function Timer({ id, name, dueDate, type, onDelete }: TimerProps) {
+export function Timer({
+  id,
+  name,
+  dueDate,
+  type,
+  onDelete,
+  isLoading,
+  isOpen,
+  handleModal,
+}: TimerProps) {
   const { now } = useTime();
   const [showDelete, setShowDelete] = React.useState(false);
   const [isHovered, setIsHovered] = React.useState(false);
@@ -139,7 +169,7 @@ export function Timer({ id, name, dueDate, type, onDelete }: TimerProps) {
                 variant="destructive"
                 size="icon"
                 className="rounded-full"
-                onClick={() => onDelete(id)}
+                onClick={() => handleModal()}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -147,6 +177,38 @@ export function Timer({ id, name, dueDate, type, onDelete }: TimerProps) {
           )}
         </AnimatePresence>
       </Card>
+
+      <AlertDialog open={isOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to delete this reminder?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This cannot be undone once the reminder has been deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="w-full">
+            <AlertDialogCancel
+              onClick={() => handleModal()}
+              className="w-full"
+              disabled={isLoading}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => onDelete(id)}
+              className="bg-red-500 text-white hover:bg-red-600 w-full flex items-center justify-center"
+              disabled={isLoading}
+            >
+              Delete Reminder{" "}
+              {isLoading && (
+                <Loader2Icon className="w-4 h-4 animate-spin ml-2" />
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   );
 }

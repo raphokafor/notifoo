@@ -7,10 +7,17 @@ import { Client } from "@upstash/qstash";
 
 const qstash = new Client({
   token: process.env.QSTASH_TOKEN!,
+  retry: {
+    retries: 3,
+    backoff: (retryCount) => {
+      return Math.pow(2, retryCount) * 1000;
+    },
+  },
 });
 
 // TODO: if reminder has a recurring schedule, create cron instead of delay
 export async function createReminder(reminder: TimerData) {
+  console.log("creating reminder", reminder);
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -28,7 +35,7 @@ export async function createReminder(reminder: TimerData) {
       data: {
         name: reminder.name,
         description: reminder.description ?? "",
-        dueDate: utcDueDate, // Store as UTC
+        dueDate: reminder.dueDate, // should only use UTC time for the schedule on QStash as the user will need to see the time in their local timezone on the dashboard
         userId: user.id,
       },
     });
@@ -55,12 +62,24 @@ export async function createReminder(reminder: TimerData) {
     });
 
     // update the reminder with the stash id
-    if (res.messageId) {
+    if (res?.messageId) {
       await prisma.reminder.update({
         where: { id: newReminder.id },
         data: { stashId: res.messageId },
       });
+    } else {
+      console.error("Error creating reminder:", res);
+      // delete the reminder
+      await prisma.reminder.delete({
+        where: { id: newReminder.id },
+      });
+      return {
+        success: false,
+        message: "Failed to create reminder",
+      };
     }
+
+    console.log("reminder created", newReminder);
 
     return {
       success: true,
@@ -114,54 +133,13 @@ export async function updateReminder(reminder: TimerData) {
       };
     }
 
-    const res = await prisma.reminder.update({
+    await prisma.reminder.update({
       where: { id: reminder.id, userId: user.id },
       data: {
         name: reminder.name,
         description: reminder.description ?? "",
       },
     });
-
-    // cancel the existing schedule if it exists
-    if (res.stashId) {
-      try {
-        await qstash.messages.delete(res.stashId);
-      } catch (error) {
-        console.error("Error deleting reminder:", error);
-      }
-    }
-
-    // Convert to UTC for consistent scheduling
-    const utcDueDate = new Date(reminder.dueDate.getTime());
-
-    // Calculate delay using UTC timestamps
-    const nowUtc = new Date();
-    const delaySeconds = Math.floor(
-      (utcDueDate.getTime() - nowUtc.getTime()) / 1000
-    );
-
-    // Ensure we don't schedule in the past
-    if (delaySeconds <= 0) {
-      return {
-        success: false,
-        message: "Cannot schedule reminder in the past",
-      };
-    }
-
-    // create new qstash schedule
-    const response = await qstash.publishJSON({
-      url: `${process.env.BASE_URL}/api/act`,
-      delay: delaySeconds,
-      body: { reminderId: res.id },
-    });
-
-    // update the reminder with the stash id
-    if (response.messageId) {
-      await prisma.reminder.update({
-        where: { id: res.id },
-        data: { stashId: response.messageId },
-      });
-    }
 
     return {
       success: true,
