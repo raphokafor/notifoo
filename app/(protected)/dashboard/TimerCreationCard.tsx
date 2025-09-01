@@ -18,7 +18,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Clock, Loader2Icon } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Plus, Clock, Loader2Icon, Mail, MessageSquare } from "lucide-react";
 import { TimerData } from "@/types/database";
 import { FormError } from "@/components/form-error";
 
@@ -44,7 +45,9 @@ export function TimerCreationCard({
     period: "PM" as "AM" | "PM",
   });
   const [timerName, setTimerName] = useState("");
-  const [step, setStep] = useState<"date" | "name">("date");
+  const [emailNotification, setEmailNotification] = useState(true);
+  const [smsNotification, setSmsNotification] = useState(false);
+  const [step, setStep] = useState<"date" | "name" | "notifications">("date");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -61,6 +64,8 @@ export function TimerCreationCard({
       setSelectedDate(undefined);
       setSelectedTime({ hours: 12, minutes: 0, period: "PM" });
       setTimerName("");
+      setEmailNotification(true);
+      setSmsNotification(false);
     }
   };
 
@@ -102,12 +107,16 @@ export function TimerCreationCard({
     if (step === "date" && combinedDateTime) {
       setStep("name");
     } else if (step === "name" && timerName && combinedDateTime) {
+      setStep("notifications");
+    } else if (step === "notifications" && timerName && combinedDateTime) {
       const now = new Date();
       const timerType = combinedDateTime > now ? "till" : "from";
       onCreateTimer({
         name: timerName,
         dueDate: combinedDateTime,
         type: timerType,
+        emailNotification,
+        smsNotification,
       });
     }
   };
@@ -121,6 +130,8 @@ export function TimerCreationCard({
   const handleBack = () => {
     if (step === "name") {
       setStep("date");
+    } else if (step === "notifications") {
+      setStep("name");
     }
   };
 
@@ -136,7 +147,11 @@ export function TimerCreationCard({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-center hidden">
-            {step === "date" ? "Select Date & Time" : "Add Description"}
+            {step === "date"
+              ? "Select Date & Time"
+              : step === "name"
+                ? "Add Description"
+                : "Choose Notifications"}
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center space-y-4">
@@ -251,7 +266,7 @@ export function TimerCreationCard({
               <Input
                 ref={inputRef}
                 type="text"
-                placeholder="Timer description"
+                placeholder="Reminder description"
                 value={timerName}
                 onChange={(e) => setTimerName(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -262,6 +277,91 @@ export function TimerCreationCard({
                   Back
                 </Button>
                 <Button onClick={handleConfirm} disabled={!timerName}>
+                  Next
+                </Button>
+              </div>
+            </>
+          )}
+          {step === "notifications" && (
+            <>
+              {getCombinedDateTime() && (
+                <div className="text-center mb-4">
+                  <p className="text-sm text-muted-foreground font-mono">
+                    {getCombinedDateTime()?.toLocaleString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
+                  </p>
+                  <p className="text-sm font-medium mt-1">{timerName}</p>
+                </div>
+              )}
+
+              <div className="w-full space-y-4">
+                <div className="text-center">
+                  <h3 className="text-sm font-medium mb-3">
+                    How would you like to be notified?
+                  </h3>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Mail className="w-5 h-5 text-blue-500" />
+                      <div>
+                        <Label htmlFor="email-toggle" className="font-medium">
+                          Email
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Receive notifications via email
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      id="email-toggle"
+                      checked={emailNotification}
+                      onCheckedChange={setEmailNotification}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <MessageSquare className="w-5 h-5 text-green-500" />
+                      <div>
+                        <Label htmlFor="sms-toggle" className="font-medium">
+                          SMS
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Receive notifications via text message
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      id="sms-toggle"
+                      checked={smsNotification}
+                      onCheckedChange={setSmsNotification}
+                    />
+                  </div>
+                </div>
+
+                {!emailNotification && !smsNotification && (
+                  <p className="text-xs text-amber-600 text-center">
+                    Please select at least one notification method
+                  </p>
+                )}
+              </div>
+
+              <div className="flex justify-between w-full">
+                <Button variant="outline" onClick={handleBack}>
+                  Back
+                </Button>
+                <Button
+                  onClick={handleConfirm}
+                  disabled={!emailNotification && !smsNotification}
+                >
                   Create Reminder{" "}
                   {isLoading && (
                     <Loader2Icon className="w-4 h-4 animate-spin ml-2" />

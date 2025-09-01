@@ -11,7 +11,7 @@ const HeaderComponent = ({
     <div>
       {/* Header */}
       <header className="bg-white/80 backdrop-blur">
-        <div className="px-6 py-4">
+        <div className="px-6 py-6">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
             <p className="text-sm text-slate-600">{description}</p>

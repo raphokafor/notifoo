@@ -28,6 +28,22 @@ export async function createReminder(reminder: TimerData) {
       };
     }
 
+    if (!reminder.dueDate) {
+      console.error("no due date provided");
+      return {
+        success: false,
+        message: "Please provide a valid due date for your reminder",
+      };
+    }
+
+    if (!reminder.name) {
+      console.error("no description provided");
+      return {
+        success: false,
+        message: "Please provide a description for your reminder",
+      };
+    }
+
     // Convert to UTC for consistent scheduling
     const utcDueDate = new Date(reminder.dueDate.getTime());
 
@@ -37,6 +53,8 @@ export async function createReminder(reminder: TimerData) {
         description: reminder.description ?? "",
         dueDate: reminder.dueDate, // should only use UTC time for the schedule on QStash as the user will need to see the time in their local timezone on the dashboard
         userId: user.id,
+        emailNotification: reminder.emailNotification ?? true,
+        smsNotification: reminder.smsNotification ?? false,
       },
     });
 
@@ -63,6 +81,7 @@ export async function createReminder(reminder: TimerData) {
 
     // update the reminder with the stash id
     if (res?.messageId) {
+      console.log("res line 84::::::::::::", res?.messageId);
       await prisma.reminder.update({
         where: { id: newReminder.id },
         data: { stashId: res.messageId },
@@ -137,7 +156,9 @@ export async function updateReminder(reminder: TimerData) {
       where: { id: reminder.id, userId: user.id },
       data: {
         name: reminder.name,
-        description: reminder.description ?? "",
+        description: reminder?.description,
+        emailNotification: reminder?.emailNotification,
+        smsNotification: reminder?.smsNotification,
       },
     });
 
@@ -163,6 +184,11 @@ export async function deleteReminder(reminderId: string) {
         message: "Unable to delete reminder",
       };
     }
+
+    console.log("reminderId line 188::::::::::::", {
+      reminderId,
+      userId: user.id,
+    });
 
     const reminder = await prisma.reminder.delete({
       where: { id: reminderId, userId: user.id },

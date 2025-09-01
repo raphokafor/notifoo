@@ -158,7 +158,13 @@ export async function purchaseAndCreateTwilioPhoneNumber({
   }
 }
 
-export async function sendTwilioTextMessage(to: string, body: string) {
+export async function sendTwilioTextMessage({
+  to,
+  body,
+}: {
+  to: string;
+  body: string;
+}) {
   try {
     const message = await client.messages.create({
       body: body,

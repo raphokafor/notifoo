@@ -1,11 +1,16 @@
 import { Resend } from "resend";
 
-export const sendEmail = async (
-  to: string,
-  subject: string,
-  body: string,
-  textBody: string
-) => {
+export const sendEmail = async ({
+  to,
+  subject,
+  body,
+  textBody,
+}: {
+  to: string;
+  subject: string;
+  body: string;
+  textBody: string;
+}) => {
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({

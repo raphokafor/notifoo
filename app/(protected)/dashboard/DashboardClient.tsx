@@ -9,6 +9,7 @@ import { TimeProvider } from "@/contexts/TimeContext";
 import { useRouter } from "next/navigation";
 import { createReminder, deleteReminder } from "@/app/actions/reminders";
 import { toast } from "sonner";
+import HeaderComponent from "@/components/header";
 
 export function Dashboard({ reminders }: { reminders: TimerData[] }) {
   const router = useRouter();
@@ -100,9 +101,13 @@ export function Dashboard({ reminders }: { reminders: TimerData[] }) {
 
   return (
     <TimeProvider>
-      <div className="min-h-screen bg-background flex items-center justify-center py-20">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <HeaderComponent
+          title="Dashboard"
+          description="Create, edit, and delete your reminders"
+        />
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center content-center"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center content-center p-4 md:p-8"
           layout
         >
           <AnimatePresence>

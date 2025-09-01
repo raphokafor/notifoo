@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Check, Users, Database, Zap, Crown, CreditCard } from "lucide-react";
 import HeaderComponent from "@/components/header";
+import Link from "next/link";
 
 type PlanType = "starter" | "pro";
 type BillingCycle = "monthly" | "yearly";
@@ -132,26 +133,6 @@ export default function CustomerBillingClient() {
               </Badge>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-4 gap-6">
-              <div className="flex items-center gap-3">
-                <Users className="h-5 w-5 text-blue-600" />
-                <span className="font-medium">{current.limits.users}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Database className="h-5 w-5 text-blue-600" />
-                <span className="font-medium">{current.limits.storage}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Zap className="h-5 w-5 text-blue-600" />
-                <span className="font-medium">{current.limits.projects}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <CreditCard className="h-5 w-5 text-blue-600" />
-                <span className="font-medium">{current.limits.apiCalls}</span>
-              </div>
-            </div>
-          </CardContent>
         </Card>
 
         {/* Payment Method - Credit Card */}
@@ -172,22 +153,6 @@ export default function CustomerBillingClient() {
                 <div className="relative h-56 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl overflow-hidden">
                   {/* Card Background Pattern */}
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20"></div>
-
-                  {/* Card Brand Logo // TODO: add card brand logo based on stripe subscription */}
-                  {/* <div className="absolute top-6 right-6">
-                    <div className="w-12 h-8 bg-white/90 rounded flex items-center justify-center">
-                      <span className="text-xs font-bold text-slate-800">
-                        VISA
-                      </span>
-                    </div>
-                  </div> */}
-
-                  {/* Chip */}
-                  {/* <div className="absolute top-16 left-6">
-                    <div className="w-12 h-9 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md shadow-sm">
-                      <div className="w-full h-full bg-gradient-to-br from-yellow-300/50 to-transparent rounded-md"></div>
-                    </div>
-                  </div> */}
 
                   {/* Contactless Symbol */}
                   <div className="absolute top-16 right-16">
@@ -267,154 +232,6 @@ export default function CustomerBillingClient() {
           </CardContent>
         </Card>
 
-        {/* Billing Cycle Toggle */}
-        {/* <div className="flex items-center justify-center">
-          <div className="flex items-center space-x-4 bg-white p-3 rounded-lg shadow-sm">
-            <span
-              className={`text-sm font-medium ${
-                billingCycle === "monthly" ? "text-gray-900" : "text-gray-500"
-              }`}
-            >
-              Monthly
-            </span>
-            <Switch
-              checked={billingCycle === "yearly"}
-              onCheckedChange={(checked) =>
-                setBillingCycle(checked ? "yearly" : "monthly")
-              }
-            />
-            <span
-              className={`text-sm font-medium ${
-                billingCycle === "yearly" ? "text-gray-900" : "text-gray-500"
-              }`}
-            >
-              Yearly
-            </span>
-            {billingCycle === "yearly" && (
-              <Badge variant="secondary" className="ml-2">
-                Save 17%
-              </Badge>
-            )}
-          </div>
-        </div> */}
-
-        {/* Plan Options */}
-        {/* <div className="grid md:grid-cols-2 gap-6">
-          {Object.entries(plans).map(([key, plan]) => {
-            const PlanIcon = plan.icon;
-            const isCurrentPlan = currentPlan === key;
-            const isSelected = selectedPlan === key;
-            const planPrice =
-              billingCycle === "monthly" ? plan.monthly : plan.yearly;
-
-            return (
-              <Card
-                key={key}
-                className={`cursor-pointer transition-all duration-200 ${
-                  isSelected
-                    ? "ring-2 ring-blue-500 shadow-lg"
-                    : "hover:shadow-md"
-                } ${plan.popular ? "border-blue-200" : ""}`}
-                onClick={() => setSelectedPlan(key as PlanType)}
-              >
-                <CardHeader className="text-center">
-                  <div className="flex justify-center items-center gap-2 mb-2">
-                    {plan.popular && (
-                      <Badge className="text-xs">Most Popular</Badge>
-                    )}
-                    {isCurrentPlan && (
-                      <Badge
-                        variant="secondary"
-                        className="text-xs bg-blue-100 text-blue-800"
-                      >
-                        Current Plan
-                      </Badge>
-                    )}
-                    {isSelected && (
-                      <Badge
-                        variant="secondary"
-                        className="text-xs bg-green-100 text-green-800"
-                      >
-                        Selected
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-center mb-3">
-                    <PlanIcon className="h-10 w-10 text-blue-600" />
-                  </div>
-                  <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
-                  <div className="space-y-1">
-                    <div className="text-4xl font-bold">
-                      ${planPrice}
-                      <span className="text-lg font-normal text-gray-600">
-                        /{billingCycle === "monthly" ? "mo" : "yr"}
-                      </span>
-                    </div>
-                    {billingCycle === "yearly" && (
-                      <p className="text-sm text-green-600">
-                        Save ${plan.monthly * 12 - plan.yearly} per year
-                      </p>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-sm text-gray-900 mb-3">
-                        Plan Limits
-                      </h4>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-gray-400" />
-                          <span className="text-sm">{plan.limits.users}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Database className="h-4 w-4 text-gray-400" />
-                          <span className="text-sm">{plan.limits.storage}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Zap className="h-4 w-4 text-gray-400" />
-                          <span className="text-sm">
-                            {plan.limits.projects}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <CreditCard className="h-4 w-4 text-gray-400" />
-                          <span className="text-sm">
-                            {plan.limits.apiCalls}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="font-semibold text-sm text-gray-900 mb-3">
-                        Key Features
-                      </h4>
-                      <ul className="space-y-1">
-                        {plan.features.slice(0, 4).map((feature, index) => (
-                          <li
-                            key={index}
-                            className="flex items-center gap-2 text-sm"
-                          >
-                            <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                        {plan.features.length > 4 && (
-                          <li className="text-sm text-gray-500 ml-6">
-                            +{plan.features.length - 4} more features
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div> */}
-
         {/* Action Buttons */}
         {canChangeplan && (
           <div className="flex justify-center">
@@ -458,11 +275,16 @@ export default function CustomerBillingClient() {
 
         {/* Footer */}
         <div className="text-center text-sm text-gray-500 space-y-2">
-          <p>
-            Changes to your subscription will be processed securely through
-            Stripe.
+          <p>All payments are processed securely through Stripe.</p>
+          <p className="text-xs text-gray-500">
+            We do not store your credit card information in any way.
           </p>
-          <p>Need help? Contact support at support@example.com</p>
+          <p className="text-xs text-gray-500">
+            Need help? Contact support at{" "}
+            <Link href="/contact" className="text-blue-500">
+              Contact Us
+            </Link>
+          </p>
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import Logo from "@/public/logo.png";
 import { User } from "@prisma/client";
 import {
+  Bell,
   ChevronLeft,
   ChevronRight,
   CreditCard,
@@ -28,11 +29,11 @@ const navigation = [
     href: "/dashboard",
     icon: LayoutDashboard,
   },
-  {
-    name: "Reminders",
-    href: "/reminders",
-    icon: FileText,
-  },
+  // {
+  //   name: "Reminders",
+  //   href: "/reminders",
+  //   icon: FileText,
+  // },
   // {
   //   name: "Call Boxes",
   //   href: "/callboxes",
@@ -68,22 +69,6 @@ export default function SideNav({ className }: SideNavProps) {
 
   // Filter navigation based on user role
   const user = session?.user as User;
-  const filteredNavigation = navigation.filter((item) => {
-    // Show "Tenants" only for STAFF and VENDOR roles
-    if (item.name === "Tenants") {
-      return (
-        (user as any)?.role === "STAFF" || (user as any)?.role === "VENDOR"
-      );
-    }
-    // Hide "Billing" for RESIDENT and STAFF roles
-    if (item.name === "Billing") {
-      return (
-        (user as any)?.role !== "RESIDENT" && (user as any)?.role !== "STAFF"
-      );
-    }
-    // Show all other navigation items
-    return true;
-  });
 
   // Mobile detection and auto-collapse
   useEffect(() => {
@@ -160,10 +145,15 @@ export default function SideNav({ className }: SideNavProps) {
     >
       {/* Header */}
       <div className="flex items-center p-4">
-        {!collapsed && (
+        {!collapsed ? (
           <div className="flex items-center gap-2">
-            <Image src={Logo} alt="Notifoo" width={100} height={100} />
-            <span className="font-bold text-slate-900">Notifoo</span>
+            {/* <Image src={Logo} alt="Notifoo" width={100} height={100} /> */}
+            <Bell className="text-primary" size={38} />
+            <span className="font-bold text-slate-600">Notifoo</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Bell className="text-primary" size={36} />
           </div>
         )}
       </div>
@@ -173,7 +163,7 @@ export default function SideNav({ className }: SideNavProps) {
       <Button
         size="sm"
         onClick={handleToggleCollapse}
-        className="absolute top-4 -right-4 z-10 p-2 bg-white border border-slate-200 hover:bg-slate-50 rounded-full shadow-sm"
+        className="absolute top-11 -right-4 z-10 p-2 bg-white border border-slate-200 hover:bg-slate-50 rounded-full shadow-sm"
       >
         {collapsed ? (
           <ChevronRight className="w-4 h-4" color="black" />
@@ -184,7 +174,7 @@ export default function SideNav({ className }: SideNavProps) {
 
       {/* Navigation */}
       <nav className="flex-1 p-2 pt4 space-y-4 mt-4">
-        {filteredNavigation.map((item) => {
+        {navigation.map((item) => {
           const isItemActive = item.href ? isActive(item.href) : false;
 
           return (
