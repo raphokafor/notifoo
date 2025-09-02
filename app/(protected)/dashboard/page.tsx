@@ -1,4 +1,4 @@
-import { getReminders } from "@/app/actions/reminders";
+import { getActiveReminders } from "@/app/actions/reminders";
 import { getUser } from "@/lib/db-actions";
 import { redirect } from "next/navigation";
 import { Dashboard } from "./DashboardClient";
@@ -10,7 +10,7 @@ const DashboardPage = async () => {
     redirect("/login");
   }
 
-  const { data: reminders } = await getReminders();
+  const { data: reminders } = await getActiveReminders();
 
   // build the default reminders from reminders array
   const defaultReminders = reminders?.map((reminder) => ({

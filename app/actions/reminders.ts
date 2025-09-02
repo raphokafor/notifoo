@@ -150,6 +150,33 @@ export async function getReminders() {
   }
 }
 
+export async function getActiveReminders() {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        message: "Unauthorized",
+        data: [],
+      };
+    }
+    const reminders = await prisma.reminder.findMany({
+      where: { userId: user.id, isActive: true },
+    });
+    return {
+      success: true,
+      data: reminders,
+    };
+  } catch (error) {
+    console.error("Error getting active reminders:", error);
+    return {
+      success: false,
+      error: "Failed to get active reminders",
+      data: [],
+    };
+  }
+}
+
 export async function getReminderById(reminderId: string) {
   try {
     const user = await getCurrentUser();
