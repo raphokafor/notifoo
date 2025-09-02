@@ -172,6 +172,13 @@ export async function sendTwilioTextMessage({
       to: to,
     });
 
+    console.log("line 175, message sent", {
+      body: body,
+      from: process.env.TWILIO_PHONE_NUMBER!,
+      to: to,
+      message,
+    });
+
     return {
       success: true,
       data: {

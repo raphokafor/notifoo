@@ -14,6 +14,9 @@ export async function POST(request: NextRequest) {
     );
     const reminder = await prisma.reminder.findUnique({
       where: { id: reminderId },
+      include: {
+        user: true,
+      },
     });
     if (!reminder) {
       return NextResponse.json(
@@ -22,16 +25,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // use the user id to get the user from the database
-    const user = await prisma.user.findUnique({
-      where: { id: reminder?.userId },
-    });
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
-
     // get the user's subscription status
-    const subscriptionStatus = user?.subscriptionStatus;
+    const subscriptionStatus = reminder?.user?.subscriptionStatus;
 
     // send email
     if (reminder?.emailNotification && subscriptionStatus === "active") {
@@ -40,7 +35,7 @@ export async function POST(request: NextRequest) {
         reminderName: reminder.name,
       });
       await sendEmail({
-        to: user.email,
+        to: reminder?.user?.email,
         subject: reminder.name,
         body: template,
         textBody: template,
@@ -50,11 +45,14 @@ export async function POST(request: NextRequest) {
     // send sms
     if (
       reminder?.smsNotification &&
-      user?.phone &&
+      reminder?.user?.phone &&
       subscriptionStatus === "active"
     ) {
       // use the user's phone number and convert it to international format
-      const phoneNumber = parsePhoneNumber(user.phone as string, "US");
+      const phoneNumber = parsePhoneNumber(
+        reminder?.user?.phone as string,
+        "US"
+      );
       if (!phoneNumber || !phoneNumber.isValid()) {
         return NextResponse.json(
           { message: "Invalid phone number" },
@@ -62,7 +60,7 @@ export async function POST(request: NextRequest) {
         );
       }
       await sendTwilioTextMessage({
-        to: phoneNumber.formatInternational(),
+        to: phoneNumber.toString(),
         body: `🔔 Ding ding! Reminder bell says: "${reminder.name}" - Consider this your friendly digital elbow nudge. -Team Notifoo`,
       });
     }
@@ -82,8 +80,8 @@ export async function POST(request: NextRequest) {
     await prisma.activity.create({
       data: {
         type: "Reminder Sent",
-        description: `Reminder sent to ${user.email} and ${user.phone}, ReminderId: ${reminder.id}`,
-        userId: user.id,
+        description: `Reminder sent to ${reminder?.user?.email} and ${reminder?.user?.phone}, ReminderId: ${reminder.id}`,
+        userId: reminder?.user?.id,
       },
     });
 

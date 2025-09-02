@@ -14,7 +14,7 @@ export const sendEmail = async ({
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
-      from: "Notifoo <no-reply@Notifoo.com>",
+      from: "Notifoo <no-reply@notifoo.io>",
       to: to,
       subject: subject,
       html: body,
@@ -44,4 +44,22 @@ export const sendEmail = async ({
       message: "Failed to send email",
     };
   }
+};
+
+export const addToResendContactList = async ({
+  email,
+  name,
+}: {
+  email: string;
+  name: string;
+}) => {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  resend.contacts.create({
+    email: email,
+    firstName: name?.split(" ")[0],
+    lastName: name?.split(" ")[1],
+    unsubscribed: false,
+    audienceId: process.env.RESEND_AUDIENCE_ID as string,
+  });
 };
