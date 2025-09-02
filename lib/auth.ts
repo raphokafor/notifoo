@@ -15,6 +15,58 @@ function generateObjectId(): string {
   return timestamp + randomBytes.slice(0, 16);
 }
 
+// Helper function to extract IP address
+function getClientIP(request: Request): string | null {
+  const forwarded = request.headers.get("x-forwarded-for");
+  const realIP = request.headers.get("x-real-ip");
+  const connectingIP = request.headers.get("x-connecting-ip");
+
+  if (forwarded) {
+    return forwarded.split(",")[0].trim();
+  }
+  if (realIP) {
+    return realIP;
+  }
+  if (connectingIP) {
+    return connectingIP;
+  }
+  return null;
+}
+
+// Manual tracking function to call after successful authentication
+export async function handleSuccessfulLogin(request: Request) {
+  try {
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+
+    if (session?.user) {
+      // Get the most recent social account for this user
+      const socialAccount = await prisma.account.findFirst({
+        where: { userId: session.user.id },
+        orderBy: { createdAt: "desc" },
+      });
+
+      await prisma.login.create({
+        data: {
+          userId: session.user.id,
+          ipAddress: getClientIP(request),
+          userAgent: request?.headers?.get("user-agent"),
+          sessionId: session.session.id,
+        },
+      });
+
+      console.log(
+        `Login tracked: ${session.user.email} via ${socialAccount?.providerId}`
+      );
+      return session;
+    }
+  } catch (error) {
+    console.error("Failed to track login:", error);
+  }
+  return null;
+}
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "mongodb",

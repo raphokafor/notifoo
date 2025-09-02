@@ -1,8 +1,15 @@
 import React from "react";
 import RemindersClient from "./RemindersClient";
 import { getReminders } from "@/app/actions/reminders";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/db-actions";
 
 const RemindersPage = async () => {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
+
   const { data: reminders } = await getReminders();
 
   // build the default reminders from reminders array
@@ -17,7 +24,9 @@ const RemindersPage = async () => {
     smsNotification: reminder.smsNotification,
   }));
 
-  return <RemindersClient reminders={defaultReminders as any} />;
+  return (
+    <RemindersClient reminders={defaultReminders as any} user={user as any} />
+  );
 };
 
 export default RemindersPage;

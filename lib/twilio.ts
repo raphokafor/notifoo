@@ -43,7 +43,7 @@ export async function createTwilioIncomingPhoneNumber({
 
     // Send success notification SMS
     const message = await client.messages.create({
-      body: `✅ Callbox created successfully!\n\nFriendly Name: ${friendlyName}\nPhone Number: ${phoneNumber}\nSID: ${incomingPhoneNumber.sid}`,
+      body: `✅ Number created successfully!\n\nFriendly Name: ${friendlyName}\nPhone Number: ${phoneNumber}\nSID: ${incomingPhoneNumber.sid}`,
       from: process.env.TWILIO_PHONE_NUMBER!, // Your Twilio phone number
       to: notificationPhoneNumber,
     });
@@ -64,7 +64,7 @@ export async function createTwilioIncomingPhoneNumber({
     // Send error notification SMS
     try {
       await client.messages.create({
-        body: `❌ Failed to create callbox: ${friendlyName}\nError: ${
+        body: `❌ Failed to create number: ${friendlyName}\nError: ${
           error instanceof Error ? error.message : "Unknown error"
         }`,
         from: process.env.TWILIO_PHONE_NUMBER!,
@@ -120,7 +120,7 @@ export async function purchaseAndCreateTwilioPhoneNumber({
 
     // Send success notification SMS
     const message = await client.messages.create({
-      body: `✅ New callbox purchased and created successfully!\n\nFriendly Name: ${friendlyName}\nPhone Number: ${selectedNumber}\nSID: ${incomingPhoneNumber.sid}`,
+      body: `✅ New number purchased and created successfully!\n\nFriendly Name: ${friendlyName}\nPhone Number: ${selectedNumber}\nSID: ${incomingPhoneNumber.sid}`,
       from: process.env.TWILIO_PHONE_NUMBER!,
       to: notificationPhoneNumber,
     });
@@ -140,7 +140,7 @@ export async function purchaseAndCreateTwilioPhoneNumber({
 
     try {
       await client.messages.create({
-        body: `❌ Failed to purchase callbox: ${friendlyName}\nError: ${
+        body: `❌ Failed to purchase number: ${friendlyName}\nError: ${
           error instanceof Error ? error.message : "Unknown error"
         }`,
         from: process.env.TWILIO_PHONE_NUMBER!,

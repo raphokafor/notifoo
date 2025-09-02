@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { updateUser } from "@/app/actions/user-action";
+import HeaderComponent from "@/components/header";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,21 +14,61 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { User, Shield, Eye, EyeOff, Check } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import HeaderComponent from "@/components/header";
-import { User as UserType } from "@prisma/client";
+import { Check, Eye, EyeOff, Shield } from "lucide-react";
 import moment from "moment";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-export default function CustomerSettingsPage({ user }: { user: UserType }) {
+// Add these helper functions before the component
+const formatPhoneNumber = (phone: string | null | undefined): string => {
+  if (!phone) return "";
+
+  // If it's an international format starting with +1 (US/Canada), convert to US format
+  if (phone.startsWith("+1") && phone.length === 12) {
+    const digits = phone.slice(2); // Remove +1
+    return `(${digits.slice(0, 3)})-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+  }
+
+  // If it's already formatted or other international format, return as is
+  return phone;
+};
+
+const normalizePhoneNumber = (phone: string): string => {
+  if (!phone) return "";
+
+  // If it's a formatted US number like (404)-247-2337, convert to +1 format
+  const digitsOnly = phone.replace(/\D/g, "");
+  if (digitsOnly.length === 10) {
+    return `+1${digitsOnly}`;
+  }
+
+  // If it already starts with +, return as is
+  if (phone.startsWith("+")) {
+    return phone;
+  }
+
+  // Otherwise return as is
+  return phone;
+};
+
+export default function CustomerSettingsPage({
+  user,
+  activities,
+}: {
+  user: any;
+  activities: any[];
+}) {
+  console.log("line 30 phone", user.phone);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [profileData, setProfileData] = useState({
     name: user.name,
     email: user.email,
+    phone: formatPhoneNumber(user.phone), // Format the initial phone number
   });
   const [passwordData, setPasswordData] = useState({
     current: "",
@@ -34,11 +76,36 @@ export default function CustomerSettingsPage({ user }: { user: UserType }) {
     confirm: "",
   });
 
-  const handleProfileSave = () => {
-    toast({
-      title: "Profile Updated",
-      description: "Your profile information has been saved successfully.",
-    });
+  const handleProfileSave = async () => {
+    try {
+      setIsLoading(true);
+      console.log("line 49, profileData", profileData);
+      const { success, message } = await updateUser({
+        name: profileData.name,
+        phone: normalizePhoneNumber(profileData.phone ?? ""), // Convert back to international format
+      });
+      if (success) {
+        toast({
+          title: "Profile Updated",
+          description: "Your profile information has been saved successfully.",
+        });
+        router.refresh();
+      } else {
+        toast({
+          title: "Error",
+          description: message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred while updating your profile.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handlePasswordChange = () => {
@@ -57,6 +124,51 @@ export default function CustomerSettingsPage({ user }: { user: UserType }) {
     setPasswordData({ current: "", new: "", confirm: "" });
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+
+    // Check if it starts with + (international format)
+    if (inputValue.startsWith("+")) {
+      // For international numbers, allow + and digits only, with basic validation
+      const cleanValue = inputValue.replace(/[^\d+]/g, "");
+
+      // Limit international numbers to reasonable length (country code + number)
+      if (cleanValue.length <= 15) {
+        // E.164 format allows up to 15 digits
+        setProfileData((prev) => ({
+          ...prev,
+          phone: cleanValue,
+        }));
+      }
+    } else {
+      // Existing US formatting logic
+      const numericValue = inputValue.replace(/\D/g, "");
+
+      // Apply formatting based on length
+      let formattedValue = "";
+      if (numericValue.length >= 1) {
+        formattedValue = `(${numericValue.slice(0, 3)}`;
+      }
+      if (numericValue.length >= 4) {
+        formattedValue = `(${numericValue.slice(0, 3)})-${numericValue.slice(3, 6)}`;
+      }
+      if (numericValue.length >= 7) {
+        formattedValue = `(${numericValue.slice(0, 3)})-${numericValue.slice(3, 6)}-${numericValue.slice(6, 10)}`;
+      }
+      if (numericValue.length === 0) {
+        formattedValue = "";
+      }
+
+      // Limit to 10 digits max for US numbers
+      if (numericValue.length <= 10) {
+        setProfileData((prev) => ({
+          ...prev,
+          phone: formattedValue,
+        }));
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 ">
       {/* Header */}
@@ -72,22 +184,18 @@ export default function CustomerSettingsPage({ user }: { user: UserType }) {
               <div className="flex items-center space-x-4">
                 <div className="relative">
                   <Avatar className="h-16 w-16 ring-4 ring-slate-100">
-                    <AvatarImage src="/placeholder.svg?height=64&width=64" />
+                    <AvatarImage src={user.image || ""} alt={user.name || ""} />
                     <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-lg font-semibold">
                       {profileData.name?.[0] || "U"}
                     </AvatarFallback>
                   </Avatar>
-                  <Badge className="absolute -bottom-1 -right-1 bg-green-500 hover:bg-green-500 text-white border-2 border-white">
-                    <Check className="h-3 w-3" />
-                  </Badge>
                 </div>
                 <div>
                   <CardTitle className="flex items-center gap-2 text-slate-900">
-                    <User className="h-5 w-5 text-blue-600" />
                     Profile Settings
                   </CardTitle>
                   <CardDescription className="text-slate-600">
-                    Update your personal information and profile details
+                    Manage your personal information and profile details
                   </CardDescription>
                 </div>
               </div>
@@ -120,7 +228,10 @@ export default function CustomerSettingsPage({ user }: { user: UserType }) {
                   htmlFor="email"
                   className="text-sm font-medium text-slate-700"
                 >
-                  Email Address
+                  Email Address{" "}
+                  <span className="text-xs text-slate-500">
+                    (for email notifications)
+                  </span>
                 </Label>
                 <Input
                   id="email"
@@ -131,41 +242,78 @@ export default function CustomerSettingsPage({ user }: { user: UserType }) {
                   className="border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
                 />
               </div>
-              <div className="flex justify-end pt-4">
-                <Button
-                  onClick={handleProfileSave}
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+              <div className="space-y-2">
+                <Label
+                  htmlFor="phone"
+                  className="text-sm font-medium text-slate-700"
                 >
-                  <Check className="mr-2 h-4 w-4" />
-                  Save Profile
+                  Phone Number{" "}
+                  <span className="text-xs text-slate-500">
+                    (Optional for SMS notifications)
+                  </span>
+                </Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="(404)-123-1234 or +14041231234"
+                  value={profileData.phone ?? ""}
+                  onChange={handlePhoneChange}
+                  className="border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 placeholder:text-slate-300"
+                />
+              </div>
+              <div className="flex w-full justify-center pt-4">
+                <Button
+                  disabled={isLoading}
+                  onClick={handleProfileSave}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  <Check
+                    className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : null}`}
+                  />
+                  Update Profile
                 </Button>
               </div>
             </CardContent>
           </Card>
 
           {/* Security Card */}
-          <Card className="lg:col-span-1 border-0 bg-white/80 backdrop-blur-sm">
+          <Card className="lg:col-span-1 border-0 bg-white/80 backdrop-blur-sm h-[500px] flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-slate-900">
                 <Shield className="h-5 w-5 text-green-600" />
-                Security
+                Activity
               </CardTitle>
               <CardDescription className="text-slate-600">
-                Account security status
+                Account activity
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-blue-800">
-                    Last Login
+            <CardContent className="space-y-4 overflow-y-auto flex-1">
+              {activities?.length > 0 ? (
+                activities?.map((activity: any) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                    </div>
+                    <div key={activity.id} className="flex flex-col">
+                      <span className="text-sm font-medium text-blue-600">
+                        {activity.type}
+                      </span>
+                      <span className="text-xs text-blue-600">
+                        {moment(activity.createdAt).fromNow()}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="flex items-center justify-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <span className="text-xs text-blue-600">
+                    No Activities yet
                   </span>
                 </div>
-                <span className="text-xs text-blue-600">
-                  {moment(user.createdAt).fromNow()}
-                </span>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -296,12 +444,15 @@ export default function CustomerSettingsPage({ user }: { user: UserType }) {
               </div>
             </div>
 
-            <div className="flex justify-end pt-4">
+            <div className="flex w-full justify-center pt-4">
               <Button
+                disabled={isLoading}
                 onClick={handlePasswordChange}
-                className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white shadow-lg hover:shadow-xl transition-all duration-200"
               >
-                <Shield className="mr-2 h-4 w-4" />
+                <Shield
+                  className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : null}`}
+                />
                 Change Password
               </Button>
             </div>

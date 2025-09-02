@@ -22,11 +22,14 @@ import { Switch } from "@/components/ui/switch";
 import { Plus, Clock, Loader2Icon, Mail, MessageSquare } from "lucide-react";
 import { TimerData } from "@/types/database";
 import { FormError } from "@/components/form-error";
+import { User } from "@prisma/client";
+import Link from "next/link";
 
 interface TimerCreationCardProps {
   onCreateTimer: (timer: Omit<TimerData, "id">) => void;
   handleModalState: (state: boolean) => void;
   modalState: boolean;
+  user: User;
   error: string;
   isLoading: boolean;
 }
@@ -35,6 +38,7 @@ export function TimerCreationCard({
   onCreateTimer,
   handleModalState,
   modalState,
+  user,
   error,
   isLoading,
 }: TimerCreationCardProps) {
@@ -301,11 +305,11 @@ export function TimerCreationCard({
               )}
 
               <div className="w-full space-y-4">
-                <div className="text-center">
+                {/* <div className="text-center">
                   <h3 className="text-sm font-medium mb-3">
                     How would you like to be notified?
                   </h3>
-                </div>
+                </div> */}
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -343,8 +347,18 @@ export function TimerCreationCard({
                       id="sms-toggle"
                       checked={smsNotification}
                       onCheckedChange={setSmsNotification}
+                      disabled={!user.phone}
                     />
                   </div>
+                  {!user.phone && (
+                    <p className="text-xs text-amber-600 text-center">
+                      Please add your phone number to your account in the{" "}
+                      <Link href="/settings" className="text-blue-500">
+                        Settings Page
+                      </Link>{" "}
+                      to receive SMS notifications.
+                    </p>
+                  )}
                 </div>
 
                 {!emailNotification && !smsNotification && (

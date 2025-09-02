@@ -114,7 +114,7 @@ export function Dashboard({
           description={`Welcome back, ${user?.name}`}
         />
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-1 justify-items-start content-start p-4 md:p-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 justify-items-start content-start p-4 md:p-8"
           layout
         >
           <AnimatePresence>
@@ -147,6 +147,7 @@ export function Dashboard({
             modalState={modalState}
             error={error}
             isLoading={isLoading}
+            user={user}
           />
         </motion.div>
       </div>

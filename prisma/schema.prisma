@@ -14,6 +14,7 @@ model User {
   id     String  @id @default(auto()) @map("_id") @db.ObjectId
   email  String  @unique
   name   String
+  phone  String?
   image  String?
   status String  @default("created") // created, active, inactive, pending, suspended
 
@@ -43,9 +44,11 @@ model User {
   logins   Login[]
 
   // timestamps
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  Reminder  Reminder[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Reminder     Reminder[]
+  Activity     Activity[]
+  Subscription Subscription[]
 
   // indexing
   @@index([name])
@@ -77,6 +80,31 @@ model Account {
   userId String @db.ObjectId
 
   @@map("account")
+}
+
+model Subscription {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // subscription details
+  subscriptionId          String?
+  subscriptionStatus      String?
+  subscriptionPlan        String?
+  subscriptionStartDate   DateTime?
+  subscriptionEndDate     DateTime?
+  subscriptionRenewalDate DateTime?
+  subscriptionCancelDate  DateTime?
+
+  // user relationship
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("subscriptions")
 }
 
 model Session {
@@ -166,8 +194,9 @@ model Reminder {
   user   User   @relation(fields: [userId], references: [id])
 
   // timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Activity  Activity[]
 
   // indexing
   @@index([userId])
@@ -188,13 +217,38 @@ model Login {
   // login details
   ipAddress String?
   userAgent String?
+  sessionId String?
 
   // timestamps
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // indexing
   @@index([userId])
   @@index([createdAt])
+  @@index([sessionId])
   // table name
   @@map("logins")
+}
+
+model Activity {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  type        String?
+  description String?
+
+  //  reminder relationship
+  reminderId String?   @db.ObjectId
+  reminder   Reminder? @relation(fields: [reminderId], references: [id])
+
+  // user relationship
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+
+  // timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // indexing
+  @@index([userId])
+  @@map("activities")
 }

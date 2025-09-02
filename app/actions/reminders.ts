@@ -81,7 +81,6 @@ export async function createReminder(reminder: TimerData) {
 
     // update the reminder with the stash id
     if (res?.messageId) {
-      console.log("res line 84::::::::::::", res?.messageId);
       await prisma.reminder.update({
         where: { id: newReminder.id },
         data: { stashId: res.messageId },
@@ -99,6 +98,15 @@ export async function createReminder(reminder: TimerData) {
     }
 
     console.log("reminder created", newReminder);
+
+    // create activity
+    await prisma.activity.create({
+      data: {
+        type: "Reminder Created",
+        description: `Reminder created: ${newReminder.name}`,
+        userId: user.id,
+      },
+    });
 
     return {
       success: true,
@@ -187,6 +195,16 @@ export async function updateReminder(reminder: TimerData) {
         description: reminder?.description,
         emailNotification: reminder?.emailNotification,
         smsNotification: reminder?.smsNotification,
+        isActive: reminder?.isActive,
+      },
+    });
+
+    // create activity
+    await prisma.activity.create({
+      data: {
+        type: "Reminder Updated",
+        description: `Reminder updated: ${reminder.name}${reminder.isActive === false ? " (Disabled)" : ""}`,
+        userId: user.id,
       },
     });
 
@@ -199,6 +217,48 @@ export async function updateReminder(reminder: TimerData) {
     return {
       success: false,
       message: "Failed to update reminder",
+    };
+  }
+}
+
+// Add a new function specifically for toggling reminder status
+export async function toggleReminderStatus(
+  reminderId: string,
+  isActive: boolean
+) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        message: "Unable to update reminder status",
+      };
+    }
+
+    const reminder = await prisma.reminder.update({
+      where: { id: reminderId, userId: user.id },
+      data: { isActive: isActive },
+    });
+
+    // create activity
+    await prisma.activity.create({
+      data: {
+        type:
+          "Reminder Status Changed to " + (isActive ? "Active" : "Inactive"),
+        description: `Reminder ${isActive ? "enabled" : "disabled"}: ${reminder.name}`,
+        userId: user.id,
+      },
+    });
+
+    return {
+      success: true,
+      message: `Reminder ${isActive ? "enabled" : "disabled"} successfully`,
+    };
+  } catch (error) {
+    console.error("Error toggling reminder status:", error);
+    return {
+      success: false,
+      message: "Failed to update reminder status",
     };
   }
 }
@@ -230,6 +290,15 @@ export async function deleteReminder(reminderId: string) {
         console.error("Error deleting reminder:", error);
       }
     }
+
+    // create activity
+    await prisma.activity.create({
+      data: {
+        type: "Reminder Deleted",
+        description: `Reminder deleted: ${reminder.name}`,
+        userId: user.id,
+      },
+    });
 
     return {
       success: true,

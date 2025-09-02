@@ -10,8 +10,15 @@ import { toast } from "sonner";
 import { TimeProvider } from "@/contexts/TimeContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { TimerCreationCard } from "../dashboard/TimerCreationCard";
+import { User } from "@prisma/client";
 
-const RemindersClient = ({ reminders }: { reminders: TimerData[] }) => {
+const RemindersClient = ({
+  reminders,
+  user,
+}: {
+  reminders: TimerData[];
+  user: User;
+}) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -100,7 +107,7 @@ const RemindersClient = ({ reminders }: { reminders: TimerData[] }) => {
           description="Create, edit, and delete your reminders"
         />
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-1 xl:grid-cols-5 justify-items-start content-start p-4 md:p-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 justify-items-start content-start p-4 md:p-8"
           layout
         >
           <AnimatePresence>
@@ -128,6 +135,7 @@ const RemindersClient = ({ reminders }: { reminders: TimerData[] }) => {
             modalState={modalState}
             error={error}
             isLoading={isLoading}
+            user={user}
           />
         </motion.div>
       </div>

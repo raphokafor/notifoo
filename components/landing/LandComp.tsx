@@ -76,7 +76,7 @@ export default function LandComp() {
       <section className="py-20 px-4">
         <div className="container mx-auto text-center max-w-4xl">
           <Badge variant="secondary" className="mb-4">
-            🥋 Master the Art of Remembering
+            Master the Art of Remembering
           </Badge>
           <h1 className="text-5xl md:text-7xl font-black text-balance mb-6 text-zinc-600">
             Never Forget Again with{" "}
@@ -108,7 +108,7 @@ export default function LandComp() {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-zinc-600">
-              Why Notifoo is the Bee's Knees
+              Why Notifoo is the Real MVP
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-zinc-600">
               We've mastered the ancient art of "not forgetting stuff" so you

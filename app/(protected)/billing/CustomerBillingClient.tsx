@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import HeaderComponent from "@/components/header";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,18 +10,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Check, Users, Database, Zap, Crown, CreditCard } from "lucide-react";
-import HeaderComponent from "@/components/header";
+import { User } from "@/lib/auth";
+import { CreditCard, Crown, Users } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 type PlanType = "starter" | "pro";
 type BillingCycle = "monthly" | "yearly";
 
-export default function CustomerBillingClient() {
-  const [currentPlan, setCurrentPlan] = useState<PlanType>("starter"); // User's current plan
-  const [selectedPlan, setSelectedPlan] = useState<PlanType>("starter"); // Plan they want to change to
+export default function CustomerBillingClient({ user }: { user: User }) {
+  const [currentPlan, setCurrentPlan] = useState<PlanType>(
+    (user?.subscriptionPlan as PlanType) ?? "starter"
+  ); // User's current plan
+  const [selectedPlan, setSelectedPlan] = useState<PlanType>(
+    (user?.subscriptionPlan as PlanType) ?? "starter"
+  ); // Plan they want to change to
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("monthly");
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -28,8 +32,8 @@ export default function CustomerBillingClient() {
     starter: {
       name: "Starter",
       icon: Users,
-      monthly: 19,
-      yearly: 190,
+      monthly: 2.99,
+      yearly: 19.99,
       popular: false, // Add this line
       features: [
         "Up to 5 team members",
@@ -49,11 +53,34 @@ export default function CustomerBillingClient() {
     pro: {
       name: "Pro",
       icon: Crown,
-      monthly: 49,
-      yearly: 490,
+      monthly: 9.99,
+      yearly: 99.99,
       popular: true,
       features: [
         "Up to 50 team members",
+        "500GB storage",
+        "Advanced analytics",
+        "Priority support",
+        "Unlimited projects",
+        "All integrations",
+        "Custom workflows",
+        "API access",
+      ],
+      limits: {
+        users: "50 users",
+        storage: "500GB",
+        projects: "Unlimited",
+        apiCalls: "50,000/month",
+      },
+    },
+    premium: {
+      name: "Premium Pro",
+      icon: Crown,
+      monthly: 19.99,
+      yearly: 199.99,
+      popular: true,
+      features: [
+        "Up to 100 team members",
         "500GB storage",
         "Advanced analytics",
         "Priority support",
@@ -115,19 +142,21 @@ export default function CustomerBillingClient() {
                   <current.icon className="h-8 w-8 text-blue-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-2xl">
+                  <CardTitle className="text-2xl text-zinc-600">
                     Current Plan: {current.name}
                   </CardTitle>
                   <CardDescription className="text-lg">
                     ${currentPrice}/
                     {billingCycle === "monthly" ? "month" : "year"} • Next
-                    billing: Dec 15, 2024
+                    billing:{" "}
+                    {user?.subscriptionRenewalDate?.toLocaleDateString() ??
+                      "N/A"}
                   </CardDescription>
                 </div>
               </div>
               <Badge
                 variant="secondary"
-                className="bg-blue-100 text-blue-800 text-sm px-3 py-1"
+                className="bg-blue-100 text-blue-800 hover:bg-blue-100 text-sm px-3 py-1"
               >
                 Active
               </Badge>

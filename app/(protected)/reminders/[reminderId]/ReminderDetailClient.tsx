@@ -6,7 +6,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { reminderUpdateSchema } from "@/schemas";
-import { updateReminder, deleteReminder } from "@/app/actions/reminders";
+import {
+  updateReminder,
+  deleteReminder,
+  toggleReminderStatus,
+} from "@/app/actions/reminders";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -49,6 +53,8 @@ import {
   Trash2Icon,
   EditIcon,
   Loader2Icon,
+  PowerIcon,
+  PowerOffIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { FormError } from "@/components/form-error";
@@ -60,6 +66,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isTogglingStatus, setIsTogglingStatus] = useState(false);
   const [error, setError] = useState<string>("");
 
   const form = useForm<FormValues>({
@@ -69,6 +76,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
       description: reminder?.description || "",
       emailNotification: reminder?.emailNotification ?? true,
       smsNotification: reminder?.smsNotification ?? false,
+      isActive: reminder?.isActive ?? true,
     },
   });
 
@@ -97,6 +105,31 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
       toast.error("An unexpected error occurred");
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleToggleStatus = async () => {
+    if (!reminder?.id) return;
+
+    setIsTogglingStatus(true);
+    setError("");
+
+    try {
+      const newStatus = !reminder.isActive;
+      const result = await toggleReminderStatus(reminder.id, newStatus);
+
+      if (result.success) {
+        toast.success(result.message);
+        router.refresh();
+      } else {
+        setError(result.message || "Failed to update reminder status");
+        toast.error(result.message || "Failed to update reminder status");
+      }
+    } catch (error) {
+      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsTogglingStatus(false);
     }
   };
 
@@ -130,6 +163,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
       description: reminder?.description || "",
       emailNotification: reminder?.emailNotification ?? true,
       smsNotification: reminder?.smsNotification ?? false,
+      isActive: reminder?.isActive ?? true,
     });
     setIsEditing(false);
     setError("");
@@ -162,14 +196,33 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
         </div>
         <div className="flex items-center gap-2">
           {!isEditing && (
-            <Button
-              variant="outline"
-              onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2"
-            >
-              <EditIcon className="h-4 w-4" />
-              Edit
-            </Button>
+            <>
+              <Button
+                variant={reminder.isActive ? "outline" : "default"}
+                onClick={handleToggleStatus}
+                disabled={isTogglingStatus}
+                className={`flex items-center gap-2 ${reminder.isActive ? "text-red-500" : "text-green-500"}`}
+              >
+                {reminder.isActive ? (
+                  <PowerIcon className="h-4 w-4" color="red" />
+                ) : (
+                  <PowerIcon className="h-4 w-4" color="green" />
+                )}
+                {isTogglingStatus
+                  ? "Updating..."
+                  : reminder.isActive
+                    ? "Disable"
+                    : "Enable"}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setIsEditing(true)}
+                className="flex items-center gap-2"
+              >
+                <EditIcon className="h-4 w-4" />
+                Edit
+              </Button>
+            </>
           )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -216,6 +269,9 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   {isEditing ? "Edit Reminder" : reminder.name}
+                  {!reminder.isActive && !isEditing && (
+                    <Badge variant="secondary">Disabled</Badge>
+                  )}
                   {isPastDue && !isEditing && (
                     <Badge variant="destructive">Past Due</Badge>
                   )}
@@ -277,9 +333,37 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                   />
 
                   <div className="space-y-4">
-                    <FormLabel className="text-base font-medium">
-                      Notification Channels
+                    <FormLabel className="text-base font-semibold text-zinc-700">
+                      Reminder Settings
                     </FormLabel>
+
+                    <FormField
+                      control={form.control}
+                      name="isActive"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-2">
+                              <PowerIcon className="h-4 w-4 text-muted-foreground" />
+                              <FormLabel className="text-base text-zinc-500">
+                                Enable Reminder
+                              </FormLabel>
+                            </div>
+                            <FormDescription>
+                              When disabled, this reminder will not send
+                              notifications
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={isUpdating}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
 
                     <FormField
                       control={form.control}
@@ -289,7 +373,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                           <div className="space-y-0.5">
                             <div className="flex items-center gap-2">
                               <MailIcon className="h-4 w-4 text-muted-foreground" />
-                              <FormLabel className="text-base">
+                              <FormLabel className="text-base text-zinc-500">
                                 Email Notifications
                               </FormLabel>
                             </div>
@@ -316,7 +400,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                           <div className="space-y-0.5">
                             <div className="flex items-center gap-2">
                               <MessageSquareIcon className="h-4 w-4 text-muted-foreground" />
-                              <FormLabel className="text-base">
+                              <FormLabel className="text-base text-zinc-500">
                                 SMS Notifications
                               </FormLabel>
                             </div>
@@ -443,10 +527,20 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Status</p>
                   <Badge
-                    variant={isPastDue ? "destructive" : "default"}
+                    variant={
+                      !reminder.isActive
+                        ? "secondary"
+                        : isPastDue
+                          ? "destructive"
+                          : "default"
+                    }
                     className="w-fit"
                   >
-                    {isPastDue ? "Past Due" : "Scheduled"}
+                    {!reminder.isActive
+                      ? "Disabled"
+                      : isPastDue
+                        ? "Past Due"
+                        : "Active"}
                   </Badge>
                 </div>
                 <div className="space-y-2">

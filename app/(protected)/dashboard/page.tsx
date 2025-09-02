@@ -1,10 +1,10 @@
-import { getCurrentUser } from "@/lib/db-actions";
+import { getReminders } from "@/app/actions/reminders";
+import { getUser } from "@/lib/db-actions";
 import { redirect } from "next/navigation";
 import { Dashboard } from "./DashboardClient";
-import { getReminders } from "@/app/actions/reminders";
 
 const DashboardPage = async () => {
-  const user = await getCurrentUser();
+  const user = await getUser();
 
   if (!user) {
     redirect("/login");

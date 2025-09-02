@@ -1,11 +1,3 @@
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Loader2Icon, PlusIcon, X, Mail, MessageSquare } from "lucide-react";
-import { TimerData } from "@/types/database";
-import { useTime } from "@/contexts/TimeContext";
-import { formatTimeDifference } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,16 +7,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Card, CardContent } from "@/components/ui/card";
+import { useTime } from "@/contexts/TimeContext";
+import { formatTimeDifference } from "@/lib/utils";
+import { TimerData } from "@/types/database";
+import { AnimatePresence, motion } from "framer-motion";
+import { Loader2Icon, Mail, MessageSquare } from "lucide-react";
 import Link from "next/link";
+import React from "react";
 
 interface TimerProps extends Omit<TimerData, "id"> {
   id: string;
@@ -134,7 +125,7 @@ export function Timer({
           >
             <CardContent className="p-4 h-full rounded-3xl ">
               <div className="absolute top-4 left-6 right-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center flex-1 min-w-0">
                     <div
                       className={`w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0 ${type === "till" ? "bg-green-500" : "bg-zinc-500"}`}
@@ -159,9 +150,9 @@ export function Timer({
                   </div>
                 </div>
                 <p
-                  className={`text-xs text-muted-foreground mt-1 font-mono transition-opacity duration-200 ${isHovered ? "opacity-100" : "opacity-0"}`}
+                  className={`text-[10px] text-muted-foreground mt-1 px-6 my-4 border-t border-b font-mono transition-opacity duration-200 ${isHovered ? "opacity-100" : "opacity-0"}`}
                 >
-                  {type === "till" ? "Until: " : "Since: "}
+                  <strong>{type === "till" ? "Until: " : "Since: "}</strong>
                   {dueDate.toLocaleString(undefined, {
                     year: "numeric",
                     month: "long",
@@ -178,27 +169,6 @@ export function Timer({
                 </div>
               </div>
             </CardContent>
-
-            {/* <AnimatePresence>
-          {showDelete && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.2 }}
-              className="absolute -top-3 -left-3 z-10"
-            >
-              <Button
-                variant="destructive"
-                size="icon"
-                className="rounded-full"
-                onClick={() => handleModal()}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence> */}
           </Card>
         </Link>
       </AnimatePresence>

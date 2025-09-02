@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/resend";
 import { sendTwilioTextMessage } from "@/lib/twilio";
+import { NotifyEmailTemplate } from "@/templates/notification/notify-email-template";
 import { parsePhoneNumber } from "libphonenumber-js";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -21,19 +22,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("reminder line 19::::::::::::: reminder from db", {
-      id: reminder?.id,
-      name: reminder?.name,
-      description: reminder?.description,
-      dueDate: reminder?.dueDate,
-      emailNotification: reminder?.emailNotification,
-      smsNotification: reminder?.smsNotification,
-      stashId: reminder?.stashId,
-      userId: reminder?.userId,
-      createdAt: reminder?.createdAt,
-      updatedAt: reminder?.updatedAt,
-    });
-
     // use the user id to get the user from the database
     const user = await prisma.user.findUnique({
       where: { id: reminder?.userId },
@@ -42,27 +30,62 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    // send email and/or sms here
-    // if(reminder?.emailNotification){
-    //   // use the user's email to build the email object
-    //   const template = `<p>Hello ${user.name},</p>
-    //   <p>You have a new reminder:</p>
-    //   <p>Name: ${reminder.name}</p>
-    //   <p>Description: ${reminder.description}</p>
-    //   <p>Due Date: ${reminder.dueDate}</p>
-    //   <p>Please check your dashboard to view your reminder.</p>
-    //   `;
-    //   await sendEmail({to: user.email, subject: reminder.name, body: template, textBody: template});
-    // }
+    // get the user's subscription status
+    const subscriptionStatus = user?.subscriptionStatus;
 
-    // if(reminder?.smsNotification){
-    //   // use the user's phone number and convert it to international format
-    //   const phoneNumber = parsePhoneNumber(user.twilioPhoneNumber as string, "US");
-    //   if(!phoneNumber || !phoneNumber.isValid()){
-    //     return NextResponse.json({ message: "Invalid phone number" }, { status: 400 });
-    //   }
-    //   await sendTwilioTextMessage({to: phoneNumber.formatInternational(), body: reminder.name});
-    // }
+    // send email
+    if (reminder?.emailNotification && subscriptionStatus === "active") {
+      // use the user's email to build the email object
+      const template = NotifyEmailTemplate({
+        reminderName: reminder.name,
+      });
+      await sendEmail({
+        to: user.email,
+        subject: reminder.name,
+        body: template,
+        textBody: template,
+      });
+    }
+
+    // send sms
+    if (
+      reminder?.smsNotification &&
+      user?.phone &&
+      subscriptionStatus === "active"
+    ) {
+      // use the user's phone number and convert it to international format
+      const phoneNumber = parsePhoneNumber(user.phone as string, "US");
+      if (!phoneNumber || !phoneNumber.isValid()) {
+        return NextResponse.json(
+          { message: "Invalid phone number" },
+          { status: 400 }
+        );
+      }
+      await sendTwilioTextMessage({
+        to: phoneNumber.formatInternational(),
+        body: `🔔 Ding ding! Reminder bell says: "${reminder.name}" - Consider this your friendly digital elbow nudge. -Team Notifoo`,
+      });
+    }
+
+    // update the reminder to inactive
+    console.log("line 71, successfully sent email and/or sms ");
+    await prisma.reminder.update({
+      where: { id: reminderId },
+      data: { isActive: false },
+    });
+
+    console.log(
+      "line 79, successfully updated reminder to inactive, reminder job completed"
+    );
+
+    // create activity
+    await prisma.activity.create({
+      data: {
+        type: "Reminder Sent",
+        description: `Reminder sent to ${user.email} and ${user.phone}, ReminderId: ${reminder.id}`,
+        userId: user.id,
+      },
+    });
 
     return NextResponse.json({ message: "Reminder created successfully" });
   } catch (error) {
