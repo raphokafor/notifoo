@@ -19,12 +19,12 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
-import Link from "next/link";
 
+import Link from "next/link";
+import Logo from "@/public/logo.png";
+import Image from "next/image";
 export default function LandComp() {
-  const router = useRouter();
   const { data: session } = useSession();
 
   return (
@@ -33,8 +33,8 @@ export default function LandComp() {
       <header className="bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Bell className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-foreground">Notifoo</span>
+            <Image src={Logo} alt="Notifoo" width={100} height={100} />
+            <span className="text-2xl font-bold text-[#3b82f6]">Notifoo</span>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
             <a
@@ -80,7 +80,7 @@ export default function LandComp() {
           </Badge>
           <h1 className="text-5xl md:text-7xl font-black text-balance mb-6 text-zinc-600">
             Never Forget Again with{" "}
-            <span className="text-primary">Notifoo!</span>
+            <span className="text-[#3b82f6]">Notifoo!</span>
           </h1>
           <p className="text-xl text-muted-foreground text-balance mb-8 max-w-2xl mx-auto text-zinc-600">
             Channel your inner reminder ninja! Set it, forget it, then get
@@ -90,7 +90,10 @@ export default function LandComp() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             {!session?.user && (
               <Link href="/signup">
-                <Button size="lg" className="text-lg px-8 py-6">
+                <Button
+                  size="lg"
+                  className="text-lg px-8 py-6 bg-[#3b82f6] hover:bg-[#3b82f6]/90"
+                >
                   <Zap className="mr-2 h-5 w-5" />
                   Start Your Free Trial
                 </Button>
@@ -321,7 +324,10 @@ export default function LandComp() {
           </p>
           {!session?.user && (
             <Link href="/signup">
-              <Button size="lg" className="text-lg px-12 py-6">
+              <Button
+                size="lg"
+                className="text-lg px-12 py-6 bg-[#3b82f6] hover:bg-[#3b82f6]/90"
+              >
                 <Bell className="mr-2 h-5 w-5" />
                 Start Your Free Trial Now
               </Button>
@@ -340,7 +346,7 @@ export default function LandComp() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <Bell className="h-6 w-6 text-primary" />
+                <Image src={Logo} alt="Notifoo" width={100} height={100} />
                 <span className="text-xl font-bold">Notifoo</span>
               </div>
               <p className="text-muted-foreground text-zinc-600">

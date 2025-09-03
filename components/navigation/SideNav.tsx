@@ -55,17 +55,14 @@ const navigation = [
 
 interface SideNavProps {
   className?: string;
+  user: User;
 }
 
-export default function SideNav({ className }: SideNavProps) {
+export default function SideNav({ className, user }: SideNavProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
   const pathname = usePathname();
-  const { data: session, isPending } = useSession();
-
-  // Filter navigation based on user role
-  const user = session?.user as User;
 
   // Mobile detection and auto-collapse
   useEffect(() => {
@@ -135,7 +132,8 @@ export default function SideNav({ className }: SideNavProps) {
     <div
       className={cn(
         "relative flex flex-col bg-white border-r border-slate-200 transition-all duration-300",
-        collapsed ? "w-16" : "w-64",
+        user?.hasOnboarded && "hidden",
+        collapsed ? "w-16" : "w-40",
         // Remove the hidden class for mobile
         className
       )}
@@ -143,14 +141,13 @@ export default function SideNav({ className }: SideNavProps) {
       {/* Header */}
       <div className="flex items-center p-4">
         {!collapsed ? (
-          <div className="flex items-center gap-2">
-            {/* <Image src={Logo} alt="Notifoo" width={100} height={100} /> */}
-            <Bell className="text-primary" size={38} />
-            <span className="font-bold text-slate-600">Notifoo</span>
+          <div className="flex flex-col items-center gap-2">
+            <Image src={Logo} alt="Notifoo" width={150} height={150} />
+            <span className="font-bold text-[#3b82f6]">notifoo!</span>
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <Bell className="text-primary" size={36} />
+            <Image src={Logo} alt="Notifoo" width={200} height={200} />
           </div>
         )}
       </div>
@@ -198,7 +195,7 @@ export default function SideNav({ className }: SideNavProps) {
       </nav>
 
       {/* User Info and Logout */}
-      {session && (
+      {user && (
         <div className="p-2">
           {!collapsed ? (
             <div className="space-y-2">

@@ -1,9 +1,14 @@
 import { prisma } from "@/lib/prisma";
+import twilio from "twilio";
 import { sendEmail } from "@/lib/resend";
 import { sendTwilioTextMessage } from "@/lib/twilio";
 import { NotifyEmailTemplate } from "@/templates/notification/notify-email-template";
 import { parsePhoneNumber } from "libphonenumber-js";
 import { NextRequest, NextResponse } from "next/server";
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = twilio(accountSid, authToken);
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,6 +56,15 @@ export async function POST(request: NextRequest) {
 
     console.log("line 47, email has been sent");
 
+    // use the user's phone number and convert it to international format
+    const phoneNumber = parsePhoneNumber(reminder?.user?.phone as string, "US");
+    if (!phoneNumber || !phoneNumber.isValid()) {
+      return NextResponse.json(
+        { message: "Invalid phone number" },
+        { status: 400 }
+      );
+    }
+
     // send sms
     if (
       reminder?.smsNotification &&
@@ -58,17 +72,6 @@ export async function POST(request: NextRequest) {
       subscriptionStatus === "active"
     ) {
       try {
-        // use the user's phone number and convert it to international format
-        const phoneNumber = parsePhoneNumber(
-          reminder?.user?.phone as string,
-          "US"
-        );
-        if (!phoneNumber || !phoneNumber.isValid()) {
-          return NextResponse.json(
-            { message: "Invalid phone number" },
-            { status: 400 }
-          );
-        }
         const smsResponse = await sendTwilioTextMessage({
           to: phoneNumber.number,
           textBody: `🔔 Ding ding! Reminder bell says: "${reminder.name}" - Consider this your friendly digital elbow nudge. -Team Notifoo`,
@@ -76,6 +79,20 @@ export async function POST(request: NextRequest) {
         console.log("line 67, smsResponse", smsResponse);
       } catch (error) {
         console.error("Error sending sms:::::::::::::::::", error);
+      }
+    }
+
+    // call the user phone
+    if (reminder?.user?.phone && subscriptionStatus === "active") {
+      try {
+        const call = await client.calls.create({
+          to: phoneNumber.number, // <-- replace with the recipient's number
+          from: process.env.TWILIO_PHONE_NUMBER!, // <-- replace with your Twilio number
+          twiml: `<Response><Say voice="Polly.Brian">${reminder.name}</Say></Response>`,
+        });
+        console.log("line 93, call", call);
+      } catch (error) {
+        console.error("Error calling user phone:::::::::::::::::", error);
       }
     }
 

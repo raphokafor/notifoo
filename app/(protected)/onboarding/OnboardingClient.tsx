@@ -7,9 +7,18 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { User } from "@prisma/client";
+import { toast } from "sonner";
 
-export default function OnboardingPage() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+export default function OnboardingClient({
+  user,
+  currentStep,
+}: {
+  user: User;
+  currentStep: number;
+}) {
+  const [currentSlide, setCurrentSlide] = useState(currentStep);
+  const [isMonthly, setIsMonthly] = useState(false);
   const [answers, setAnswers] = useState({
     reminderType: "",
     notificationPreference: "",
@@ -21,7 +30,7 @@ export default function OnboardingPage() {
   const slides = [
     {
       id: "welcome",
-      title: "Welcome to the Notifoo Dojo! 🥋",
+      title: "Welcome to the Notifoo Dojo!",
       subtitle: "Time to master the ancient art of remembering stuff",
       content: (
         <div className="space-y-6 text-center">
@@ -32,7 +41,7 @@ export default function OnboardingPage() {
             forms!
           </p>
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-left block">
+            <Label htmlFor="name" className="text-center block">
               What should we call you, future Reminder Master?
             </Label>
             <Input
@@ -259,15 +268,100 @@ export default function OnboardingPage() {
         </RadioGroup>
       ),
     },
+    {
+      id: "free-trial",
+      title: "Try Us for Free!",
+      subtitle: "Here's exactly how your 7-day free trial works",
+      content: (
+        <div className="space-y-4">
+          {/* Compact Timeline */}
+          <div className="relative max-w-lg mx-auto">
+            {/* Timeline Line */}
+            <div className="absolute left-4 top-6 bottom-6 w-0.5 bg-gradient-to-b from-green-500 via-blue-500 to-orange-500"></div>
+
+            <div className="space-y-2">
+              {/* Today - Signup */}
+              <div className="flex items-center gap-3">
+                <div className="relative z-10 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold shadow">
+                  0
+                </div>
+                <div className="flex-1 flex justify-between items-center bg-green-50 dark:bg-green-950/20 px-3 py-2 rounded border border-green-200 dark:border-green-800">
+                  <div>
+                    <div className="font-medium text-sm text-green-700 dark:text-green-400">
+                      Today - Start Your Free Trial!
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Start immediately
+                    </div>
+                  </div>
+                  <div className="text-sm font-bold text-green-600">FREE</div>
+                </div>
+              </div>
+
+              {/* Days 1-6 */}
+              {[1, 2, 3, 4, 5, 6].map((day) => (
+                <div key={day} className="flex items-center gap-3">
+                  <div className="relative z-10 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold shadow">
+                    {day}
+                  </div>
+                  <div className="flex-1 flex justify-between items-center bg-blue-50 dark:bg-blue-950/20 px-3 py-2 rounded border border-blue-200 dark:border-blue-800">
+                    <div>
+                      <div className="font-medium text-sm text-blue-700 dark:text-blue-400">
+                        Day {day}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Full access
+                      </div>
+                    </div>
+                    <div className="text-sm font-bold text-blue-600">FREE</div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Day 7 - Payment */}
+              <div className="flex items-center gap-3">
+                <div className="relative z-10 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold shadow">
+                  7
+                </div>
+                <div className="flex-1 flex justify-between items-center bg-orange-50 dark:bg-orange-950/20 px-3 py-2 rounded border-2 border-orange-400">
+                  <div>
+                    <div className="font-medium text-sm text-orange-700 dark:text-orange-400">
+                      Day 7 - Billing Starts
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Subscription begins
+                    </div>
+                  </div>
+                  <div className="text-sm font-bold text-orange-600">
+                    $9.99{isMonthly ? "/mo" : "/yr"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Compact Summary */}
+          <div className="text-center py-2 px-4 bg-accent/30 rounded text-sm">
+            <span className="font-medium">✨ 7 days free</span> •{" "}
+            <span className="text-muted-foreground">
+              Cancel anytime before day 7
+            </span>
+          </div>
+        </div>
+      ),
+    },
   ];
 
   const nextSlide = () => {
+    if (currentSlide === slides.length - 1) {
+      onConnectStripe();
+    }
+
     if (currentSlide < slides.length - 1) {
       setCurrentSlide(currentSlide + 1);
-    } else {
-      // Handle completion - could redirect to dashboard or show success
-      console.log("Onboarding complete!", answers);
     }
+
+    return;
   };
 
   const prevSlide = () => {
@@ -296,6 +390,33 @@ export default function OnboardingPage() {
 
   const currentSlideData = slides[currentSlide];
 
+  const onConnectStripe = async () => {
+    try {
+      const res = await fetch("/api/stripe/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: answers.name,
+          reminderType: answers.reminderType,
+          notificationPreference: answers.notificationPreference,
+          forgetfulness: answers.forgetfulness,
+          hearAbout: answers.hearAbout,
+          isMonthly: isMonthly,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error("Connect Stripe failed. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Connect Stripe error:", error);
+      toast.error("Connect Stripe failed. Please try again later.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-accent/20 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl">
@@ -322,7 +443,7 @@ export default function OnboardingPage() {
 
           {/* Slide content */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2 text-balance">
+            <h1 className="text-3xl font-bold mb-2 text-balance text-zinc-600">
               {currentSlideData.title}
             </h1>
             <p className="text-muted-foreground text-lg">
@@ -333,18 +454,29 @@ export default function OnboardingPage() {
           <div className="mb-8">{currentSlideData.content}</div>
 
           {/* Navigation */}
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col gap-4 md:flex-row justify-between items-center">
+            <div className="flex gap-2 md:hidden">
+              {slides.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    index === currentSlide ? "bg-primary" : "bg-accent"
+                  }`}
+                />
+              ))}
+            </div>
+
             <Button
               variant="outline"
               onClick={prevSlide}
               disabled={currentSlide === 0}
-              className="flex items-center gap-2 bg-transparent"
+              className="flex items-center gap-2 bg-transparent w-[250px]"
             >
               <ChevronLeft className="w-4 h-4" />
               Back
             </Button>
 
-            <div className="flex gap-2">
+            <div className="md:flex gap-2 hidden">
               {slides.map((_, index) => (
                 <div
                   key={index}
@@ -358,16 +490,16 @@ export default function OnboardingPage() {
             <Button
               onClick={nextSlide}
               disabled={!canProceed()}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 w-[250px]"
             >
               {currentSlide === slides.length - 1 ? (
                 <>
-                  Complete Setup
+                  Start Free Trial
                   <Sparkles className="w-4 h-4" />
                 </>
               ) : (
                 <>
-                  Next
+                  Continue
                   <ChevronRight className="w-4 h-4" />
                 </>
               )}

@@ -136,7 +136,7 @@ export async function getReminders() {
         userId: user.id,
       },
       orderBy: {
-        dueDate: "asc",
+        dueDate: "desc",
       },
     });
     return {
@@ -166,7 +166,7 @@ export async function getActiveReminders() {
     const reminders = await prisma.reminder.findMany({
       where: { userId: user.id, isActive: true },
       orderBy: {
-        dueDate: "asc",
+        dueDate: "desc",
       },
     });
     return {

@@ -11,9 +11,6 @@ export default function WelcomeEmailTemplate({ appUrl }: { appUrl: string }) {
         
          Header 
         <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); padding: 40px 30px; text-align: center;">
-            <div style="background-color: #ffffff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                🥋
-            </div>
             <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Welcome to the Notifoo Dojo!</h1>
             <p style="color: #dbeafe; margin: 10px 0 0; font-size: 16px;">You've just earned your white belt in remembering stuff</p>
         </div>

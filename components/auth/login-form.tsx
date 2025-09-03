@@ -54,11 +54,11 @@ export default function LoginForm() {
       <Card className="w-full max-w-md border-0 shadow-lg bg-white/80 backdrop-blur">
         <CardHeader className="text-center pb-4">
           <Link href="/">
-            <div className="w-12 h-12  rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Image src={Logo} alt="Notifoo" width={100} height={100} />
+            <div className="rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Image src={Logo} alt="Notifoo" width={200} height={200} />
             </div>
           </Link>
-          <CardTitle className="text-2xl font-bold text-slate-900">
+          <CardTitle className="text-2xl font-bold text-[#3b82f6]">
             Notifoo
           </CardTitle>
           <p className="text-slate-600">Sign in to your account</p>
@@ -98,7 +98,7 @@ export default function LoginForm() {
             </div>
             <Button
               type="submit"
-              className="w-full h-12 bg-[#296465] hover:bg-[#296465]/90"
+              className="w-full h-12 bg-[#3b82f6] hover:bg-[#3b82f6]/90"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -172,7 +172,7 @@ export default function LoginForm() {
                 href="/signup"
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
-                Request an account
+                Create an account
               </a>
             </p>
           </div>
