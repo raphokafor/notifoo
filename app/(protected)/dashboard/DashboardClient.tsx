@@ -135,7 +135,7 @@ export function Dashboard({
                     isLoading={isLoading}
                     dueDate={timer.dueDate}
                     isOpen={isOpen}
-                    isActive={timer.isActive}
+                    isActive={true}
                     handleModal={handleModal}
                     emailNotification={timer.emailNotification}
                     smsNotification={timer.smsNotification}

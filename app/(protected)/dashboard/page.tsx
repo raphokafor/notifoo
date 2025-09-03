@@ -1,3 +1,7 @@
+// no cache
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { getActiveReminders } from "@/app/actions/reminders";
 import { getUser } from "@/lib/db-actions";
 import { redirect } from "next/navigation";

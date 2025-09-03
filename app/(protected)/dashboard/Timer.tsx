@@ -151,7 +151,7 @@ export function Timer({
                     )}
                   </div>
                 </div>
-                <p
+                {/* <p
                   className={`text-[10px] text-muted-foreground mt-1 px-6 my-4 border-t border-b font-mono transition-opacity duration-200 ${isHovered ? "opacity-100" : "opacity-0"}`}
                 >
                   <strong>{type === "till" ? "Until: " : "Since: "}</strong>
@@ -162,15 +162,16 @@ export function Timer({
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
-                </p>
+                </p> */}
               </div>
 
               <div className="absolute inset-0 flex items-center justify-center mt-12">
                 <div className="flex flex-col -space-y-1">
                   {renderTimeUnits()}
                   <br />
-                  <div className="flex items-center gap-2 text-xs text-red-500 text-center">
-                    &nbsp;
+                  <div
+                    className={`flex items-center gap-2 text-xs ${!isActive ? "text-red-500" : "text-zinc-500"} text-center transition-opacity duration-200 ${isHovered ? "opacity-100" : "opacity-0"}`}
+                  >
                     <Calendar className="w-3 h-3" />
                     {dueDate.toLocaleString(undefined, {
                       year: "numeric",
