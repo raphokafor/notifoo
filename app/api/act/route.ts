@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
         const call = await client.calls.create({
           to: phoneNumber.number, // <-- replace with the recipient's number
           from: process.env.TWILIO_PHONE_NUMBER!, // <-- replace with your Twilio number
-          twiml: `<Response><Say voice="Polly.Brian">${reminder.name}</Say></Response>`,
+          twiml: `<Response><Pause length="1"/><Say voice="Polly.Brian">Ding ding! Reminder bell says: "${reminder.name}" - Consider this your friendly digital elbow nudge. -Team Notifoo</Say></Response>`,
         });
         console.log("line 93, call", call);
       } catch (error) {
