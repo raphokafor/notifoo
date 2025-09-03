@@ -133,7 +133,9 @@ export function Dashboard({
                     onDelete={handleDeleteTimer}
                     id={timer.id?.toString() ?? ""}
                     isLoading={isLoading}
+                    dueDate={timer.dueDate}
                     isOpen={isOpen}
+                    isActive={timer.isActive}
                     handleModal={handleModal}
                     emailNotification={timer.emailNotification}
                     smsNotification={timer.smsNotification}

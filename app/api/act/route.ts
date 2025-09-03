@@ -84,10 +84,15 @@ export async function POST(request: NextRequest) {
     const updatedReminder = await prisma.reminder.update({
       where: { id: reminderId },
       data: { isActive: false },
+      select: {
+        isActive: true,
+        stashId: true,
+        name: true,
+      },
     });
 
     console.log(
-      "line 80, successfully updated reminder to inactive, reminder job completed",
+      "line 90, successfully updated reminder to inactive, reminder job completed",
       updatedReminder
     );
 

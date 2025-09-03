@@ -119,6 +119,7 @@ const RemindersClient = ({
                     name={reminder.name}
                     dueDate={reminder.dueDate}
                     type={reminder.type}
+                    isActive={reminder.isActive}
                     onDelete={handleDeleteTimer}
                     isLoading={isLoading}
                     isOpen={isOpen}

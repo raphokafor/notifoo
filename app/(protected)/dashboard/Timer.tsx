@@ -8,12 +8,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useTime } from "@/contexts/TimeContext";
 import { formatTimeDifference } from "@/lib/utils";
 import { TimerData } from "@/types/database";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2Icon, Mail, MessageSquare } from "lucide-react";
+import { Calendar, Loader2Icon, Mail, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -30,6 +31,7 @@ export function Timer({
   name,
   dueDate,
   type,
+  isActive,
   emailNotification = true,
   smsNotification = false,
   onDelete,
@@ -128,7 +130,7 @@ export function Timer({
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center flex-1 min-w-0">
                     <div
-                      className={`w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0 ${type === "till" ? "bg-green-500" : "bg-zinc-500"}`}
+                      className={`w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0 ${!isActive ? "bg-red-600" : type === "till" ? "bg-green-500" : "bg-zinc-500"}`}
                     ></div>
                     <h2 className="text-sm text-muted-foreground truncate font-mono capitalize">
                       {name}
@@ -166,6 +168,18 @@ export function Timer({
               <div className="absolute inset-0 flex items-center justify-center mt-12">
                 <div className="flex flex-col -space-y-1">
                   {renderTimeUnits()}
+                  <br />
+                  <div className="flex items-center gap-2 text-xs text-red-500 text-center">
+                    &nbsp;
+                    <Calendar className="w-3 h-3" />
+                    {dueDate.toLocaleString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </div>
                 </div>
               </div>
             </CardContent>

@@ -178,11 +178,10 @@ model Reminder {
   description String? // description of the reminder
 
   // due date
-  type           String   @default("till") // till or from
-  dueDate        DateTime // when the reminder is due
-  isActive       Boolean  @default(true) // is the reminder active?
-  repeat         Boolean? // how often the reminder should be repeated
-  repeatInterval String? // how often the reminder should be repeated
+  type     String   @default("till") // till or from
+  dueDate  DateTime // when the reminder is due
+  isActive Boolean  @default(true) // is the reminder active?
+  repeat   Boolean  @default(false) // should the reminder be repeated? if true automatically create another reminder right before executing the notifications
 
   // notification settings
   emailNotification Boolean @default(true) // should the reminder be sent via email?
