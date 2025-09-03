@@ -160,20 +160,20 @@ export async function purchaseAndCreateTwilioPhoneNumber({
 
 export async function sendTwilioTextMessage({
   to,
-  body,
+  textBody,
 }: {
   to: string;
-  body: string;
+  textBody: string;
 }) {
   try {
     const message = await client.messages.create({
-      body: body,
+      body: textBody,
       from: process.env.TWILIO_PHONE_NUMBER!,
       to: to,
     });
 
     console.log("line 175, message sent", {
-      body: body,
+      body: textBody,
       from: process.env.TWILIO_PHONE_NUMBER!,
       to: to,
       message,

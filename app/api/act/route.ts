@@ -70,8 +70,8 @@ export async function POST(request: NextRequest) {
           );
         }
         const smsResponse = await sendTwilioTextMessage({
-          to: phoneNumber.toString(),
-          body: `🔔 Ding ding! Reminder bell says: "${reminder.name}" - Consider this your friendly digital elbow nudge. -Team Notifoo`,
+          to: phoneNumber.number,
+          textBody: `🔔 Ding ding! Reminder bell says: "${reminder.name}" - Consider this your friendly digital elbow nudge. -Team Notifoo`,
         });
         console.log("line 67, smsResponse", smsResponse);
       } catch (error) {
