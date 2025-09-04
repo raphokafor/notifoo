@@ -30,13 +30,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("line 28, reminder", reminder);
+    console.log("line 28, reminder", {
+      reminderName: reminder.name,
+      reminderId: reminder.id,
+      reminderType: reminder.type,
+      reminderDueDate: reminder.dueDate,
+      reminderIsActive: reminder.isActive,
+      reminderRepeat: reminder.repeat,
+      reminderUserEmail: reminder.user?.email,
+      reminderUserPhone: reminder.user?.phone,
+      reminderEmailNotification: reminder.emailNotification,
+      reminderSmsNotification: reminder.smsNotification,
+    });
 
     // get the user's subscription status
     const subscriptionStatus = reminder?.user?.subscriptionStatus;
 
     // send email
-    if (reminder?.emailNotification && subscriptionStatus === "active") {
+    if (reminder?.emailNotification && reminder?.smsNotification) {
       try {
         // use the user's email to build the email object
         const template = NotifyEmailTemplate({
@@ -52,6 +63,8 @@ export async function POST(request: NextRequest) {
       } catch (error) {
         console.error("Error sending email:::::::::::::::::", error);
       }
+    } else {
+      console.log("line 67, not subscribed to for call");
     }
 
     console.log("line 47, email has been sent");
