@@ -76,10 +76,7 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: false,
   },
-  trustedOrigins: [
-    process.env.NEXT_PUBLIC_APNEXT_PUBLIC_BASE_URLP_URL ||
-      "http://localhost:3000",
-  ],
+  trustedOrigins: [process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"],
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
