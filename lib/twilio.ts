@@ -19,9 +19,9 @@ interface CreatePhoneNumberParams {
 
 export async function createTwilioIncomingPhoneNumber({
   friendlyName,
-  smsUrl = "https://Notifoo.com/api/twilio/sms",
-  voiceUrl = "https://Notifoo.com/api/twilio/voice",
-  fallbackUrl = "https://Notifoo.com/api/twilio/fallback",
+  smsUrl = "https://notifoo.com/api/twilio/sms",
+  voiceUrl = "https://notifoo.com/api/twilio/voice",
+  fallbackUrl = "https://notifoo.com/api/twilio/fallback",
   phoneNumber,
   notificationPhoneNumber,
 }: CreatePhoneNumberParams) {
@@ -36,7 +36,7 @@ export async function createTwilioIncomingPhoneNumber({
       voiceFallbackUrl: fallbackUrl,
       smsMethod: "POST",
       voiceMethod: "POST",
-      statusCallback: "https://Notifoo.com/status",
+      statusCallback: "https://notifoo.com/status",
       statusCallbackMethod: "POST",
       voiceFallbackMethod: "POST",
     });
@@ -44,7 +44,7 @@ export async function createTwilioIncomingPhoneNumber({
     // Send success notification SMS
     const message = await client.messages.create({
       body: `✅ Number created successfully!\n\nFriendly Name: ${friendlyName}\nPhone Number: ${phoneNumber}\nSID: ${incomingPhoneNumber.sid}`,
-      from: process.env.TWILIO_PHONE_NUMBER!, // Your Twilio phone number
+      from: process.env.TWILIO_PHONE_NUMBER as string, // Your Twilio phone number
       to: notificationPhoneNumber,
     });
 
@@ -67,7 +67,7 @@ export async function createTwilioIncomingPhoneNumber({
         body: `❌ Failed to create number: ${friendlyName}\nError: ${
           error instanceof Error ? error.message : "Unknown error"
         }`,
-        from: process.env.TWILIO_PHONE_NUMBER!,
+        from: process.env.TWILIO_PHONE_NUMBER as string,
         to: notificationPhoneNumber,
       });
     } catch (smsError) {
@@ -85,11 +85,11 @@ export async function createTwilioIncomingPhoneNumber({
 // Alternative version that purchases a new phone number instead of using existing one
 export async function purchaseAndCreateTwilioPhoneNumber({
   friendlyName,
-  smsUrl = "https://Notifoo.com/api/twilio/sms",
-  voiceUrl = "https://Notifoo.com/api/twilio/voice",
+  smsUrl = "https://notifoo.com/api/twilio/sms",
+  voiceUrl = "https://notifoo.com/api/twilio/voice",
   areaCode = "470",
   notificationPhoneNumber,
-  fallbackUrl = "https://Notifoo.com/api/twilio/fallback",
+  fallbackUrl = "https://notifoo.com/api/twilio/fallback",
 }: Omit<CreatePhoneNumberParams, "phoneNumber"> & { areaCode?: string }) {
   try {
     // First, search for available phone numbers
@@ -121,7 +121,7 @@ export async function purchaseAndCreateTwilioPhoneNumber({
     // Send success notification SMS
     const message = await client.messages.create({
       body: `✅ New number purchased and created successfully!\n\nFriendly Name: ${friendlyName}\nPhone Number: ${selectedNumber}\nSID: ${incomingPhoneNumber.sid}`,
-      from: process.env.TWILIO_PHONE_NUMBER!,
+      from: process.env.TWILIO_PHONE_NUMBER as string,
       to: notificationPhoneNumber,
     });
 
@@ -143,7 +143,7 @@ export async function purchaseAndCreateTwilioPhoneNumber({
         body: `❌ Failed to purchase number: ${friendlyName}\nError: ${
           error instanceof Error ? error.message : "Unknown error"
         }`,
-        from: process.env.TWILIO_PHONE_NUMBER!,
+        from: process.env.TWILIO_PHONE_NUMBER as string,
         to: notificationPhoneNumber,
       });
     } catch (smsError) {
@@ -168,13 +168,13 @@ export async function sendTwilioTextMessage({
   try {
     const message = await client.messages.create({
       body: textBody,
-      from: process.env.TWILIO_PHONE_NUMBER!,
+      from: process.env.TWILIO_PHONE_NUMBER as string,
       to: to,
     });
 
     console.log("line 175, message sent", {
       body: textBody,
-      from: process.env.TWILIO_PHONE_NUMBER!,
+      from: process.env.TWILIO_PHONE_NUMBER as string,
       to: to,
       message,
     });
