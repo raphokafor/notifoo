@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
           reminderName: reminder.name,
         });
         const emailResponse = await sendEmail({
+          from: "Notifoo <no-reply@notifoo.io>",
           to: reminder?.user?.email,
           subject: reminder.name,
           body: template,
@@ -70,7 +71,10 @@ export async function POST(request: NextRequest) {
     const phoneNumber = parsePhoneNumber(reminder?.user?.phone as string, "US");
     if (!phoneNumber || !phoneNumber.isValid()) {
       return NextResponse.json(
-        { message: "Invalid phone number" },
+        {
+          message:
+            "Invalid phone number, we only support US phone numbers at the moment.",
+        },
         { status: 400 }
       );
     }

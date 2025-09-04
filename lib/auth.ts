@@ -57,7 +57,7 @@ export async function handleSuccessfulLogin(request: Request) {
       });
 
       console.log(
-        `Login tracked: ${session.user.email} via ${socialAccount?.providerId}`
+        `Login logged: ${session.user.email} via ${socialAccount?.providerId}`
       );
       return session;
     }
@@ -71,10 +71,15 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "mongodb",
   }),
+  secret: process.env.BETTER_AUTH_SECRET!,
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
   },
+  trustedOrigins: [
+    process.env.NEXT_PUBLIC_APNEXT_PUBLIC_BASE_URLP_URL ||
+      "http://localhost:3000",
+  ],
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -84,7 +89,6 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
-    // Remove generateSessionToken completely
   },
   user: {
     additionalFields: {

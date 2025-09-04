@@ -1,83 +1,60 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/db-actions";
-import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const data = await req.json();
     const {
-      propertyType,
-      buildingCount,
-      unitCount,
-      currentSolution,
-      primaryConcern,
-      planType,
-    } = data;
+      name,
+      reminderType,
+      notificationPreference,
+      forgetfulness,
+      hearAbout,
+      isMonthly,
+      userId,
+      email,
+    } = await req.json();
 
-    if (!user) {
-      return new NextResponse(null, { status: 401 });
+    // declare price id
+    let priceId = "";
+    if (isMonthly) {
+      priceId = process.env
+        .NEXT_PUBLIC_MONTHLY_STRIPE_STARTER_PRICE_ID as string;
+    } else {
+      priceId = process.env
+        .NEXT_PUBLIC_YEARLY_STRIPE_STARTER_PRICE_ID as string;
     }
 
-    console.log("line 31::::::::", {
-      propertyType,
-      buildingCount,
-      unitCount,
-      currentSolution,
-      primaryConcern,
-      planType,
-    });
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "subscription",
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${req.nextUrl.origin}/billing?plan=${priceId}`,
+      cancel_url: `${req.nextUrl.origin}/onboarding`,
+      customer_email: email,
 
-    // create a new audit log to track the onboarding info
-    await prisma.auditLog.create({
-      data: {
-        userId: user.id,
-        action: "onboarding",
-        formType: "onboarding_form",
-        changes: {
-          propertyType,
-          buildingCount,
-          unitCount,
-          currentSolution,
-          primaryConcern,
-          planType,
+      // Optional: Trial period (if supported by your price)
+      subscription_data: {
+        trial_period_days: 7, // 7-day free trial
+        metadata: {
+          plan_type: "starter",
+          user_id: userId,
+          name,
+          reminderType,
+          notificationPreference,
+          forgetfulness,
+          hearAbout,
+          subscriptionPeriod: isMonthly ? "monthly" : "yearly",
+          userId,
+          type: "onboarding",
         },
       },
     });
 
-    // create a new stripe session
-    const session = await stripe.checkout.sessions.create({
-      customer_email: user.email,
-      line_items: [{ price: "price_1QZ002FZ0000000000000000", quantity: 1 }],
-      mode: "subscription",
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/billing?onboarding=true&&success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/billing?onboarding=true&&success=false`,
-      metadata: {
-        userId: user.id,
-        propertyType,
-        buildingCount,
-        unitCount,
-        currentSolution,
-        primaryConcern,
-        planType,
-        type: "onboarding",
-      },
-    });
-
-    // return NextResponse.json({ url: accountLink.url ?? "" }, { status: 200 });
+    return NextResponse.json({ url: session.url });
+  } catch (err) {
+    console.error("Stripe error:", err);
     return NextResponse.json(
-      { url: "https://dashboard.stripe.com/onboarding" },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Free trial creation error:", error);
-    return NextResponse.json(
-      { error: "Unable to start free trial" },
+      { error: "Unable to create checkout session" },
       { status: 500 }
     );
   }

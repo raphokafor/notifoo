@@ -402,6 +402,8 @@ export default function OnboardingClient({
           forgetfulness: answers.forgetfulness,
           hearAbout: answers.hearAbout,
           isMonthly: isMonthly,
+          userId: user.id,
+          email: user.email,
         }),
       });
 

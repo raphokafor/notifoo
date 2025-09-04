@@ -1,11 +1,13 @@
 import { Resend } from "resend";
 
 export const sendEmail = async ({
+  from,
   to,
   subject,
   body,
   textBody,
 }: {
+  from: string;
   to: string;
   subject: string;
   body: string;
@@ -14,7 +16,7 @@ export const sendEmail = async ({
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
-      from: "Notifoo <no-reply@notifoo.io>",
+      from: from,
       to: to,
       subject: subject,
       html: body,
