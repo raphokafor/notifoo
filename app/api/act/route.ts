@@ -1,13 +1,13 @@
+import { createReminderHook } from "@/app/actions/reminders";
 import { prisma } from "@/lib/prisma";
-import twilio from "twilio";
 import { sendEmail } from "@/lib/resend";
+import { getSubscriptionStatus } from "@/lib/stripe";
 import { sendTwilioTextMessage } from "@/lib/twilio";
 import { NotifyEmailTemplate } from "@/templates/notification/notify-email-template";
+import { Reminder, User } from "@prisma/client";
 import { parsePhoneNumber } from "libphonenumber-js";
 import { NextRequest, NextResponse } from "next/server";
-import { createReminder } from "@/app/actions/reminders";
-import { Reminder } from "@prisma/client";
-import { getSubscriptionStatus } from "@/lib/stripe";
+import twilio from "twilio";
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -160,7 +160,7 @@ const callUser = async ({
     await client.calls.create({
       to: phoneNumber, // <-- replace with the recipient's number
       from: process.env.TWILIO_PHONE_NUMBER!, // <-- replace with your Twilio number
-      twiml: `<Response><Pause length="1"/><Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">Ding! ding! Reminder bell says: "${reminderName}" - NoTeaFoo</Say></Response>`,
+      twiml: `<Response><Pause length="1"/><Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">Heeeeyyyyyyooooooooooo!! Notifoo says: "${reminderName}"</Say></Response>`,
 
       // TODO: possibly wait for the answer to say something before talking or 2 seconds, which ever comes first
     });
@@ -191,7 +191,7 @@ const textUser = async ({
 const createReminderForNextDay = async ({
   reminder,
 }: {
-  reminder: Reminder;
+  reminder: Reminder & { user: User };
 }) => {
   // not using try catch here because if the reminder has a repeat, that repeat needs to be created or  through an error
   console.log("line 197, creating a new reminder for the next day");
@@ -204,7 +204,7 @@ const createReminderForNextDay = async ({
   console.log("line 204, newDueDate", newDueDate);
 
   // create a new reminder with the new due date
-  const res = await createReminder({
+  const res = await createReminderHook({
     name: reminder.name,
     dueDate: newDueDate,
     type: reminder.type as "till" | "from",
@@ -212,6 +212,7 @@ const createReminderForNextDay = async ({
     smsNotification: reminder.smsNotification,
     callNotification: reminder.callNotification,
     recurringNotification: reminder.repeat,
+    user: reminder.user,
   });
 
   if (res.success) {

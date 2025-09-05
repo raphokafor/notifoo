@@ -137,7 +137,6 @@ export function TimerCreationCard({
         recurringNotification,
       });
       // clear state for the form
-      setStep("date");
       setSelectedDate(undefined);
       setSelectedTime({ hours: 12, minutes: 0, period: "PM" });
       setTimerName("");
@@ -145,6 +144,7 @@ export function TimerCreationCard({
       setSmsNotification(false);
       setCallNotification(false);
       setRecurringNotification(false);
+      setStep("date");
     }
   };
 

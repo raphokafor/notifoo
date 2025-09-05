@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/db-actions";
 import { prisma } from "@/lib/prisma";
 import { TimerData } from "@/types/database";
 import { Client } from "@upstash/qstash";
+import { User } from "better-auth";
 
 const qstash = new Client({
   token: process.env.QSTASH_TOKEN!,
@@ -27,6 +28,106 @@ export async function createReminder(reminder: TimerData) {
         message: "Unable to create reminder",
       };
     }
+
+    if (!reminder.dueDate) {
+      console.error("no due date provided");
+      return {
+        success: false,
+        message: "Please provide a valid due date for your reminder",
+      };
+    }
+
+    if (!reminder.name) {
+      console.error("no description provided");
+      return {
+        success: false,
+        message: "Please provide a description for your reminder",
+      };
+    }
+
+    // Convert to UTC for consistent scheduling
+    const utcDueDate = new Date(reminder.dueDate.getTime());
+
+    const newReminder = await prisma.reminder.create({
+      data: {
+        name: reminder.name,
+        description: reminder.description ?? "",
+        dueDate: reminder.dueDate, // should only use UTC time for the schedule on QStash as the user will need to see the time in their local timezone on the dashboard
+        userId: user.id,
+        emailNotification: reminder.emailNotification ?? true,
+        smsNotification: reminder.smsNotification ?? false,
+        callNotification: reminder.callNotification ?? false,
+        repeat: reminder.recurringNotification ?? false,
+      },
+    });
+
+    // Calculate delay using UTC timestamps
+    const nowUtc = new Date();
+    const delaySeconds = Math.floor(
+      (utcDueDate.getTime() - nowUtc.getTime()) / 1000
+    );
+
+    // Ensure we don't schedule in the past
+    if (delaySeconds <= 0) {
+      return {
+        success: false,
+        message: "Cannot schedule reminder in the past",
+      };
+    }
+
+    // Schedule exact delivery
+    const res = await qstash.publishJSON({
+      url: `${process.env.BASE_URL}/api/act`,
+      delay: delaySeconds,
+      body: { reminderId: newReminder.id },
+    });
+
+    // update the reminder with the stash id
+    if (res?.messageId) {
+      await prisma.reminder.update({
+        where: { id: newReminder.id },
+        data: { stashId: res.messageId },
+      });
+    } else {
+      console.error("Error creating reminder:", res);
+      // delete the reminder
+      await prisma.reminder.delete({
+        where: { id: newReminder.id },
+      });
+      return {
+        success: false,
+        message: "Failed to create reminder",
+      };
+    }
+
+    console.log("reminder created", newReminder);
+
+    // create activity
+    await prisma.activity.create({
+      data: {
+        type: "Reminder Created",
+        description: `Reminder created: ${newReminder.name}`,
+        userId: user.id,
+      },
+    });
+
+    return {
+      success: true,
+      message: "Reminder created successfully",
+    };
+  } catch (error) {
+    console.error("Error creating reminder:", error);
+    return {
+      success: false,
+      message: "Failed to create reminder",
+    };
+  }
+}
+
+export async function createReminderHook(reminder: TimerData & { user: User }) {
+  console.log("creating reminder", reminder);
+  try {
+    const user = reminder.user;
 
     if (!reminder.dueDate) {
       console.error("no due date provided");
