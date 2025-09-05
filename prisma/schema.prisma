@@ -169,7 +169,8 @@ model AuditLog {
 }
 
 model Onboarding {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  isCompleted Boolean @default(false)
 
   // user relationship
   userId String @db.ObjectId
