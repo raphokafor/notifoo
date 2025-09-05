@@ -55,6 +55,8 @@ export async function createReminder(reminder: TimerData) {
         userId: user.id,
         emailNotification: reminder.emailNotification ?? true,
         smsNotification: reminder.smsNotification ?? false,
+        callNotification: reminder.callNotification ?? false,
+        repeat: reminder.recurringNotification ?? false,
       },
     });
 
@@ -226,9 +228,12 @@ export async function updateReminder(reminder: TimerData) {
       data: {
         name: reminder.name,
         description: reminder?.description,
-        emailNotification: reminder?.emailNotification,
-        smsNotification: reminder?.smsNotification,
-        isActive: reminder?.isActive,
+
+        // notification settings
+        emailNotification: reminder?.emailNotification, // should the reminder be sent via email?
+        smsNotification: reminder?.smsNotification, // should the reminder be sent via SMS?
+        callNotification: reminder?.callNotification, // should the reminder be sent via call?
+        repeat: reminder?.recurringNotification ?? false, // should the reminder be repeated? if true automatically create another reminder right before executing the notifications
       },
     });
 

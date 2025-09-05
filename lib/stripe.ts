@@ -11,57 +11,6 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   typescript: true,
 });
 
-export const updateSubscriptionCount = async (
-  userId: string,
-  count: number
-) => {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    if (!user.subscriptionId) {
-      throw new Error("User has no active subscription");
-    }
-
-    // First, get the current subscription to access its items
-    const currentSubscription = await stripe.subscriptions.retrieve(
-      user.subscriptionId
-    );
-
-    if (!currentSubscription.items.data.length) {
-      throw new Error("Subscription has no items");
-    }
-
-    // Update the quantity of the first subscription item
-    // (assuming single item subscription - modify if you have multiple items)
-    const subscriptionItemId = currentSubscription.items.data[0].id;
-
-    const updatedSubscription = await stripe.subscriptions.update(
-      user.subscriptionId,
-      {
-        items: [
-          {
-            id: subscriptionItemId,
-            quantity: count,
-          },
-        ],
-        metadata: {
-          count, // Keep metadata for reference
-        },
-      }
-    );
-
-    return updatedSubscription;
-  } catch (error) {
-    console.error(error);
-    throw new Error("Failed to update subscription count");
-  }
-};
-
 export const createSubscription = async (userId: string) => {
   try {
     const user = await prisma.user.findUnique({
@@ -176,4 +125,19 @@ export const plans = (isPropertyManagement: boolean) => {
           popular: false,
         },
       ];
+};
+
+export const getSubscriptionStatus = async (userId: string) => {
+  try {
+    const subscription = await prisma.subscription.findFirst({
+      where: { userId: userId as string },
+    });
+    if (!subscription) {
+      return false;
+    }
+    return subscription;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };

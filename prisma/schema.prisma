@@ -208,6 +208,7 @@ model Reminder {
   // notification settings
   emailNotification Boolean @default(true) // should the reminder be sent via email?
   smsNotification   Boolean @default(false) // should the reminder be sent via SMS? 
+  callNotification  Boolean @default(false) // should the reminder be sent via call?
   // TODO: add mcp stuff here. think about good use cases for this
 
   // user relationship

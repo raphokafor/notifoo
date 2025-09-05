@@ -59,7 +59,6 @@ export default function CustomerSettingsPage({
   user: any;
   activities: any[];
 }) {
-  console.log("line 30 phone", user.phone);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -255,7 +254,7 @@ export default function CustomerSettingsPage({
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="(404)-123-1234 or +14041231234"
+                  placeholder="(404)-123-1234"
                   value={profileData.phone ?? ""}
                   onChange={handlePhoneChange}
                   className="border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 placeholder:text-slate-300"

@@ -136,4 +136,6 @@ export interface TimerData {
   id?: string;
   emailNotification?: boolean;
   smsNotification?: boolean;
+  recurringNotification?: boolean;
+  callNotification?: boolean;
 }

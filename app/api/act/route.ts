@@ -5,6 +5,9 @@ import { sendTwilioTextMessage } from "@/lib/twilio";
 import { NotifyEmailTemplate } from "@/templates/notification/notify-email-template";
 import { parsePhoneNumber } from "libphonenumber-js";
 import { NextRequest, NextResponse } from "next/server";
+import { createReminder } from "@/app/actions/reminders";
+import { Reminder } from "@prisma/client";
+import { getSubscriptionStatus } from "@/lib/stripe";
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -30,7 +33,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("line 33, reminder", {
+    console.log("line 36, reminder has been found", {
       reminderName: reminder.name,
       reminderId: reminder.id,
       reminderType: reminder.type,
@@ -41,87 +44,62 @@ export async function POST(request: NextRequest) {
       reminderUserPhone: reminder.user?.phone,
       reminderEmailNotification: reminder.emailNotification,
       reminderSmsNotification: reminder.smsNotification,
+      reminderCallNotification: reminder.callNotification,
+      reminderRecurringNotification: reminder.repeat,
     });
 
-    // send email
+    // send email if the user has opted in for email notifications
     if (reminder?.emailNotification) {
-      try {
-        // use the user's email to build the email object
-        const template = NotifyEmailTemplate({
-          reminderName: reminder.name,
-        });
-        const emailResponse = await sendEmail({
-          from: "Notifoo <no-reply@notifoo.io>",
-          to: reminder?.user?.email,
-          subject: reminder.name,
-          body: template,
-          textBody: template,
-        });
-        console.log("line 59, emailResponse", emailResponse);
-      } catch (error) {
-        console.error("Error sending email:::::::::::::::::", error);
-      }
-    } else {
-      console.log("line 64, not subscribed to for email");
+      await sendEmailToUser({
+        email: reminder?.user?.email as string,
+        reminderName: reminder.name,
+      });
     }
-
-    console.log("line 68, email has been sent");
 
     // use the user's phone number and convert it to international format
     const phoneNumber = parsePhoneNumber(reminder?.user?.phone as string, "US");
-    if (!phoneNumber || !phoneNumber.isValid()) {
-      return NextResponse.json(
-        {
-          message:
-            "Invalid phone number, we only support US phone numbers at the moment.",
-        },
-        { status: 400 }
-      );
+    const isValidPhoneNumber = phoneNumber && phoneNumber.isValid();
+
+    // get the user's subscription status
+    const subscriptionStatus = await getSubscriptionStatus(
+      reminder?.user?.id as string
+    );
+
+    // send sms if the user has opted in for sms notifications
+    if (
+      reminder?.smsNotification &&
+      reminder?.user?.phone &&
+      isValidPhoneNumber
+    ) {
+      await textUser({
+        phoneNumber: phoneNumber.number,
+        reminderName: reminder.name,
+      });
     }
 
-    // send sms
-    if (reminder?.smsNotification && reminder?.user?.phone) {
-      try {
-        const smsResponse = await sendTwilioTextMessage({
-          to: phoneNumber.number,
-          textBody: `🔔 Ding ding! Reminder bell says: "${reminder.name}" - Consider this your friendly digital elbow nudge. -Team Notifoo`,
-        });
-        console.log("line 85, smsResponse", smsResponse);
-      } catch (error) {
-        console.error("Error sending sms:::::::::::::::::", error);
-      }
+    // call the user phone if the user has opted in for call notifications
+    if (
+      reminder?.user?.phone &&
+      reminder?.callNotification &&
+      isValidPhoneNumber
+    ) {
+      await callUser({
+        phoneNumber: phoneNumber.number,
+        reminderName: reminder.name,
+      });
     }
 
-    // call the user phone
-    if (reminder?.user?.phone && reminder?.smsNotification) {
-      try {
-        const call = await client.calls.create({
-          to: phoneNumber.number, // <-- replace with the recipient's number
-          from: process.env.TWILIO_PHONE_NUMBER!, // <-- replace with your Twilio number
-          twiml: `<Response><Pause length="1"/><Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">Ding! ding! Reminder bell says: "${reminder.name}" - NoooTeeFooo</Say></Response>`,
-        });
-        console.log("line 97, call", call);
-      } catch (error) {
-        console.error("Error calling user phone:::::::::::::::::", error);
-      }
-    }
-
-    // update the reminder to inactive
-    console.log("line 108, successfully sent email and/or sms ");
-    const updatedReminder = await prisma.reminder.update({
+    // update the reminder to inactive if the user has opted in for recurring notifications leave it active if not
+    console.log("line 93, successfully sent email, call and/or sms ");
+    await prisma.reminder.update({
       where: { id: reminderId },
-      data: { isActive: false },
-      select: {
-        isActive: true,
-        stashId: true,
-        name: true,
-      },
+      data: { isActive: reminder.repeat ? true : false },
     });
 
-    console.log(
-      "line 118, successfully updated reminder to inactive, reminder job completed",
-      updatedReminder
-    );
+    // if the user has opted in for recurring notifications, create another reminder
+    if (reminder.repeat) {
+      await createReminderForNextDay({ reminder });
+    }
 
     // create activity
     await prisma.activity.create({
@@ -132,6 +110,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    console.log(
+      "line 114, successfully updated reminder to inactive, reminder job completed"
+    );
+
     return NextResponse.json({ message: "Reminder created successfully" });
   } catch (error) {
     console.error("Error creating reminder:", error);
@@ -141,3 +123,103 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+const sendEmailToUser = async ({
+  email,
+  reminderName,
+}: {
+  email: string;
+  reminderName: string;
+}) => {
+  try {
+    // use the user's email to build the email object
+    const template = NotifyEmailTemplate({
+      reminderName: reminderName,
+    });
+    const emailResponse = await sendEmail({
+      from: "Notifoo <no-reply@notifoo.io>",
+      to: email,
+      subject: reminderName,
+      body: template,
+      textBody: template,
+    });
+    console.log("line 146, emailResponse", emailResponse);
+  } catch (error) {
+    console.error("Error sending email:::::::::::::::::", error);
+  }
+};
+
+const callUser = async ({
+  phoneNumber,
+  reminderName,
+}: {
+  phoneNumber: string;
+  reminderName: string;
+}) => {
+  try {
+    await client.calls.create({
+      to: phoneNumber, // <-- replace with the recipient's number
+      from: process.env.TWILIO_PHONE_NUMBER!, // <-- replace with your Twilio number
+      twiml: `<Response><Pause length="1"/><Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">Ding! ding! Reminder bell says: "${reminderName}" - NoTeaFoo</Say></Response>`,
+
+      // TODO: possibly wait for the answer to say something before talking or 2 seconds, which ever comes first
+    });
+    console.log("line 167, call has been made");
+  } catch (error) {
+    console.error("Error calling user phone:::::::::::::::::", error);
+  }
+};
+
+const textUser = async ({
+  phoneNumber,
+  reminderName,
+}: {
+  phoneNumber: string;
+  reminderName: string;
+}) => {
+  try {
+    await sendTwilioTextMessage({
+      to: phoneNumber,
+      textBody: `🔔 Ding ding! Reminder bell says: "${reminderName}" - Consider this your friendly digital elbow nudge. -Team Notifoo`,
+    });
+    console.log("line 186, sms has been sent");
+  } catch (error) {
+    console.error("Error sending sms:::::::::::::::::", error);
+  }
+};
+
+const createReminderForNextDay = async ({
+  reminder,
+}: {
+  reminder: Reminder;
+}) => {
+  // not using try catch here because if the reminder has a repeat, that repeat needs to be created or  through an error
+  console.log("line 197, creating a new reminder for the next day");
+  // get the due date
+  const dueDate = reminder.dueDate;
+  console.log("line 200, dueDate", dueDate);
+
+  // add 1 day to the due date
+  const newDueDate = new Date(dueDate.getTime() + 24 * 60 * 60 * 1000);
+  console.log("line 204, newDueDate", newDueDate);
+
+  // create a new reminder with the new due date
+  const res = await createReminder({
+    name: reminder.name,
+    dueDate: newDueDate,
+    type: reminder.type as "till" | "from",
+    emailNotification: reminder.emailNotification,
+    smsNotification: reminder.smsNotification,
+    callNotification: reminder.callNotification,
+    recurringNotification: reminder.repeat,
+  });
+
+  if (res.success) {
+    console.log("line 218, new reminder created for the next day");
+  } else {
+    console.error(
+      "line 220, error creating new reminder for the next day",
+      res
+    );
+  }
+};

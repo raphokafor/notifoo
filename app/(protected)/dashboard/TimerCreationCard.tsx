@@ -19,7 +19,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Clock, Loader2Icon, Mail, MessageSquare } from "lucide-react";
+import {
+  Plus,
+  Clock,
+  Loader2Icon,
+  Mail,
+  MessageSquare,
+  RefreshCcwDotIcon,
+  PhoneCallIcon,
+} from "lucide-react";
 import { TimerData } from "@/types/database";
 import { FormError } from "@/components/form-error";
 import { User } from "@prisma/client";
@@ -51,6 +59,8 @@ export function TimerCreationCard({
   const [timerName, setTimerName] = useState("");
   const [emailNotification, setEmailNotification] = useState(true);
   const [smsNotification, setSmsNotification] = useState(false);
+  const [callNotification, setCallNotification] = useState(false);
+  const [recurringNotification, setRecurringNotification] = useState(false);
   const [step, setStep] = useState<"date" | "name" | "notifications">("date");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -70,6 +80,8 @@ export function TimerCreationCard({
       setTimerName("");
       setEmailNotification(true);
       setSmsNotification(false);
+      setCallNotification(false);
+      setRecurringNotification(false);
     }
   };
 
@@ -121,7 +133,18 @@ export function TimerCreationCard({
         type: timerType,
         emailNotification,
         smsNotification,
+        callNotification,
+        recurringNotification,
       });
+      // clear state for the form
+      setStep("date");
+      setSelectedDate(undefined);
+      setSelectedTime({ hours: 12, minutes: 0, period: "PM" });
+      setTimerName("");
+      setEmailNotification(true);
+      setSmsNotification(false);
+      setCallNotification(false);
+      setRecurringNotification(false);
     }
   };
 
@@ -300,7 +323,9 @@ export function TimerCreationCard({
                       hour12: true,
                     })}
                   </p>
-                  <p className="text-sm font-medium mt-1">{timerName}</p>
+                  <p className="text-sm font-medium mt-1 p-2 rounded-sm bg-muted-foreground/10">
+                    {timerName}
+                  </p>
                 </div>
               )}
 
@@ -333,6 +358,26 @@ export function TimerCreationCard({
 
                   <div className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
+                      <PhoneCallIcon className="w-5 h-5 text-[#E2725B]" />
+                      <div>
+                        <Label htmlFor="call-toggle" className="font-medium">
+                          Call
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Receive notifications via phone call
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      id="call-toggle"
+                      checked={callNotification}
+                      onCheckedChange={setCallNotification}
+                      disabled={!user.phone}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
                       <MessageSquare className="w-5 h-5 text-green-500" />
                       <div>
                         <Label htmlFor="sms-toggle" className="font-medium">
@@ -350,6 +395,30 @@ export function TimerCreationCard({
                       disabled={!user.phone}
                     />
                   </div>
+
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <RefreshCcwDotIcon className="w-5 h-5 text-purple-500" />
+                      <div>
+                        <Label
+                          htmlFor="recurring-toggle"
+                          className="font-medium"
+                        >
+                          Recurring
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Repeat this reminder every day after.
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      id="recurring-toggle"
+                      checked={recurringNotification}
+                      onCheckedChange={setRecurringNotification}
+                      disabled={!user.phone}
+                    />
+                  </div>
+
                   {!user.phone && (
                     <p className="text-xs text-amber-600 text-center">
                       Please add your phone number to your account in the{" "}
@@ -361,11 +430,14 @@ export function TimerCreationCard({
                   )}
                 </div>
 
-                {!emailNotification && !smsNotification && (
-                  <p className="text-xs text-amber-600 text-center">
-                    Please select at least one notification method
-                  </p>
-                )}
+                {!emailNotification &&
+                  !smsNotification &&
+                  !callNotification &&
+                  !recurringNotification && (
+                    <p className="text-xs text-amber-600 text-center">
+                      Please select at least one notification method
+                    </p>
+                  )}
               </div>
 
               <div className="flex justify-between w-full">
@@ -374,7 +446,12 @@ export function TimerCreationCard({
                 </Button>
                 <Button
                   onClick={handleConfirm}
-                  disabled={!emailNotification && !smsNotification}
+                  disabled={
+                    !emailNotification &&
+                    !smsNotification &&
+                    !callNotification &&
+                    !recurringNotification
+                  }
                 >
                   Create Reminder{" "}
                   {isLoading && (
