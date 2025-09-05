@@ -72,4 +72,5 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)"],
   // Remove the runtime specification to let Next.js choose
+  runtime: "nodejs",
 };
