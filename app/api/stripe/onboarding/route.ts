@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -23,6 +24,19 @@ export async function POST(req: NextRequest) {
       priceId = process.env
         .NEXT_PUBLIC_YEARLY_STRIPE_STARTER_PRICE_ID as string;
     }
+
+    // update onboarding status
+    await prisma.onboarding.update({
+      where: { id: userId },
+      data: {
+        isCompleted: true,
+        name,
+        reminderType,
+        notificationPreference,
+        forgetfulness,
+        hearAbout,
+      },
+    });
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
