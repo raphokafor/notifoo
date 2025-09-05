@@ -19,20 +19,15 @@ model User {
   status String  @default("created") // created, active, inactive, pending, suspended
 
   // Better-auth required fields
-  emailVerified Boolean @default(false)
+  emailVerified    Boolean @default(false)
+  welcomeEmailSent Boolean @default(false)
 
   // twilio details
   twilioPhoneNumber String? // SID
 
   // subscription fields
-  hasOnboarded            Boolean   @default(false)
-  subscriptionId          String?
-  subscriptionStatus      String?
-  subscriptionPlan        String?
-  subscriptionStartDate   DateTime?
-  subscriptionEndDate     DateTime?
-  subscriptionRenewalDate DateTime?
-  subscriptionCancelDate  DateTime?
+  hasOnboarded       Boolean @default(false)
+  subscriptionStatus String?
 
   // Healthcare-specific fields
   role     UserRole @default(CUSTOMER)

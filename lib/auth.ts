@@ -1,6 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
+import { sendEmail } from "./resend";
+import WelcomeEmailTemplate from "@/templates/welcome/welcome-email-template";
 
 // Simple ObjectId-like string generator for edge runtime
 function generateObjectId(): string {
@@ -86,6 +88,63 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
+  },
+  databaseHooks: {
+    session: {
+      create: {
+        // Runs after a session is created => on every successful login
+        after: async (session, ctx) => {
+          try {
+            await prisma.login.create({
+              data: {
+                userId: session.userId,
+                sessionId: session.id,
+                ipAddress: getClientIP(ctx?.request as Request),
+                userAgent:
+                  ctx?.request?.headers?.get("user-agent") ?? undefined,
+              },
+            });
+          } catch (e) {
+            console.error("Failed to record login event", e);
+          }
+        },
+      },
+    },
+    user: {
+      create: {
+        // Runs after a user record is created (email/password OR OAuth)
+        after: async (user) => {
+          // idempotent guard if you want (e.g., check a "welcomed" flag)
+          try {
+            console.log("line 97, user created", user);
+            if (!user?.email) {
+              console.log("line 99, user has no email");
+              return;
+            }
+            // generate welcome email template
+            const welcomeEmailTemplate = WelcomeEmailTemplate({
+              appUrl: "https://www.notifoo.io/dashboard",
+            });
+            // send welcome email
+            await sendEmail({
+              from: "Notifoo <ralph@notifoo.io>",
+              to: user?.email as string,
+              subject: "Welcome aboard 👋",
+              body: welcomeEmailTemplate,
+              textBody: `<p>Hey ${user?.name ?? "there"}, welcome to Notifoo!</p>`,
+            });
+
+            // Optionally mark welcomed=true in your own users table/extra column
+            await prisma.user.update({
+              where: { id: user?.id as string },
+              data: { welcomeEmailSent: true },
+            });
+          } catch (err) {
+            console.error("Welcome email failed", err);
+          }
+        },
+      },
+    },
   },
   user: {
     additionalFields: {
