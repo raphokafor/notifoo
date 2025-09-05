@@ -71,6 +71,5 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)"],
-  // Force middleware to use Node.js runtime instead of Edge Runtime
-  runtime: "nodejs",
+  // Remove the runtime specification to let Next.js choose
 };

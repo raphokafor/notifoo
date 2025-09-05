@@ -126,17 +126,18 @@ model Session {
 }
 
 model Verification {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   identifier String
-  value      String? // The missing field that Better Auth is trying to pass
-  token      String?   @unique
-  expires    DateTime?
-  expiresAt  DateTime?
+  value      String
+  key        String?
+  token      String?
+  expiresAt  DateTime
 
   // timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([identifier, value]) // Add this composite unique constraint
   @@map("verification")
 }
 
