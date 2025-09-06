@@ -105,9 +105,12 @@ export function PricingSection({ user }: { user?: User }) {
           onClick={onConnect}
           className="bg-[#3b82f6] hover:bg-[#3b82f6]/80 text-white px-8 py-3 text-base font-medium"
         >
-          Start your 7-day free trial
+          Try it For Free
           {isLoading && <Loader2 className="w-4 h-4 ml-2 animate-spin" />}
         </Button>
+        <p className="text-zinc-400 text-[10px] pl-2">
+          7-Day Free Trial, Cancel anytime.
+        </p>
       </div>
 
       {/* Feature Grid */}
