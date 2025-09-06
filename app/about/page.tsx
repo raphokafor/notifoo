@@ -115,7 +115,7 @@ const FeaturesPage = () => {
               </CardHeader>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-yellow-500">
+            <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-purple-500">
               <CardHeader>
                 <Zap className="h-12 w-12 text-primary mb-4" />
                 <CardTitle className="text-zinc-600">Lightning Setup</CardTitle>
@@ -127,7 +127,7 @@ const FeaturesPage = () => {
               </CardHeader>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-red-500">
+            <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-purple-500">
               <CardHeader>
                 <Users className="h-12 w-12 text-primary mb-4" />
                 <CardTitle className="text-zinc-600">Team Reminders</CardTitle>
@@ -171,31 +171,6 @@ const FeaturesPage = () => {
 
             <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <Calendar className="h-12 w-12 text-primary mb-4" />
-                <CardTitle className="text-zinc-600">
-                  Smart Scheduling
-                </CardTitle>
-                <CardDescription>
-                  Our AI knows when you're most likely to actually pay
-                  attention. No more 3 AM reminders to water your plants (unless
-                  you're into that).
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Brain className="h-12 w-12 text-primary mb-4" />
-                <CardTitle className="text-zinc-600">Memory Patterns</CardTitle>
-                <CardDescription>
-                  We learn your forgetting habits and adapt. It's like having a
-                  personal memory coach who actually remembers to show up.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
                 <Globe className="h-12 w-12 text-primary mb-4" />
                 <CardTitle className="text-zinc-600">
                   Global Time Zones
@@ -212,24 +187,12 @@ const FeaturesPage = () => {
               <CardHeader>
                 <Shield className="h-12 w-12 text-primary mb-4" />
                 <CardTitle className="text-zinc-600">
-                  Backup Notifications
+                  Multi-Channel Notifications
                 </CardTitle>
                 <CardDescription>
                   If your phone dies, we'll email you. If your email crashes,
                   we'll text you. We're like that friend who won't let you
                   forget... anything.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Target className="h-12 w-12 text-primary mb-4" />
-                <CardTitle className="text-zinc-600">Priority Levels</CardTitle>
-                <CardDescription>
-                  "Remember to breathe" vs "Pick up mom from airport" – we know
-                  the difference. Color-coded urgency that even your brain can
-                  understand.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -242,7 +205,7 @@ const FeaturesPage = () => {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-zinc-600">
-              The Fun Stuff
+              The Fun Stuff To come
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-zinc-600">
               Because life's too short for boring reminders
@@ -292,7 +255,7 @@ const FeaturesPage = () => {
       </section>
 
       {/* How It All Works Together */}
-      <section className="py-20 px-4">
+      {/* <section className="py-20 px-4">
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-zinc-600">
@@ -404,7 +367,7 @@ const FeaturesPage = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
       <section className="py-20 px-4 bg-muted/30">
