@@ -30,21 +30,48 @@ export async function POST(req: NextRequest) {
     const session = event.data.object as Stripe.Checkout.Session;
     const customerEmail = session.customer_email;
     const priceId = session.metadata?.priceId;
+    const status = session.status;
+
+    console.log("line 35, session", session);
 
     if (customerEmail && priceId) {
-      let plan = "basic";
-      if (priceId === process.env.NEXT_PUBLIC_STRIPE_STANDARD_PRICE_ID)
-        plan = "standard";
-      if (priceId === process.env.NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID)
-        plan = "premium";
+      try {
+        await prisma.user.update({
+          where: { email: customerEmail },
+          data: { subscriptionStatus: status },
+        });
 
-      // Update user in DB
-      //   await prisma.user.update({
-      //     where: { email: customerEmail },
-      //     data: { plan },
-      //   });
+        await prisma.subscription.create({
+          data: {
+            userId: customerEmail,
+            subscriptionStatus: status,
+            subscriptionPlan: priceId,
+          },
+        });
+      } catch (error) {
+        console.error("line 39, error updating user", error);
+      }
     }
   }
+
+  if (event.type === "customer.subscription.created") {
+    const subscription = event.data.object as Stripe.Subscription;
+    const customerEmail = subscription.customer as string;
+    const priceId = subscription.items.data[0].price.id;
+    const status = subscription.status;
+
+    console.log("line 61, subscription", subscription);
+  }
+
+  if (event.type === "customer.updated") {
+    const customer = event.data.object as Stripe.Customer;
+    const customerEmail = customer.email;
+    const status = customer.subscriptions?.data[0].status;
+
+    console.log("line 69, customer", customer);
+  }
+
+  console.log("line 57, webhook received", event.type);
 
   return new NextResponse("Webhook received", { status: 200 });
 }

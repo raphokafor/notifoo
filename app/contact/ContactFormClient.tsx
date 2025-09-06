@@ -17,8 +17,13 @@ import Logo from "@/public/logo.png";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export default function ContactFormClient() {
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -27,10 +32,38 @@ export default function ContactFormClient() {
     urgency: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission here
-    console.log("Form submitted:", formData);
+    try {
+      setIsLoading(true);
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        setError(
+          "There was an error submitting the message. Please try again."
+        );
+        toast.error("Failed to submit contact form");
+        return;
+      }
+
+      setSuccess(true);
+      toast.success("Message submitted successfully");
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+        urgency: "",
+      });
+    } catch (error) {
+      console.error("Error submitting contact form", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -38,7 +71,7 @@ export default function ContactFormClient() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+    <div className="min-h-screen ">
       {/* Header */}
       <header className="bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -124,12 +157,24 @@ export default function ContactFormClient() {
                   />
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  Send Message
-                </Button>
+                {!success ? (
+                  <Button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Sending..." : "Send Message"}
+                    {isLoading && (
+                      <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                    )}
+                  </Button>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <p className="text-green-600">
+                      Message submitted successfully
+                    </p>
+                  </div>
+                )}
               </form>
             </CardContent>
           </Card>

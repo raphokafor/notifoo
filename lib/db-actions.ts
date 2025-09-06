@@ -19,6 +19,22 @@ export async function getUser() {
 
   const user = await prisma.user.findUnique({
     where: { id: session?.user?.id },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      fooName: true,
+      phone: true,
+      image: true,
+      status: true,
+      emailVerified: true,
+      welcomeEmailSent: true,
+      twilioPhoneNumber: true,
+      hasOnboarded: true,
+      subscriptionStatus: true,
+      role: true,
+      isActive: true,
+    },
   });
 
   return user;

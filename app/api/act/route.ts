@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     console.log("line 93, successfully sent email, call and/or sms ");
     await prisma.reminder.update({
       where: { id: reminderId },
-      data: { isActive: reminder.repeat ? true : false },
+      data: { isActive: false },
     });
 
     // if the user has opted in for recurring notifications, create another reminder
@@ -160,7 +160,7 @@ const callUser = async ({
     await client.calls.create({
       to: phoneNumber, // <-- replace with the recipient's number
       from: process.env.TWILIO_PHONE_NUMBER!, // <-- replace with your Twilio number
-      twiml: `<Response><Pause length="1"/><Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">Heeeeyyyyyyooooooooooo!! Notifoo says: "${reminderName}"</Say></Response>`,
+      twiml: `<Response><Pause length="1"/><Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">Heeeeyyyyyyooooooooooooo!! "${reminderName}"</Say></Response>`,
 
       // TODO: possibly wait for the answer to say something before talking or 2 seconds, which ever comes first
     });

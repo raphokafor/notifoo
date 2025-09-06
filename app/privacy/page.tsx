@@ -1,23 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, Shield, Eye, Lock, Mail, MessageSquare } from "lucide-react";
+import { Eye, Lock, Mail, MessageSquare, Shield } from "lucide-react";
+import NavHeader from "@/components/navigation/NavHeader";
 import Link from "next/link";
 
 export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <Bell className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-foreground">Notifoo</span>
-          </Link>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/">Back to Home</Link>
-          </Button>
-        </div>
-      </header>
+      <NavHeader />
 
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="text-center mb-12">

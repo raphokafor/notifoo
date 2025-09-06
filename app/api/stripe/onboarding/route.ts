@@ -1,3 +1,4 @@
+import { getCurrentUser } from "@/lib/db-actions";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { NextRequest, NextResponse } from "next/server";
@@ -10,10 +11,24 @@ export async function POST(req: NextRequest) {
       notificationPreference,
       forgetfulness,
       hearAbout,
-      isMonthly,
-      userId,
-      email,
+      isMonthly = true,
     } = await req.json();
+
+    console.log("linr 17 ", name);
+    console.log("linr 20, reminderType", reminderType);
+    console.log("linr 21, notificationPreference", notificationPreference);
+    console.log("linr 22, forgetfulness", forgetfulness);
+    console.log("linr 23, hearAbout", hearAbout);
+    console.log("linr 24, isMonthly", isMonthly);
+
+    // get user
+    const user_ = await getCurrentUser();
+    const user = await prisma.user.findUnique({
+      where: { id: user_?.id as string },
+    });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
     // declare price id
     let priceId = "";
@@ -26,9 +41,18 @@ export async function POST(req: NextRequest) {
     }
 
     // update onboarding status
-    await prisma.onboarding.update({
-      where: { id: userId },
-      data: {
+    await prisma.onboarding.upsert({
+      where: { id: user_?.id as string },
+      update: {
+        isCompleted: true,
+        name,
+        reminderType,
+        notificationPreference,
+        forgetfulness,
+        hearAbout,
+      },
+      create: {
+        userId: user_?.id as string,
         isCompleted: true,
         name,
         reminderType,
@@ -44,21 +68,22 @@ export async function POST(req: NextRequest) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${req.nextUrl.origin}/billing?plan=${priceId}`,
       cancel_url: `${req.nextUrl.origin}/onboarding`,
-      customer_email: email,
+      customer_email: user?.email as string,
 
       // Optional: Trial period (if supported by your price)
       subscription_data: {
         trial_period_days: 7, // 7-day free trial
         metadata: {
           plan_type: "starter",
-          user_id: userId,
+          user_id: user_?.id as string,
+          priceId,
           name,
           reminderType,
           notificationPreference,
           forgetfulness,
           hearAbout,
           subscriptionPeriod: isMonthly ? "monthly" : "yearly",
-          userId,
+          userId: user_?.id as string,
           type: "onboarding",
         },
       },

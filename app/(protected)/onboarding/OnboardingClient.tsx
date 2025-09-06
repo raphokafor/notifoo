@@ -18,7 +18,7 @@ export default function OnboardingClient({
   currentStep: number;
 }) {
   const [currentSlide, setCurrentSlide] = useState(currentStep);
-  const [isMonthly, setIsMonthly] = useState(false);
+  const [isMonthly, setIsMonthly] = useState(true);
   const [answers, setAnswers] = useState({
     reminderType: "",
     notificationPreference: "",
@@ -392,7 +392,7 @@ export default function OnboardingClient({
 
   const onConnectStripe = async () => {
     try {
-      const res = await fetch("/api/stripe/connect", {
+      const res = await fetch("/api/stripe/onboarding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -411,11 +411,11 @@ export default function OnboardingClient({
       if (data.url) {
         window.location.href = data.url;
       } else {
-        toast.error("Connect Stripe failed. Please try again later.");
+        toast.error("Onboarding Stripe failed. Please try again later.");
       }
     } catch (error) {
-      console.error("Connect Stripe error:", error);
-      toast.error("Connect Stripe failed. Please try again later.");
+      console.error("Onboarding Stripe error:", error);
+      toast.error("Onboarding Stripe failed. Please try again later.");
     }
   };
 

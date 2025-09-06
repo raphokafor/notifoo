@@ -10,7 +10,7 @@ const BillingPage = async () => {
     redirect("/login");
   }
 
-  if (!user.subscriptionId) {
+  if (user?.subscriptionStatus !== "active") {
     return <BillingNoSubscription user={user as any} />;
   }
 

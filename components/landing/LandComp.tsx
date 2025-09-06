@@ -24,53 +24,14 @@ import { useSession } from "@/lib/auth-client";
 import Link from "next/link";
 import Logo from "@/public/logo.png";
 import Image from "next/image";
+import NavHeader from "../navigation/NavHeader";
 export default function LandComp() {
   const { data: session } = useSession();
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Image src={Logo} alt="Notifoo" width={100} height={100} />
-            <span className="text-2xl font-bold text-[#3b82f6]">Notifoo</span>
-          </div>
-          <nav className="hidden md:flex items-center space-x-6">
-            <a
-              href="#features"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Features
-            </a>
-            <a
-              href="#pricing"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Pricing
-            </a>
-            <a
-              href="#testimonials"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Reviews
-            </a>
-            {session?.user ? (
-              <Link href="/dashboard">
-                <Button variant="outline" size="sm">
-                  Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <Link href="/signin">
-                <Button variant="outline" size="sm">
-                  Sign In
-                </Button>
-              </Link>
-            )}
-          </nav>
-        </div>
-      </header>
+      <NavHeader />
 
       {/* Hero Section */}
       <section className="py-20 px-4">
@@ -359,15 +320,7 @@ export default function LandComp() {
               <ul className="space-y-2 text-muted-foreground text-zinc-600">
                 <li>
                   <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
+                    href="/pricing"
                     className="hover:text-foreground transition-colors"
                   >
                     Pricing
@@ -381,7 +334,7 @@ export default function LandComp() {
               <ul className="space-y-2 text-muted-foreground text-zinc-600">
                 <li>
                   <a
-                    href="#"
+                    href="/about"
                     className="hover:text-foreground transition-colors"
                   >
                     About
@@ -389,7 +342,7 @@ export default function LandComp() {
                 </li>
                 <li>
                   <a
-                    href="#"
+                    href="/blog"
                     className="hover:text-foreground transition-colors"
                   >
                     Blog

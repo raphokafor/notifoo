@@ -136,16 +136,19 @@ export function TimerCreationCard({
         callNotification,
         recurringNotification,
       });
-      // clear state for the form
-      setSelectedDate(undefined);
-      setSelectedTime({ hours: 12, minutes: 0, period: "PM" });
-      setTimerName("");
-      setEmailNotification(true);
-      setSmsNotification(false);
-      setCallNotification(false);
-      setRecurringNotification(false);
-      setStep("date");
     }
+  };
+
+  const clearState = () => {
+    // clear state for the form
+    setSelectedDate(undefined);
+    setSelectedTime({ hours: 12, minutes: 0, period: "PM" });
+    setTimerName("");
+    setEmailNotification(true);
+    setSmsNotification(false);
+    setCallNotification(false);
+    setRecurringNotification(false);
+    setStep("date");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
