@@ -5,18 +5,13 @@ import OnboardingClient from "./OnboardingClient";
 
 const OnboardingPage = async () => {
   const user = await getUser();
-  if (!user) {
-    redirect("/signup");
-  }
 
   // set initial step to 0
   let currentStep = 0;
 
-  // check if user has onboarded
-  // const isOnboarded = user.hasOnboarded;
-  // if (isOnboarded) {
-  //   redirect("/dashboard");
-  // }
+  if (user?.phone) {
+    currentStep = 1;
+  }
 
   return (
     <OnboardingClient user={user as User} currentStep={currentStep as number} />

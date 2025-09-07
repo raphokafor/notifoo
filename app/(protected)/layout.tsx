@@ -10,7 +10,12 @@ export default async function ProtectedLayout({
   const user = await getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/signup");
+  }
+
+  // check if user has onboarded
+  if (!user.hasOnboarded) {
+    redirect("/onboarding");
   }
 
   return (

@@ -15,7 +15,6 @@ model User {
   email   String  @unique
   name    String
   fooName String? // notifoo name
-  phone   String?
   image   String?
   status  String  @default("created") // created, active(success payment), inactive(delete or cancel subscription), pending(payment failure), suspended(multiple payment failures)
 
@@ -25,6 +24,8 @@ model User {
 
   // twilio details
   twilioPhoneNumber String? // SID
+  phone             String? // international phone number +14041231234
+  phoneVerifiedAt   DateTime? // when the phone number was verified
 
   // subscription fields
   hasOnboarded       Boolean @default(false)

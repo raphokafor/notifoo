@@ -1,12 +1,13 @@
 import { getCurrentUser } from "@/lib/db-actions";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
+import { parsePhoneNumber } from "libphonenumber-js";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
     const {
-      name,
+      phoneNumber,
       reminderType,
       notificationPreference,
       forgetfulness,
@@ -14,12 +15,18 @@ export async function POST(req: NextRequest) {
       isMonthly = true,
     } = await req.json();
 
+    // convert phone number to international format
+    const phoneNumberInternational = parsePhoneNumber(phoneNumber, "US");
+    const isValidPhoneNumber =
+      phoneNumberInternational && phoneNumberInternational.isValid();
+
     // get user
     const user_ = await getCurrentUser();
     const user = await prisma.user.update({
       where: { id: user_?.id as string },
       data: {
         hasOnboarded: true,
+        phone: isValidPhoneNumber ? phoneNumberInternational?.number : null,
       },
     });
     if (!user) {
@@ -42,17 +49,17 @@ export async function POST(req: NextRequest) {
         where: { id: user_?.id as string },
         update: {
           isCompleted: true,
-          name,
           reminderType,
           notificationPreference,
           forgetfulness,
           hearAbout,
+          name: "none atm",
         },
         create: {
           userId: user_?.id as string,
           isCompleted: true,
-          name,
           reminderType,
+          name: "none atm",
           notificationPreference,
           forgetfulness,
           hearAbout,
@@ -73,7 +80,7 @@ export async function POST(req: NextRequest) {
         plan_type: "starter",
         user_id: user_?.id as string,
         priceId,
-        name,
+        name: "none atm",
         reminderType,
         notificationPreference,
         forgetfulness,
@@ -90,7 +97,7 @@ export async function POST(req: NextRequest) {
           plan_type: "starter",
           user_id: user_?.id as string,
           priceId,
-          name,
+          name: "none atm",
           reminderType,
           notificationPreference,
           forgetfulness,

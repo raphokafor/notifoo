@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, PhoneCall, Sparkles } from "lucide-react";
 import { User } from "@prisma/client";
 import { toast } from "sonner";
 
@@ -24,7 +24,7 @@ export default function OnboardingClient({
     notificationPreference: "",
     forgetfulness: "",
     hearAbout: "",
-    name: "",
+    phoneNumber: "",
   });
 
   const slides = [
@@ -34,21 +34,25 @@ export default function OnboardingClient({
       subtitle: "Time to master the ancient art of remembering stuff",
       content: (
         <div className="space-y-6 text-center">
-          <div className="text-6xl">🔔</div>
-          <p className="text-lg text-muted-foreground">
+          <div className="text-6xl flex justify-center items-center">
+            <PhoneCall className="w-12 h-12" />
+          </div>
+          <p className="text-sm text-muted-foreground">
             We're about to ask you a few questions to customize your reminder
             experience. Don't worry, this is way more fun than filling out tax
             forms!
           </p>
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-center block">
-              What should we call you, future Reminder Master?
+            <Label htmlFor="phoneNumber" className="text-center block">
+              What should we call you, future Reminder Champion?
             </Label>
             <Input
-              id="name"
-              placeholder="Enter your name (or superhero alias)"
-              value={answers.name}
-              onChange={(e) => setAnswers({ ...answers, name: e.target.value })}
+              id="phoneNumber"
+              placeholder="Enter your phone number"
+              value={answers.phoneNumber}
+              onChange={(e) =>
+                setAnswers({ ...answers, phoneNumber: e.target.value })
+              }
               className="text-center"
             />
           </div>
@@ -374,7 +378,7 @@ export default function OnboardingClient({
     const slide = slides[currentSlide];
     switch (slide.id) {
       case "welcome":
-        return answers.name.trim().length > 0;
+        return answers.phoneNumber.trim().length > 0;
       case "reminder-type":
         return answers.reminderType !== "";
       case "notification-preference":
@@ -396,7 +400,7 @@ export default function OnboardingClient({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: answers.name,
+          phoneNumber: answers.phoneNumber,
           reminderType: answers.reminderType,
           notificationPreference: answers.notificationPreference,
           forgetfulness: answers.forgetfulness,
@@ -422,7 +426,7 @@ export default function OnboardingClient({
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-accent/20 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl">
-        <CardContent className="p-8">
+        <CardContent className="flex flex-col justify-between p-8 h-[600px]">
           {/* Progress bar */}
           <div className="mb-8">
             <div className="flex justify-between text-sm text-muted-foreground mb-2">
