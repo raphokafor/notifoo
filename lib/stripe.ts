@@ -141,3 +141,72 @@ export const getSubscriptionStatus = async (userId: string) => {
     return false;
   }
 };
+
+export const getSubscription = async (subscriptionId: string) => {
+  try {
+    // Retrieve the subscription with the default payment method expanded
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+      expand: ["default_payment_method"],
+    });
+
+    // Get the payment method details
+    const paymentMethod =
+      subscription.default_payment_method as Stripe.PaymentMethod;
+
+    // Get the subscription item
+    const subscriptionItem = subscription.items.data[0];
+
+    // Extract card details including last 4 digits
+    return {
+      // sub card details
+      last4: paymentMethod?.card?.last4,
+      brand: paymentMethod?.card?.brand,
+      exp_month: paymentMethod?.card?.exp_month,
+      exp_year: paymentMethod?.card?.exp_year,
+
+      // sub data
+      rate: subscriptionItem?.plan?.amount
+        ? subscriptionItem?.plan?.amount / 100
+        : 0,
+      interval: subscriptionItem?.price?.recurring?.interval, // month, year, week, day
+      current_period_start: new Date(
+        subscriptionItem?.current_period_start * 1000
+      ), // The date the subscription will start
+      current_period_end: new Date(subscriptionItem?.current_period_end * 1000), // This is your next billing date
+      status: subscription.status, // active, past_due, canceled, unpaid, trialing, incomplete, incomplete_expired
+      trial_end: new Date(
+        subscription.trial_end ? subscription.trial_end * 1000 : 0
+      ), // The date the trial will end
+      cancel_at_period_end: subscription.cancel_at_period_end, // The date the subscription will be canceled this is a boolean
+    };
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+export const getSubscriptionWithPaymentMethod = async (
+  subscriptionId: string
+) => {
+  try {
+    // Retrieve the subscription with the default payment method expanded
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+      expand: ["default_payment_method"],
+    });
+
+    // Get the payment method details
+    const paymentMethod =
+      subscription.default_payment_method as Stripe.PaymentMethod;
+
+    // Extract card details including last 4 digits
+    return {
+      last4: paymentMethod?.card?.last4,
+      brand: paymentMethod?.card?.brand,
+      exp_month: paymentMethod?.card?.exp_month,
+      exp_year: paymentMethod?.card?.exp_year,
+    };
+  } catch (error) {
+    console.error("Error retrieving subscription with payment method:", error);
+    return false;
+  }
+};

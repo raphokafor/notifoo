@@ -23,8 +23,15 @@ export async function POST(req: NextRequest) {
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${req.nextUrl.origin}/billing?plan=${priceId}`,
-      cancel_url: `${req.nextUrl.origin}/onboarding`,
+      cancel_url: `${req.nextUrl.origin}/billing`,
       customer_email: user?.email as string,
+      metadata: {
+        plan_type: "starter",
+        user_id: user_?.id as string,
+        priceId,
+        userId: user_?.id as string,
+        type: "checkout",
+      },
 
       // Optional: Trial period (if supported by your price)
       subscription_data: {

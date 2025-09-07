@@ -11,14 +11,62 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { User } from "@/lib/auth";
-import { CreditCard, Crown, Users } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
+import {
+  ArrowRightIcon,
+  CreditCard,
+  CreditCardIcon,
+  Crown,
+  Users,
+} from "lucide-react";
+import moment from "moment";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type PlanType = "starter" | "pro";
 type BillingCycle = "monthly" | "yearly";
 
-export default function CustomerBillingClient({ user }: { user: User }) {
+// create color system for the subscription status
+const subscriptionStatusColor = {
+  active: "bg-green-500",
+  trialing: "bg-blue-500",
+  past_due: "bg-yellow-500",
+  canceled: "bg-red-500",
+  incomplete: "bg-gray-500",
+};
+const subscriptionStatusText = {
+  active: "Active",
+  trialing: "Trialing",
+  past_due: "Past Due",
+  canceled: "Canceled",
+  incomplete: "Incomplete",
+};
+
+interface ISubscriptionData {
+  last4: string;
+  brand: string;
+  exp_month: number;
+  exp_year: number;
+  rate: number;
+  interval: string;
+  current_period_start: Date;
+  current_period_end: Date;
+  status: string;
+  trial_end: Date;
+  cancel_at_period_end: boolean;
+}
+
+export default function CustomerBillingClient({
+  user,
+  subscriptionData,
+}: {
+  user: User;
+  subscriptionData: ISubscriptionData;
+}) {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [currentPlan, setCurrentPlan] = useState<PlanType>(
     (user?.subscriptionPlan as PlanType) ?? "starter"
   ); // User's current plan
@@ -31,7 +79,7 @@ export default function CustomerBillingClient({ user }: { user: User }) {
   const plans = {
     starter: {
       name: "Starter",
-      icon: Users,
+      icon: CreditCardIcon,
       monthly: 2.99,
       yearly: 19.99,
       popular: false, // Add this line
@@ -109,21 +157,31 @@ export default function CustomerBillingClient({ user }: { user: User }) {
   const isDowngrade = selectedPrice < currentPrice;
   const canChangeplan = currentPlan !== selectedPlan;
 
-  const handlePlanChange = async () => {
-    setIsProcessing(true);
+  const handleManagePayment = async () => {
+    try {
+      setIsProcessing(true);
+      const res = await fetch("/api/stripe/manage", {
+        method: "POST",
+      });
 
-    // Simulate API call delay
-    setTimeout(() => {
-      // Redirect to Stripe hosted checkout/billing portal
-      const stripeUrl = `https://billing.stripe.com/p/session/test_YWNjdF8xTzVCQ0xLMkJuVmtaWGl0LF9QaXBBVGVzdGluZ1N0cmlwZQ`;
-      window.location.href = stripeUrl;
-    }, 1000);
-  };
+      if (!res.ok) {
+        setError("Failed to manage payment");
+        toast.error("Failed to manage payment");
+        return;
+      }
 
-  const handleManagePayment = () => {
-    // Redirect to Stripe customer portal
-    const stripePortalUrl = `https://billing.stripe.com/p/login/test_00000000000000`;
-    window.location.href = stripePortalUrl;
+      toast.success("Redirecting to Stripe's secure checkout");
+      const data = await res.json();
+      window.location.href = data.url;
+
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      setError("Failed to manage payment");
+      toast.error("Failed to manage payment");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -133,37 +191,6 @@ export default function CustomerBillingClient({ user }: { user: User }) {
         description="Upgrade or downgrade your plan anytime"
       />
       <div className="max-w-4xl mx-auto space-y-8 p-4 md:p-8">
-        {/* Current Plan */}
-        <Card className="border-blue-200 bg-blue-50/50">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <current.icon className="h-8 w-8 text-blue-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl text-zinc-600">
-                    Current Plan: {current.name}
-                  </CardTitle>
-                  <CardDescription className="text-lg">
-                    ${currentPrice}/
-                    {billingCycle === "monthly" ? "month" : "year"} • Next
-                    billing:{" "}
-                    {user?.subscriptionRenewalDate?.toLocaleDateString() ??
-                      "N/A"}
-                  </CardDescription>
-                </div>
-              </div>
-              <Badge
-                variant="secondary"
-                className="bg-blue-100 text-blue-800 hover:bg-blue-100 text-sm px-3 py-1"
-              >
-                Active
-              </Badge>
-            </div>
-          </CardHeader>
-        </Card>
-
         {/* Payment Method - Credit Card */}
         <Card>
           <CardHeader>
@@ -194,7 +221,7 @@ export default function CustomerBillingClient({ user }: { user: User }) {
 
                   {/* Card Number */}
                   <div className="absolute top-32 left-6 right-6">
-                    <div className="text-white font-mono md:text-xl tracking-widest">
+                    <div className="text-white font-mono text-sm md:text-xl tracking-widest">
                       •••• •••• •••• 4242
                     </div>
                   </div>
@@ -205,14 +232,17 @@ export default function CustomerBillingClient({ user }: { user: User }) {
                       <div className="text-white/70 text-xs uppercase tracking-wide mb-1">
                         Card Holder
                       </div>
-                      <div className="text-white font-medium">John Doe</div>
+                      <div className="text-white text-xs md:text-sm font-medium">
+                        {user.name}
+                      </div>
                     </div>
                     <div>
                       <div className="text-white/70 text-xs uppercase tracking-wide mb-1">
                         Expires
                       </div>
-                      <div className="text-white font-medium font-mono">
-                        12/28
+                      <div className="text-white text-xs md:text-sm font-medium font-mono">
+                        {subscriptionData.exp_month}/
+                        {subscriptionData.exp_year.toString().slice(-2)}
                       </div>
                     </div>
                   </div>
@@ -227,36 +257,84 @@ export default function CustomerBillingClient({ user }: { user: User }) {
 
               {/* Card Details */}
               <div className="flex-1 space-y-4">
-                <div className="md:flex items-center justify-between hidden">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">
-                      Card Number
-                    </label>
-                    <p className="text-sm font-mono">•••• •••• •••• 4242</p>
+                <div className="space-y-6">
+                  {/* Subscription Details Card */}
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                          <Crown className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-lg text-gray-900">
+                            Subscription Details
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            Starter -{" "}
+                            {formatCurrency(subscriptionData.rate, "USD")}/
+                            {subscriptionData.interval === "month"
+                              ? "Monthly"
+                              : "Yearly"}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge
+                        variant="secondary"
+                        className={`
+                          px-3 py-1 text-xs font-medium rounded-full
+                          ${
+                            subscriptionData.status === "active"
+                              ? "bg-green-100 text-green-800"
+                              : subscriptionData.status === "trialing"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-yellow-100 text-yellow-800"
+                          }
+                        `}
+                      >
+                        {subscriptionData.status === "trialing"
+                          ? "Free Trial"
+                          : subscriptionData.status}
+                      </Badge>
+                    </div>
+
+                    {/* Next Billing */}
+                    <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-blue-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span className="text-sm font-medium text-gray-600">
+                          {subscriptionData.status === "trialing"
+                            ? "Trial Ends"
+                            : "Next Billing"}
+                        </span>
+                      </div>
+                      <p className="font-semibold text-gray-900">
+                        {subscriptionData.status === "trialing"
+                          ? moment(subscriptionData.trial_end).format(
+                              "MMM DD, YYYY"
+                            )
+                          : moment(subscriptionData.current_period_end).format(
+                              "MMM DD, YYYY"
+                            )}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {subscriptionData.status === "trialing"
+                          ? `${moment(subscriptionData.trial_end).diff(moment(), "days")} days left`
+                          : `in ${moment(subscriptionData.current_period_start).diff(moment(), "days")} days`}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700">
-                      Expires
-                    </label>
-                    <p className="text-lg font-mono">12/28</p>
-                  </div>
-                </div>
-                <div className="hidden md:block">
-                  <label className="text-sm font-medium text-gray-700">
-                    Cardholder Name
-                  </label>
-                  <p className="text-lg">John Doe</p>
-                </div>
-                <div className="pt-4 w-full">
-                  <Button
-                    variant="outline"
-                    onClick={handleManagePayment}
-                    className="w-full lg:w-auto bg-transparent"
-                  >
-                    Manage Subscription
-                  </Button>
                 </div>
               </div>
+            </div>
+
+            <div className="pt-4 w-full">
+              <Button
+                onClick={handleManagePayment}
+                className="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800"
+              >
+                Manage Subscription
+                <ArrowRightIcon className="w-4 h-4 ml-2" />
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -264,7 +342,7 @@ export default function CustomerBillingClient({ user }: { user: User }) {
         {/* Action Buttons */}
         {canChangeplan && (
           <div className="flex justify-center">
-            <div className="bg-white p-6 rounded-lg shadow-sm border max-w-md w-full">
+            <div className="bg-white md:p-6 rounded-lg shadow-sm border max-w-md w-full">
               <div className="text-center space-y-4">
                 <div>
                   <h3 className="font-semibold text-lg">
@@ -284,7 +362,7 @@ export default function CustomerBillingClient({ user }: { user: User }) {
                 </div>
                 <Button
                   className="w-full h-12 text-lg"
-                  onClick={handlePlanChange}
+                  onClick={handleManagePayment}
                   disabled={isProcessing}
                   variant={isUpgrade ? "default" : "secondary"}
                 >

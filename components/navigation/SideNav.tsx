@@ -2,28 +2,24 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { authClient, useSession } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import Logo from "@/public/logo.png";
 import { User } from "@prisma/client";
 import {
-  Bell,
   CalendarIcon,
   ChevronLeft,
   ChevronRight,
-  CreditCard,
   DollarSign,
-  FileText,
   LayoutDashboard,
   LogOut,
   Settings,
-  Users,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
-import { toast } from "../ui/use-toast";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const navigation = [
   {
@@ -41,11 +37,6 @@ const navigation = [
     href: "/billing",
     icon: DollarSign,
   },
-  // {
-  //   name: "Tenants",
-  //   href: "/tenants",
-  //   icon: Users,
-  // },
   {
     name: "Settings",
     href: "/settings",
@@ -97,11 +88,7 @@ export default function SideNav({ className, user }: SideNavProps) {
 
   const handleToggleCollapse = () => {
     if (!user?.hasOnboarded) {
-      toast({
-        title: "Please complete onboarding",
-        description: "Please complete onboarding to continue",
-        variant: "destructive",
-      });
+      toast.info("Please complete onboarding to continue");
       return;
     }
 
@@ -132,7 +119,7 @@ export default function SideNav({ className, user }: SideNavProps) {
     <div
       className={cn(
         "relative flex flex-col bg-white border-r border-slate-200 transition-all duration-300",
-        user?.hasOnboarded && "hidden",
+        !user?.hasOnboarded && "hidden",
         collapsed ? "w-16" : "w-40",
         // Remove the hidden class for mobile
         className
@@ -173,7 +160,7 @@ export default function SideNav({ className, user }: SideNavProps) {
 
           return (
             <div key={item.name}>
-              <Link href={user?.hasOnboarded ? item.href! : "#"}>
+              <Link href={!user?.hasOnboarded ? (item.href as string) : "#"}>
                 <Button
                   variant="ghost"
                   disabled={!user?.hasOnboarded}

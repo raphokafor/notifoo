@@ -14,17 +14,13 @@ export async function POST(req: NextRequest) {
       isMonthly = true,
     } = await req.json();
 
-    console.log("linr 17 ", name);
-    console.log("linr 20, reminderType", reminderType);
-    console.log("linr 21, notificationPreference", notificationPreference);
-    console.log("linr 22, forgetfulness", forgetfulness);
-    console.log("linr 23, hearAbout", hearAbout);
-    console.log("linr 24, isMonthly", isMonthly);
-
     // get user
     const user_ = await getCurrentUser();
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.update({
       where: { id: user_?.id as string },
+      data: {
+        hasOnboarded: true,
+      },
     });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -40,27 +36,31 @@ export async function POST(req: NextRequest) {
         .NEXT_PUBLIC_YEARLY_STRIPE_STARTER_PRICE_ID as string;
     }
 
-    // update onboarding status
-    await prisma.onboarding.upsert({
-      where: { id: user_?.id as string },
-      update: {
-        isCompleted: true,
-        name,
-        reminderType,
-        notificationPreference,
-        forgetfulness,
-        hearAbout,
-      },
-      create: {
-        userId: user_?.id as string,
-        isCompleted: true,
-        name,
-        reminderType,
-        notificationPreference,
-        forgetfulness,
-        hearAbout,
-      },
-    });
+    try {
+      // fire and forget onboarding data
+      await prisma.onboarding.upsert({
+        where: { id: user_?.id as string },
+        update: {
+          isCompleted: true,
+          name,
+          reminderType,
+          notificationPreference,
+          forgetfulness,
+          hearAbout,
+        },
+        create: {
+          userId: user_?.id as string,
+          isCompleted: true,
+          name,
+          reminderType,
+          notificationPreference,
+          forgetfulness,
+          hearAbout,
+        },
+      });
+    } catch (error) {
+      console.error("Error creating onboarding user:", error);
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -69,6 +69,19 @@ export async function POST(req: NextRequest) {
       success_url: `${req.nextUrl.origin}/billing?plan=${priceId}`,
       cancel_url: `${req.nextUrl.origin}/onboarding`,
       customer_email: user?.email as string,
+      metadata: {
+        plan_type: "starter",
+        user_id: user_?.id as string,
+        priceId,
+        name,
+        reminderType,
+        notificationPreference,
+        forgetfulness,
+        hearAbout,
+        subscriptionPeriod: isMonthly ? "monthly" : "yearly",
+        userId: user_?.id as string,
+        type: "onboarding",
+      },
 
       // Optional: Trial period (if supported by your price)
       subscription_data: {

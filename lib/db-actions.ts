@@ -34,6 +34,8 @@ export async function getUser() {
       subscriptionStatus: true,
       role: true,
       isActive: true,
+      stripeCustomerId: true,
+      subscriptionId: true,
     },
   });
 

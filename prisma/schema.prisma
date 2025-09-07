@@ -17,7 +17,7 @@ model User {
   fooName String? // notifoo name
   phone   String?
   image   String?
-  status  String  @default("created") // created, active, inactive, pending, suspended
+  status  String  @default("created") // created, active(success payment), inactive(delete or cancel subscription), pending(payment failure), suspended(multiple payment failures)
 
   // Better-auth required fields
   emailVerified    Boolean @default(false)
@@ -29,6 +29,8 @@ model User {
   // subscription fields
   hasOnboarded       Boolean @default(false)
   subscriptionStatus String?
+  stripeCustomerId   String?
+  subscriptionId     String?
 
   // Healthcare-specific fields
   role     UserRole @default(CUSTOMER)
@@ -80,7 +82,9 @@ model Account {
 }
 
 model Subscription {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id               String  @id @default(auto()) @map("_id") @db.ObjectId
+  isMonthly        Boolean @default(true)
+  stripeCustomerId String?
 
   // subscription details
   subscriptionId          String?
@@ -90,6 +94,12 @@ model Subscription {
   subscriptionEndDate     DateTime?
   subscriptionRenewalDate DateTime?
   subscriptionCancelDate  DateTime?
+
+  // card details
+  last4Digits         String?
+  cardBrand           String?
+  cardExpirationMonth Int?
+  cardExpirationYear  Int?
 
   // user relationship
   userId String @db.ObjectId
