@@ -50,18 +50,17 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-0 shadow-lg bg-white/80 backdrop-blur">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl backdrop-blur">
         <CardHeader className="text-center pb-4">
           <Link href="/">
-            <div className="rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div className="flex items-center justify-center mx-auto mb-4">
               <Image src={Logo} alt="Notifoo" width={200} height={200} />
             </div>
           </Link>
           <CardTitle className="text-2xl font-bold text-[#3b82f6]">
-            Notifoo
+            Notifoo Sign In
           </CardTitle>
-          <p className="text-slate-600">Sign in to your account</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -177,7 +176,7 @@ export default function LoginForm() {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </div>
     </div>
   );
 }

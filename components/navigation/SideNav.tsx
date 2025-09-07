@@ -160,7 +160,7 @@ export default function SideNav({ className, user }: SideNavProps) {
 
           return (
             <div key={item.name}>
-              <Link href={!user?.hasOnboarded ? (item.href as string) : "#"}>
+              <Link href={user?.hasOnboarded ? (item.href as string) : "#"}>
                 <Button
                   variant="ghost"
                   disabled={!user?.hasOnboarded}

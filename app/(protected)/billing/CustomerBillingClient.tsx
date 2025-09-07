@@ -330,7 +330,7 @@ export default function CustomerBillingClient({
             <div className="pt-4 w-full">
               <Button
                 onClick={handleManagePayment}
-                className="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800"
+                className="w-full bg-zinc-50 hover:bg-zinc-100 text-zinc-800 "
               >
                 Manage Subscription
                 <ArrowRightIcon className="w-4 h-4 ml-2" />

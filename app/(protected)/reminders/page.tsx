@@ -26,6 +26,7 @@ const RemindersPage = async () => {
     type: reminder.type,
     emailNotification: reminder.emailNotification,
     smsNotification: reminder.smsNotification,
+    recurringNotification: reminder.repeat ?? false,
   }));
 
   return (

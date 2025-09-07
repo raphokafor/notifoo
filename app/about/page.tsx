@@ -1,5 +1,4 @@
 import NavHeader from "@/components/navigation/NavHeader";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,8 +8,6 @@ import {
 } from "@/components/ui/card";
 import {
   Bell,
-  Brain,
-  Calendar,
   Clock,
   Coffee,
   Globe,
@@ -21,7 +18,6 @@ import {
   Repeat,
   Shield,
   Smartphone,
-  Target,
   Users,
   Zap,
 } from "lucide-react";
@@ -36,14 +32,13 @@ const FeaturesPage = () => {
       <section className="py-20 px-4">
         <div className="container mx-auto text-center max-w-4xl">
           <h1 className="text-5xl md:text-6xl font-black text-balance mb-6 text-zinc-600">
-            Why <span className="text-[#3b82f6]">Notifoo</span> is the Real MVP
+            What is <span className="text-[#3b82f6]">Notifoo</span>?
           </h1>
           <p className="text-2xl text-muted-foreground text-balance max-w-3xl mx-auto text-zinc-600">
             Ever thought to yourself, this reminder app on my phone sucks?
           </p>
           <p className="text-sm text-muted-foreground text-balance mb-8 max-w-3xl mx-auto text-zinc-600">
-            We've mastered the ancient art of "not forgetting stuff" so you
-            don't have to.
+            That is why we are here.
           </p>
         </div>
       </section>
@@ -54,7 +49,7 @@ const FeaturesPage = () => {
             <h2 className="text-4xl text-center font-bold mb-4 text-zinc-600 underline">
               About Notifoo
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-zinc-600 text-left">
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto px-4 text-zinc-600 text-left">
               Notifoo is the reminder application that actually works – a
               revolutionary concept in a world where your phone's built-in
               reminders have the reliability of a chocolate teapot. We're on a

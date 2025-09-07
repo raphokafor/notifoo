@@ -29,7 +29,7 @@ export default function LandComp() {
   const { data: session } = useSession();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       {/* Header */}
       <NavHeader />
 
@@ -37,7 +37,7 @@ export default function LandComp() {
       <section className="py-20 px-4">
         <div className="container mx-auto text-center max-w-4xl">
           <Badge variant="secondary" className="mb-4">
-            Master the Art of Remembering
+            We get Remembering stuff
           </Badge>
           <h1 className="text-5xl md:text-7xl font-black text-balance mb-6 text-zinc-600">
             Never Forget Again with{" "}
@@ -363,7 +363,7 @@ export default function LandComp() {
               <ul className="space-y-2 text-muted-foreground">
                 <li>
                   <Link
-                    href="/help"
+                    href="/faq"
                     className="hover:text-foreground transition-colors"
                   >
                     Help Center

@@ -14,7 +14,13 @@ import { useTime } from "@/contexts/TimeContext";
 import { formatTimeDifference } from "@/lib/utils";
 import { TimerData } from "@/types/database";
 import { AnimatePresence, motion } from "framer-motion";
-import { Calendar, Loader2Icon, Mail, MessageSquare } from "lucide-react";
+import {
+  Calendar,
+  Loader2Icon,
+  Mail,
+  MessageSquare,
+  Repeat2Icon,
+} from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -24,6 +30,7 @@ interface TimerProps extends Omit<TimerData, "id"> {
   isLoading: boolean;
   isOpen: boolean;
   handleModal: () => void;
+  recurringNotification: boolean;
 }
 
 export function Timer({
@@ -34,6 +41,7 @@ export function Timer({
   isActive,
   emailNotification = true,
   smsNotification = false,
+  recurringNotification = false,
   onDelete,
   isLoading,
   isOpen,
@@ -132,7 +140,7 @@ export function Timer({
                     <div
                       className={`w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0 ${!isActive ? "bg-red-600" : type === "till" ? "bg-green-500" : "bg-zinc-500"}`}
                     ></div>
-                    <h2 className="text-sm text-muted-foreground truncate font-mono capitalize">
+                    <h2 className="text-xs text-muted-foreground truncate font-mono capitalize">
                       {name}
                     </h2>
                   </div>
@@ -149,20 +157,13 @@ export function Timer({
                         <MessageSquare className="h-3 w-3 text-green-600 dark:text-green-400" />
                       </div>
                     )}
+                    {recurringNotification && (
+                      <div className="p-1 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                        <Repeat2Icon className="h-3 w-3 text-purple-600 dark:text-purple-400" />
+                      </div>
+                    )}
                   </div>
                 </div>
-                {/* <p
-                  className={`text-[10px] text-muted-foreground mt-1 px-6 my-4 border-t border-b font-mono transition-opacity duration-200 ${isHovered ? "opacity-100" : "opacity-0"}`}
-                >
-                  <strong>{type === "till" ? "Until: " : "Since: "}</strong>
-                  {dueDate.toLocaleString(undefined, {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p> */}
               </div>
 
               <div className="absolute inset-0 flex items-center justify-center mt-12">

@@ -126,6 +126,9 @@ const RemindersClient = ({
                     handleModal={handleModal}
                     emailNotification={reminder.emailNotification}
                     smsNotification={reminder.smsNotification}
+                    recurringNotification={
+                      reminder.recurringNotification ?? false
+                    }
                   />
                 </motion.div>
               ))}
