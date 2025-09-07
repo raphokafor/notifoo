@@ -1,7 +1,10 @@
 import { MetadataRoute } from "next";
+import { getAllPosts } from "@/lib/blog";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
+  const posts = getAllPosts();
+
+  const staticRoutes = [
     {
       url: "https://www.Notifoo.com/",
       lastModified: new Date(),
@@ -34,5 +37,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: "https://www.Notifoo.com/terms",
       lastModified: new Date(),
     },
+    {
+      url: "https://www.Notifoo.com/blog",
+      lastModified: new Date(),
+    },
   ];
+
+  const blogRoutes = posts.map((post) => ({
+    url: `https://www.Notifoo.com/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+  }));
+
+  return [...staticRoutes, ...blogRoutes];
 }

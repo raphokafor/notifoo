@@ -295,8 +295,7 @@ export default function LandComp() {
             </Link>
           )}
           <p className="text-sm text-muted-foreground mt-4 text-zinc-600    ">
-            No credit card required. Cancel anytime. But you probably won't want
-            to.
+            Cancel anytime. But you probably won't want to.
           </p>
         </div>
       </section>
@@ -324,6 +323,14 @@ export default function LandComp() {
                     className="hover:text-foreground transition-colors"
                   >
                     Pricing
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/use-cases"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Use Cases
                   </a>
                 </li>
               </ul>

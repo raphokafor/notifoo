@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth, type User } from "./lib/auth";
 
-const publicRoutes = ["/", "/login", "/signup", "/landing"];
+const publicRoutes = ["/", "/login", "/signup", "/landing", "/blog"];
 const adminRoutes = ["/admin"];
 const supervisorRoutes = ["/reports", "/audit-logs"];
 

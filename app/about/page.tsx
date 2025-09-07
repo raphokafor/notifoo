@@ -35,9 +35,6 @@ const FeaturesPage = () => {
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto text-center max-w-4xl">
-          <Badge variant="secondary" className="mb-4">
-            Feature Deep Dive
-          </Badge>
           <h1 className="text-5xl md:text-6xl font-black text-balance mb-6 text-zinc-600">
             Why <span className="text-[#3b82f6]">Notifoo</span> is the Real MVP
           </h1>
@@ -48,6 +45,29 @@ const FeaturesPage = () => {
             We've mastered the ancient art of "not forgetting stuff" so you
             don't have to.
           </p>
+        </div>
+      </section>
+
+      <section className="py-2 ">
+        <div className="container mx-auto">
+          <div className=" mb-16">
+            <h2 className="text-4xl text-center font-bold mb-4 text-zinc-600 underline">
+              About Notifoo
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-zinc-600 text-left">
+              Notifoo is the reminder application that actually works – a
+              revolutionary concept in a world where your phone's built-in
+              reminders have the reliability of a chocolate teapot. We're on a
+              mission to rescue the chronically forgetful from the endless cycle
+              of 'I'll definitely remember that' followed by the inevitable 'Why
+              didn't I write that down?' Born from the frustration of missed
+              appointments, forgotten anniversaries, and that sinking feeling
+              when you realize you've been ignoring your own reminders for three
+              weeks, Notifoo combines multiple notification channels with the
+              persistence of your most annoying friend – except we actually want
+              you to succeed.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -399,8 +419,8 @@ const FeaturesPage = () => {
           </div>
 
           <p className="text-sm text-muted-foreground mt-4 text-zinc-600">
-            No credit card required. Cancel anytime. But you probably won't want
-            to. (We'll remind you if you try to cancel... just kidding!)
+            Cancel anytime. But you probably won't want to. (We'll remind you if
+            you try to cancel... just kidding!)
           </p>
         </div>
       </section>
