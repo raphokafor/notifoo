@@ -48,11 +48,17 @@ export default function OnboardingClient({
             </Label>
             <Input
               id="phoneNumber"
+              type="tel"
               placeholder="Enter your phone number"
               value={answers.phoneNumber}
-              onChange={(e) =>
-                setAnswers({ ...answers, phoneNumber: e.target.value })
-              }
+              onChange={(e) => {
+                // Only allow numeric characters
+                const numericValue = e.target.value.replace(/\D/g, "");
+                setAnswers({
+                  ...answers,
+                  phoneNumber: numericValue?.toString(),
+                });
+              }}
               className="text-center"
             />
           </div>
