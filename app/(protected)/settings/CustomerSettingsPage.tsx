@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
-import { Check, Eye, EyeOff, Shield } from "lucide-react";
+import { Check, Eye, EyeOff, Loader2Icon, Shield, Trash } from "lucide-react";
 import moment from "moment";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -74,6 +74,37 @@ export default function CustomerSettingsPage({
     new: "",
     confirm: "",
   });
+
+  const handleDeleteAccount = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch("/api/delete", {
+        method: "POST",
+      });
+      if (res.ok) {
+        toast({
+          title: "Account Deleted",
+          description: "Your account has been deleted successfully.",
+        });
+        router.push("/signin");
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to delete account.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to delete account.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleProfileSave = async () => {
     try {
@@ -452,11 +483,25 @@ export default function CustomerSettingsPage({
                 <Shield
                   className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : null}`}
                 />
-                Change Password
+                Update Password
               </Button>
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="flex w-full justify-center py-10">
+        <Button
+          disabled={isLoading}
+          onClick={handleDeleteAccount}
+          variant="secondary"
+        >
+          <Trash className="h-4 w-4 text-red-600" />
+          Delete Account
+          {isLoading && (
+            <Loader2Icon className="h-4 w-4 text-red-600 animate-spin" />
+          )}
+        </Button>
       </div>
     </div>
   );

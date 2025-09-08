@@ -4,16 +4,17 @@ import type React from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
 import Logo from "@/public/logo.png";
+import { track } from "@vercel/analytics/react";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import Link from "next/link";
 
 export default function SignupForm() {
   const [formData, setFormData] = useState({
@@ -49,11 +50,25 @@ export default function SignupForm() {
 
       if (result.error) {
         setError(result.error.message || "Signup failed");
+        track("sign_up_error", {
+          location: "signup_form",
+          email: formData.email,
+          error: result.error.message || "Signup failed",
+        });
       } else {
+        track("sign_up_success", {
+          location: "signup_form",
+          email: formData.email,
+        });
         // Redirect to dashboard on successful signup
         router.push("/dashboard");
       }
     } catch (err) {
+      track("sign_up_error", {
+        location: "signup_form",
+        email: formData.email,
+        error: err as string,
+      });
       console.error("Signup error:", err);
       setError("An unexpected error occurred");
     } finally {
@@ -187,11 +202,18 @@ export default function SignupForm() {
               setIsLoading(true);
               setError("");
               try {
+                track("sign_up_social_google", {
+                  location: "signup_form",
+                });
                 await authClient.signIn.social({
                   provider: "google",
                   callbackURL: "/dashboard",
                 });
               } catch (err) {
+                track("sign_up_social_google_error", {
+                  location: "signup_form",
+                  error: err as string,
+                });
                 setError("Google sign-up failed");
                 setIsLoading(false);
               }

@@ -20,6 +20,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { track } from "@vercel/analytics/react";
 
 const navigation = [
   {
@@ -102,8 +103,12 @@ export default function SideNav({ className, user }: SideNavProps) {
 
   const handleSignOut = async () => {
     try {
+      track("sign_out", {
+        location: "side_nav",
+        email: user?.email,
+      });
       await authClient.signOut();
-      window.location.href = "/login";
+      window.location.href = "/signin";
     } catch (error) {
       console.error("Sign out error:", error);
     }
@@ -187,7 +192,7 @@ export default function SideNav({ className, user }: SideNavProps) {
           {!collapsed ? (
             <div className="space-y-2">
               {/* User Info */}
-              <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-50">
+              {/* <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-50">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
                   <AvatarFallback className="text-xs">
@@ -202,7 +207,7 @@ export default function SideNav({ className, user }: SideNavProps) {
                     {user?.email}
                   </p>
                 </div>
-              </div>
+              </div> */}
 
               {/* Logout Button */}
               <Button
@@ -217,14 +222,14 @@ export default function SideNav({ className, user }: SideNavProps) {
           ) : (
             <div className="space-y-1">
               {/* User Avatar */}
-              <div className="flex justify-center p-1">
+              {/* <div className="flex justify-center p-1">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
                   <AvatarFallback className="text-xs">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-              </div>
+              </div> */}
 
               {/* Logout Button */}
               <Button

@@ -7,7 +7,7 @@ import CustomerSettingsPage from "./CustomerSettingsPage";
 export default async function SettingsPage() {
   const user = await getUser();
   if (!user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   // get user's logins

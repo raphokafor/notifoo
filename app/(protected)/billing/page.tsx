@@ -12,7 +12,7 @@ import { getSubscription } from "@/lib/stripe";
 const BillingPage = async () => {
   const user = await getUser();
   if (!user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   if (user?.subscriptionStatus !== "active") {

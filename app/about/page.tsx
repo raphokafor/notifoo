@@ -43,25 +43,110 @@ const FeaturesPage = () => {
         </div>
       </section>
 
-      <section className="py-2 ">
-        <div className="container mx-auto">
-          <div className=" mb-16">
-            <h2 className="text-4xl text-center font-bold mb-4 text-zinc-600 underline">
-              About Notifoo
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-4xl mx-auto px-4 text-zinc-600 text-left">
-              Notifoo is the reminder application that actually works – a
-              revolutionary concept in a world where your phone's built-in
-              reminders have the reliability of a chocolate teapot. We're on a
-              mission to rescue the chronically forgetful from the endless cycle
-              of 'I'll definitely remember that' followed by the inevitable 'Why
-              didn't I write that down?' Born from the frustration of missed
-              appointments, forgotten anniversaries, and that sinking feeling
-              when you realize you've been ignoring your own reminders for three
-              weeks, Notifoo combines multiple notification channels with the
-              persistence of your most annoying friend – except we actually want
-              you to succeed.
-            </p>
+      <section className="py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            {/* Header */}
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-6">
+                <svg
+                  className="w-8 h-8 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 17h5l-5 5v-5zM9 7H4l5-5v5zM12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+                  />
+                </svg>
+              </div>
+              <h2 className="text-5xl font-bold mb-6 text-gray-900">
+                About <span className="text-blue-600">Notifoo</span>
+              </h2>
+              <div className="w-24 h-1 bg-blue-600 mx-auto rounded-full"></div>
+            </div>
+
+            {/* Main Content */}
+            <div className="bg-white rounded-3xl shadow-xl p-12 relative overflow-hidden">
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-full -translate-y-16 translate-x-16 opacity-50"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-indigo-100 rounded-full translate-y-12 -translate-x-12 opacity-50"></div>
+
+              <div className="relative z-10">
+                <div className="prose prose-xl max-w-none">
+                  <p className="text-2xl leading-relaxed text-gray-700 mb-8 font-medium">
+                    Notifoo is the reminder application that actually works – a{" "}
+                    <span className="text-blue-600 font-semibold">
+                      revolutionary concept
+                    </span>{" "}
+                    in a world where your phone's built-in reminders have the
+                    reliability of a chocolate teapot.
+                  </p>
+
+                  <div className="grid md:grid-cols-2 gap-12 items-center my-12">
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                        Our Mission
+                      </h3>
+                      <p className="text-lg leading-relaxed text-gray-600">
+                        We're on a mission to rescue the chronically forgetful
+                        from the endless cycle of "I'll definitely remember
+                        that" followed by the inevitable "Why didn't I write
+                        that down?"
+                      </p>
+                    </div>
+                    <div className="bg-blue-50 rounded-2xl p-8">
+                      <div className="text-center">
+                        <div className="text-4xl font-bold text-blue-600 mb-2">
+                          100%
+                        </div>
+                        <div className="text-zinc-600">
+                          Is what we strive for
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-2xl p-8 my-12">
+                    <h3 className="text-2xl font-bold text-zinc-600 mb-4 text-center">
+                      Born From Frustration
+                    </h3>
+                    <div className="grid md:grid-cols-3 gap-6 text-center">
+                      <div>
+                        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <span className="text-red-600 text-xl">📅</span>
+                        </div>
+                        <p className="text-gray-600">Missed appointments</p>
+                      </div>
+                      <div>
+                        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <span className="text-red-600 text-xl">💝</span>
+                        </div>
+                        <p className="text-gray-600">Forgotten anniversaries</p>
+                      </div>
+                      <div>
+                        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <span className="text-red-600 text-xl">😰</span>
+                        </div>
+                        <p className="text-zinc-600">Ignored reminders</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-xl leading-relaxed text-gray-700 text-center">
+                    Notifoo combines multiple notification channels with the
+                    persistence of your most annoying friend – except{" "}
+                    <span className="text-blue-600 font-semibold">
+                      we actually want you to succeed
+                    </span>
+                    .
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -108,12 +193,12 @@ const FeaturesPage = () => {
                 <Smartphone className="h-12 w-12 text-primary mb-4" />
                 <CardTitle className="text-zinc-600">Phone Reaching</CardTitle>
                 <CardDescription>
-                  We will literally call you to remind you! When SMS and email
-                  fail to penetrate your fortress of forgetfulness, we deploy
-                  the nuclear option: an actual phone call. Our Memory Warriors
-                  will dial your digits and personally ensure your brain
-                  receives the memo. It's like having a very persistent friend,
-                  but one you actually pay for.
+                  We will literally call you! When SMS and email fail to
+                  penetrate your fortress of forgetfulness, we deploy the
+                  nuclear option: an actual phone call. Our Memory Warriors will
+                  dial your digits and personally ensure your brain receives the
+                  memo. It's like having a very persistent friend, but one you
+                  actually pay for.
                 </CardDescription>
               </CardHeader>
             </Card>

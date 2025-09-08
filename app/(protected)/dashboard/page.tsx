@@ -9,9 +9,8 @@ import { Dashboard } from "./DashboardClient";
 
 const DashboardPage = async () => {
   const user = await getUser();
-
   if (!user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   const { data: reminders } = await getActiveReminders();

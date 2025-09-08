@@ -13,31 +13,36 @@ export async function getCurrentUser() {
 }
 
 export async function getUser() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
-  const user = await prisma.user.findUnique({
-    where: { id: session?.user?.id },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      fooName: true,
-      phone: true,
-      image: true,
-      status: true,
-      emailVerified: true,
-      welcomeEmailSent: true,
-      twilioPhoneNumber: true,
-      hasOnboarded: true,
-      subscriptionStatus: true,
-      role: true,
-      isActive: true,
-      stripeCustomerId: true,
-      subscriptionId: true,
-    },
-  });
+    const user = await prisma.user.findUnique({
+      where: { id: session?.user?.id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        fooName: true,
+        phone: true,
+        image: true,
+        status: true,
+        emailVerified: true,
+        welcomeEmailSent: true,
+        twilioPhoneNumber: true,
+        hasOnboarded: true,
+        subscriptionStatus: true,
+        role: true,
+        isActive: true,
+        stripeCustomerId: true,
+        subscriptionId: true,
+      },
+    });
 
-  return user;
+    return user;
+  } catch (error) {
+    console.error("line 16, Error getting user", error);
+    return null;
+  }
 }

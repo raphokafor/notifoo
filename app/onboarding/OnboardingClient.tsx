@@ -25,6 +25,7 @@ import {
   sendPhoneVerification,
   verifyPhoneNumber,
 } from "../actions/user-actions";
+import { track } from "@vercel/analytics/react";
 
 export default function OnboardingClient({
   user,
@@ -37,6 +38,7 @@ export default function OnboardingClient({
   const [currentSlide, setCurrentSlide] = useState(currentStep);
   const [isMonthly, setIsMonthly] = useState(true);
   const [verifionError, setVerifionError] = useState("");
+  const [error, setError] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [verificationSent, setVerificationSent] = useState(false);
   const [verified, setVerified] = useState(false);
@@ -56,6 +58,10 @@ export default function OnboardingClient({
         phoneNumber: answers.phoneNumber,
       });
       if (result.success) {
+        track("phone_number_verified", {
+          location: "onboarding_client",
+          email: user.email,
+        });
         toast.success("Phone number verified!");
         setVerified(true);
         setVerificationCode("");
@@ -65,10 +71,20 @@ export default function OnboardingClient({
           phoneNumber: answers.phoneNumber,
         });
       } else {
+        track("phone_number_verification_error", {
+          location: "onboarding_client",
+          email: user.email,
+          error: result?.error || "Invalid verification code",
+        });
         setVerifionError(result?.error || "Invalid verification code");
         toast.error(result?.error || "Invalid verification code");
       }
     } catch (error) {
+      track("phone_number_verification_error_error", {
+        location: "onboarding_client",
+        email: user.email,
+        error: error as string,
+      });
       setVerifionError("Invalid verification code");
       toast.error("Invalid verification code");
     } finally {
@@ -512,6 +528,11 @@ export default function OnboardingClient({
   ];
 
   const nextSlide = () => {
+    track("onboarding_next_slide", {
+      location: "onboarding_client",
+      email: user.email,
+      currentSlide: currentSlide,
+    });
     if (currentSlide === slides.length - 1) {
       onConnectStripe();
     }
@@ -551,6 +572,10 @@ export default function OnboardingClient({
 
   const onConnectStripe = async () => {
     try {
+      track("onboarding_connect_stripe", {
+        location: "onboarding_client",
+        email: user.email,
+      });
       const res = await fetch("/api/stripe/onboarding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -568,13 +593,29 @@ export default function OnboardingClient({
 
       const data = await res.json();
       if (data.url) {
+        track("onboarding_connect_stripe_success", {
+          location: "onboarding_client",
+          email: user.email,
+        });
         window.location.href = data.url;
       } else {
+        track("onboarding_connect_stripe_error", {
+          location: "onboarding_client",
+          email: user.email,
+          error: "Onboarding Stripe failed. Please try again later.",
+        });
         toast.error("Onboarding Stripe failed. Please try again later.");
+        setError("Onboarding Stripe failed. Please try again later.");
       }
     } catch (error) {
+      track("onboarding_connect_stripe_error_error", {
+        location: "onboarding_client",
+        email: user.email,
+        error: error as string,
+      });
       console.error("Onboarding Stripe error:", error);
       toast.error("Onboarding Stripe failed. Please try again later.");
+      setError("Onboarding Stripe failed. Please try again later.");
     }
   };
 
@@ -666,6 +707,11 @@ export default function OnboardingClient({
               )}
             </Button>
           </div>
+          {error && (
+            <div className="text-red-500 text-center p-2 rounded-md bg-red-500/10">
+              {error}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -32,6 +32,7 @@ import { TimerData } from "@/types/database";
 import { FormError } from "@/components/form-error";
 import { User } from "@prisma/client";
 import Link from "next/link";
+import { track } from "@vercel/analytics/react";
 
 interface TimerCreationCardProps {
   onCreateTimer: (timer: Omit<TimerData, "id">) => void;
@@ -127,6 +128,14 @@ export function TimerCreationCard({
     } else if (step === "notifications" && timerName && combinedDateTime) {
       const now = new Date();
       const timerType = combinedDateTime > now ? "till" : "from";
+      track("Timer Created", {
+        name: timerName,
+        type: timerType,
+        emailNotification,
+        smsNotification,
+        callNotification,
+        recurringNotification,
+      });
       onCreateTimer({
         name: timerName,
         dueDate: combinedDateTime,
@@ -453,7 +462,8 @@ export function TimerCreationCard({
                     !emailNotification &&
                     !smsNotification &&
                     !callNotification &&
-                    !recurringNotification
+                    !recurringNotification &&
+                    isLoading
                   }
                 >
                   Create Reminder{" "}

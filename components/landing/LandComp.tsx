@@ -68,79 +68,112 @@ export default function LandComp() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-muted/30">
-        <div className="container mx-auto">
+      <section
+        id="features"
+        className="py-20 px-4 bg-gradient-to-br from-blue-50/50 via-background to-purple-50/30 relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] -z-10" />
+        <div className="absolute top-10 left-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl -z-10" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl -z-10" />
+
+        <div className="container mx-auto relative">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-zinc-600">
+            <h2 className="text-4xl md:text-5xl py-2 font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Why Notifoo is the Real MVP
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-zinc-600">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               We've mastered the ancient art of "not forgetting stuff" so you
               don't have to.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <MessageSquare className="h-12 w-12 text-primary mb-4" />
-                <CardTitle className="text-zinc-600">SMS Kung Fu</CardTitle>
-                <CardDescription>
+            <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-blue-500/25">
+              <CardHeader className="pb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <MessageSquare className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-gray-900">
+                  SMS Superpowers
+                </CardTitle>
+                <CardDescription className="text-gray-600 leading-relaxed">
                   Get text messages that pack a punch. Your phone will buzz with
                   the power of a thousand reminders.
                 </CardDescription>
               </CardHeader>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Mail className="h-12 w-12 text-primary mb-4" />
-                <CardTitle className="text-zinc-600">Email Mastery</CardTitle>
-                <CardDescription>
+            <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-blue-500/25">
+              <CardHeader className="pb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Mail className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-gray-900">
+                  Inbox Champion
+                </CardTitle>
+                <CardDescription className="text-gray-600 leading-relaxed">
                   Inbox notifications so smooth, they'll make your other emails
                   jealous. Delivered faster than you can say "Notifoo!"
                 </CardDescription>
               </CardHeader>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Clock className="h-12 w-12 text-primary mb-4" />
-                <CardTitle className="text-zinc-600">Time Bending</CardTitle>
-                <CardDescription>
+            <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-purple-500/25">
+              <CardHeader className="pb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Smartphone className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-gray-900">
+                  The Nuclear Option
+                </CardTitle>
+                <CardDescription className="text-gray-600 leading-relaxed">
+                  We will literally call you - when your brain treats text
+                  messages like spam and emails like suggestions, we bring out
+                  the big guns: that ancient technology called 'talking on the
+                  phone.'
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-green-500/25">
+              <CardHeader className="pb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Clock className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-gray-900">
+                  Time Bending
+                </CardTitle>
+                <CardDescription className="text-gray-600 leading-relaxed">
                   Set reminders for any time, any day. We'll remember so you
                   don't have to strain your brain muscles.
                 </CardDescription>
               </CardHeader>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Smartphone className="h-12 w-12 text-primary mb-4" />
-                <CardTitle className="text-zinc-600">Mobile Mojo</CardTitle>
-                <CardDescription>
-                  Works on all devices because forgetting stuff is a universal
-                  human experience. We're here for everyone.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Zap className="h-12 w-12 text-primary mb-4" />
-                <CardTitle className="text-zinc-600">Lightning Setup</CardTitle>
-                <CardDescription>
+            <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-yellow-500/25">
+              <CardHeader className="pb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Zap className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-gray-900">
+                  Lightning Setup
+                </CardTitle>
+                <CardDescription className="text-gray-600 leading-relaxed">
                   Get started faster than you can forget why you opened the app.
                   Seriously, it's that quick.
                 </CardDescription>
               </CardHeader>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <Users className="h-12 w-12 text-primary mb-4" />
-                <CardTitle className="text-zinc-600">Team Reminders</CardTitle>
-                <CardDescription>
+            <Card className="group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-indigo-500/25">
+              <CardHeader className="pb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Users className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl font-bold text-gray-900">
+                  Team Reminders
+                </CardTitle>
+                <CardDescription className="text-gray-600 leading-relaxed">
                   Share the reminder love with your team. Because forgetting
                   together is better than forgetting alone.
                 </CardDescription>

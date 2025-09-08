@@ -51,7 +51,7 @@ export function UserNav() {
     try {
       await authClient.signOut();
       // Optional: Add redirect to login page
-      window.location.href = "/login";
+      window.location.href = "/signin";
     } catch (error) {
       console.error("Sign out error:", error);
     }

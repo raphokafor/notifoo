@@ -5,6 +5,7 @@ import { getSubscriptionWithPaymentMethod, stripe } from "@/lib/stripe";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { SuccessSubscriptionTemplate } from "@/templates/subscription/success";
+import { sendTwilioTextMessage } from "@/lib/twilio";
 
 export const runtime = "nodejs"; // ⚠️ Required (webhooks need raw body)
 export const dynamic = "force-dynamic"; // Always run on server
@@ -90,6 +91,13 @@ export async function POST(req: NextRequest) {
             subject: "Subscription Success",
             body: successSubscriptionBody,
             textBody: `Congratulations ${user?.name}! You've successfully subscribed and earned your place among the elite ranks of people who actually remember stuff. Go to https://www.notifoo.io to get started.`,
+          });
+
+          // try and send text to user about our number, letting them know to add it to their contacts and we will never spam them
+          await sendTwilioTextMessage({
+            to: user?.phone as string,
+            textBody:
+              "Thank you for verifying your phone number with Notifoo! As we're your new favorite contact - the one who remembers everything and never asks to borrow your car. Add us and let the remembering begin (spam-free zone, obviously).",
           });
         }
       } catch (error) {

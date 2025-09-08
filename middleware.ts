@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth, type User } from "./lib/auth";
 
-const publicRoutes = ["/", "/login", "/signup", "/landing", "/blog"];
+const publicRoutes = ["/", "/signin", "/signup", "/landing", "/blog"];
 const adminRoutes = ["/admin"];
 const supervisorRoutes = ["/reports", "/audit-logs"];
 
@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
     });
 
     if (!session) {
-      const loginUrl = new URL("/login", request.url);
+      const loginUrl = new URL("/signin", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
     }
@@ -65,7 +65,7 @@ export async function middleware(request: NextRequest) {
   } catch (error) {
     console.error("Middleware auth error:", error);
     // Redirect to login on auth errors
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/signin", request.url));
   }
 }
 

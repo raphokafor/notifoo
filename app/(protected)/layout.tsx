@@ -8,9 +8,8 @@ export default async function ProtectedLayout({
   children: React.ReactNode;
 }) {
   const user = await getUser();
-
   if (!user) {
-    redirect("/signup");
+    redirect("/signin");
   }
 
   // check if user has onboarded

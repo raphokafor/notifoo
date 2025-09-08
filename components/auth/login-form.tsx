@@ -4,11 +4,12 @@ import type React from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
 import Logo from "@/public/logo.png";
+import { track } from "@vercel/analytics/react";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -39,10 +40,24 @@ export default function LoginForm() {
 
       if (result.error) {
         setError(result.error.message || "Login failed");
+        track("sign_in_error", {
+          location: "login_form",
+          email: email,
+          error: result.error.message || "Login failed",
+        });
       } else {
+        track("sign_in_success", {
+          location: "login_form",
+          email: email,
+        });
         router.push("/dashboard");
       }
     } catch (err) {
+      track("sign_in_error", {
+        location: "login_form",
+        email: email,
+        error: err as string,
+      });
       setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
@@ -132,11 +147,18 @@ export default function LoginForm() {
               setIsLoading(true);
               setError("");
               try {
+                track("sign_in_social_google", {
+                  location: "login_form",
+                });
                 await authClient.signIn.social({
                   provider: "google",
                   callbackURL: "/dashboard",
                 });
               } catch (err) {
+                track("sign_in_social_google_error", {
+                  location: "login_form",
+                  error: err as string,
+                });
                 setError("Google sign-in failed");
                 setIsLoading(false);
               }

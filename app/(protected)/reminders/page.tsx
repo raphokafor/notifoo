@@ -11,7 +11,7 @@ import { getCurrentUser } from "@/lib/db-actions";
 const RemindersPage = async () => {
   const user = await getCurrentUser();
   if (!user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
   const { data: reminders } = await getReminders();
