@@ -135,6 +135,7 @@ export function TimerCreationCard({
         smsNotification,
         callNotification,
         recurringNotification,
+        email: user.email,
       });
       onCreateTimer({
         name: timerName,
