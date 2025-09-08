@@ -12,6 +12,7 @@ import NavHeader from "@/components/navigation/NavHeader";
 import { Calendar, Clock, User, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import FooterComp from "@/components/landing/Footer";
 
 export const metadata = {
   title: "Blog | Notifoo",
@@ -124,6 +125,7 @@ export default function BlogPage() {
             </div>
           )}
         </div>
+        <FooterComp />
       </section>
     </div>
   );

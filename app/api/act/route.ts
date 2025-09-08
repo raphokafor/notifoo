@@ -1,7 +1,8 @@
 import { createReminderHook } from "@/app/actions/reminder-actions";
+import { intros } from "@/lib/intros";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/resend";
-import { getSubscriptionStatus } from "@/lib/stripe";
+import { getSubscriptionStatus, stripe } from "@/lib/stripe";
 import { sendTwilioTextMessage } from "@/lib/twilio";
 import { NotifyEmailTemplate } from "@/templates/notification/notify-email-template";
 import { Reminder, User } from "@prisma/client";
@@ -33,47 +34,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("line 36, reminder has been found", {
-      reminderName: reminder.name,
-      reminderId: reminder.id,
-      reminderType: reminder.type,
-      reminderDueDate: reminder.dueDate,
-      reminderIsActive: reminder.isActive,
-      reminderRepeat: reminder.stashId,
-      reminderUserEmail: reminder.user?.email,
-      reminderUserPhone: reminder.user?.phone,
-      reminderEmailNotification: reminder.emailNotification,
-      reminderSmsNotification: reminder.smsNotification,
-      reminderCallNotification: reminder.callNotification,
-      reminderRecurringNotification: reminder.repeat,
-    });
-
-    // send email if the user has opted in for email notifications
-    if (reminder?.emailNotification) {
-      await sendEmailToUser({
-        email: reminder?.user?.email as string,
-        reminderName: reminder.name,
-      });
-    }
+    // generate a random number between 0 and 29
+    const randomNumber = Math.floor(Math.random() * 3);
+    const intro = intros[randomNumber];
 
     // use the user's phone number and convert it to international format
     const phoneNumber = parsePhoneNumber(reminder?.user?.phone as string, "US");
     const isValidPhoneNumber = phoneNumber && phoneNumber.isValid();
 
     // get the user's subscription status
-    const subscriptionStatus = await getSubscriptionStatus(
-      reminder?.user?.id as string
+    const subscription = await stripe.subscriptions.retrieve(
+      reminder?.user?.subscriptionId as string
     );
+    const subscriptionStatus = subscription?.status;
+
+    // send email if the user has opted in for email notifications
+    if (reminder?.emailNotification && subscriptionStatus === "active") {
+      await sendEmailToUser({
+        email: reminder?.user?.email as string,
+        reminderName: reminder.name,
+      });
+    }
 
     // send sms if the user has opted in for sms notifications
     if (
       reminder?.smsNotification &&
       reminder?.user?.phone &&
-      isValidPhoneNumber
+      isValidPhoneNumber &&
+      subscriptionStatus === "active"
     ) {
       await textUser({
         phoneNumber: phoneNumber.number,
-        reminderName: reminder.name,
+        reminderName: `${intro} ${reminder.name}`,
       });
     }
 
@@ -81,11 +73,12 @@ export async function POST(request: NextRequest) {
     if (
       reminder?.user?.phone &&
       reminder?.callNotification &&
-      isValidPhoneNumber
+      isValidPhoneNumber &&
+      subscriptionStatus === "active"
     ) {
       await callUser({
         phoneNumber: phoneNumber.number,
-        reminderName: reminder.name,
+        reminderName: `${intro} ${reminder.name}`,
       });
     }
 
@@ -160,7 +153,7 @@ const callUser = async ({
     await client.calls.create({
       to: phoneNumber, // <-- replace with the recipient's number
       from: process.env.TWILIO_PHONE_NUMBER!, // <-- replace with your Twilio number
-      twiml: `<Response><Pause length="1"/><Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">Heeeeyyyyyyooooooooooooo!! "${reminderName}"</Say></Response>`,
+      twiml: `<Response><Pause length="1"/><Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">"${reminderName}"</Say></Response>`,
 
       // TODO: possibly wait for the answer to say something before talking or 2 seconds, which ever comes first
     });
@@ -180,7 +173,7 @@ const textUser = async ({
   try {
     await sendTwilioTextMessage({
       to: phoneNumber,
-      textBody: `🔔 Ding ding! Reminder bell says: "${reminderName}" - Consider this your friendly digital elbow nudge. -Team Notifoo`,
+      textBody: `🔔 🔔 🔔 🔔 🔔 "${reminderName}" - Notifoo Team`,
     });
     console.log("line 186, sms has been sent");
   } catch (error) {

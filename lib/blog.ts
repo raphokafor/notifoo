@@ -63,7 +63,7 @@ export function getAllPosts(): BlogPostMeta[] {
 
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   try {
-    const fullPath = path.join(articlesDirectory, `${slug}.md`);
+    let fullPath = path.join(articlesDirectory, `${slug}.md`);
 
     // Check if file exists
     if (!fs.existsSync(fullPath)) {

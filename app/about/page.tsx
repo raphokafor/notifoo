@@ -264,7 +264,7 @@ const FeaturesPage = () => {
                 <CardDescription>
                   Set it once, forget about setting it again. Perfect for those
                   "Oh, it's Monday already?" moments. Daily, weekly, monthly, or
-                  whenever Mercury is in retrograde.
+                  whenever Mercury is in retrograde(coming soon, hopefully).
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -273,12 +273,12 @@ const FeaturesPage = () => {
               <CardHeader>
                 <Globe className="h-12 w-12 text-primary mb-4" />
                 <CardTitle className="text-zinc-600">
-                  Global Time Zones
+                  National Time Zones (US only)
                 </CardTitle>
                 <CardDescription>
-                  Jet lag can't defeat our reminders. Whether you're in Tokyo or
-                  Timbuktu, we'll find you and remind you (in the least creepy
-                  way possible).
+                  Jet lag can't defeat our reminders. Whether you're in
+                  Mendocino, CA or Willacoochie, GA, we'll find you and remind
+                  you (in the least spammy way possible).
                 </CardDescription>
               </CardHeader>
             </Card>
