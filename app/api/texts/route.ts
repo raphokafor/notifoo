@@ -303,7 +303,7 @@ Respond with JSON in this exact format:
 }`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5",
+      model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.3,
       max_tokens: 500,
