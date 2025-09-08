@@ -23,7 +23,20 @@ export async function POST(req: NextRequest) {
     const twilioSignature = req.headers.get("X-Twilio-Signature");
     if (!twilioSignature) {
       console.error("Missing Twilio signature");
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new Response(
+        createTwiMLResponse("Hmm, something is not going well."),
+        {
+          status: 401,
+        }
+      );
+    }
+
+    // this is still being built, short return here for now
+    if (process.env.NODE_ENV !== "development") {
+      console.log("line 36, coming soon..., Maybe.");
+      return new Response(createTwiMLResponse("Coming soon..., Maybe."), {
+        headers: { "Content-Type": "application/xml" },
+      });
     }
 
     // Get the raw body for validation
