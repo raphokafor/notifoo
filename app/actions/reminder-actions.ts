@@ -146,70 +146,70 @@ export async function createReminderHook(reminder: TimerData & { user: User }) {
     }
 
     // Convert to UTC for consistent scheduling
-    // const utcDueDate = new Date(reminder.dueDate.getTime());
+    const utcDueDate = new Date(reminder.dueDate.getTime());
 
-    // const newReminder = await prisma.reminder.create({
-    //   data: {
-    //     name: reminder.name,
-    //     description: reminder.description ?? "",
-    //     dueDate: reminder.dueDate, // should only use UTC time for the schedule on QStash as the user will need to see the time in their local timezone on the dashboard
-    //     userId: user.id,
-    //     emailNotification: reminder.emailNotification ?? true,
-    //     smsNotification: reminder.smsNotification ?? false,
-    //     callNotification: reminder.callNotification ?? false,
-    //     repeat: reminder.recurringNotification ?? false,
-    //   },
-    // });
+    const newReminder = await prisma.reminder.create({
+      data: {
+        name: reminder.name,
+        description: reminder.description ?? "",
+        dueDate: reminder.dueDate, // should only use UTC time for the schedule on QStash as the user will need to see the time in their local timezone on the dashboard
+        userId: user.id,
+        emailNotification: reminder.emailNotification ?? true,
+        smsNotification: reminder.smsNotification ?? false,
+        callNotification: reminder.callNotification ?? false,
+        repeat: reminder.recurringNotification ?? false,
+      },
+    });
 
-    // // Calculate delay using UTC timestamps
-    // const nowUtc = new Date();
-    // const delaySeconds = Math.floor(
-    //   (utcDueDate.getTime() - nowUtc.getTime()) / 1000
-    // );
+    // Calculate delay using UTC timestamps
+    const nowUtc = new Date();
+    const delaySeconds = Math.floor(
+      (utcDueDate.getTime() - nowUtc.getTime()) / 1000
+    );
 
-    // // Ensure we don't schedule in the past
-    // if (delaySeconds <= 0) {
-    //   return {
-    //     success: false,
-    //     message: "Cannot schedule reminder in the past",
-    //   };
-    // }
+    // Ensure we don't schedule in the past
+    if (delaySeconds <= 0) {
+      return {
+        success: false,
+        message: "Cannot schedule reminder in the past",
+      };
+    }
 
-    // // Schedule exact delivery
-    // const res = await qstash.publishJSON({
-    //   url: `${process.env.BASE_URL}/api/act`,
-    //   delay: delaySeconds,
-    //   body: { reminderId: newReminder.id },
-    // });
+    // Schedule exact delivery
+    const res = await qstash.publishJSON({
+      url: `${process.env.BASE_URL}/api/act`,
+      delay: delaySeconds,
+      body: { reminderId: newReminder.id },
+    });
 
-    // // update the reminder with the stash id
-    // if (res?.messageId) {
-    //   await prisma.reminder.update({
-    //     where: { id: newReminder.id },
-    //     data: { stashId: res.messageId },
-    //   });
-    // } else {
-    //   console.error("Error creating reminder:", res);
-    //   // delete the reminder
-    //   await prisma.reminder.delete({
-    //     where: { id: newReminder.id },
-    //   });
-    //   return {
-    //     success: false,
-    //     message: "Failed to create reminder",
-    //   };
-    // }
+    // update the reminder with the stash id
+    if (res?.messageId) {
+      await prisma.reminder.update({
+        where: { id: newReminder.id },
+        data: { stashId: res.messageId },
+      });
+    } else {
+      console.error("Error creating reminder:", res);
+      // delete the reminder
+      await prisma.reminder.delete({
+        where: { id: newReminder.id },
+      });
+      return {
+        success: false,
+        message: "Failed to create reminder",
+      };
+    }
 
-    // console.log("reminder created", newReminder);
+    console.log("reminder created", newReminder);
 
-    // // create activity
-    // await prisma.activity.create({
-    //   data: {
-    //     type: "Reminder Created",
-    //     description: `Reminder created: ${newReminder.name}`,
-    //     userId: user.id,
-    //   },
-    // });
+    // create activity
+    await prisma.activity.create({
+      data: {
+        type: "Reminder Created",
+        description: `Reminder created: ${newReminder.name}`,
+        userId: user.id,
+      },
+    });
 
     return {
       success: true,
