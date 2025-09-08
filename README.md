@@ -1,8 +1,19 @@
 # Notifoo
 
-# Notifoo
+A smart reminder service that accepts SMS messages and uses AI to create reminders.
 
-# Pricing Thoughts
+## Environment Variables
+
+The following environment variables are required for the SMS webhook functionality:
+
+```
+OPENAI_API_KEY=your_openai_api_key_here
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_PHONE_NUMBER=your_twilio_phone_number
+```
+
+## Pricing Thoughts
 
 - $2.99
   - simple email notifications of reminder

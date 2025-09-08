@@ -66,7 +66,7 @@ export const plans = (isPropertyManagement: boolean) => {
           name: "Enterprise",
           description: "For large property portfolios",
           features: [
-            "Unlimited call boxes",
+            "Unlimited reminders",
             "Custom integrations",
             "Dedicated support",
             "White-label options",
@@ -99,7 +99,7 @@ export const plans = (isPropertyManagement: boolean) => {
           price: 39,
           description: "For small businesses",
           features: [
-            "Up to 3 call boxes",
+            "Up to 3 reminders",
             "Business features",
             "Priority support",
             "Advanced notifications",
@@ -114,7 +114,7 @@ export const plans = (isPropertyManagement: boolean) => {
           name: "Enterprise",
           description: "For large property portfolios",
           features: [
-            "Unlimited call boxes",
+            "Unlimited reminders",
             "Custom integrations",
             "Dedicated support",
             "White-label options",
