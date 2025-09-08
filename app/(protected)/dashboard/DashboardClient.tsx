@@ -7,7 +7,7 @@ import { TimerCreationCard } from "./TimerCreationCard";
 import { TimerData } from "@/types/database";
 import { TimeProvider } from "@/contexts/TimeContext";
 import { useRouter } from "next/navigation";
-import { createReminder, deleteReminder } from "@/app/actions/reminders";
+import { createReminder, deleteReminder } from "@/app/actions/reminder-actions";
 import { toast } from "sonner";
 import HeaderComponent from "@/components/header";
 import { User } from "@prisma/client";

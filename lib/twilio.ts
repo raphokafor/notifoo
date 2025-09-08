@@ -194,3 +194,63 @@ export async function sendTwilioTextMessage({
     };
   }
 }
+
+// Phone number verification functions
+export async function sendVerificationCode(phoneNumber: string) {
+  try {
+    const verification = await client.verify.v2
+      .services(process.env.TWILIO_VERIFY_SERVICE_SID!)
+      .verifications.create({ to: phoneNumber, channel: "sms" });
+
+    return {
+      success: true,
+      data: {
+        status: verification.status,
+        sid: verification.sid,
+      },
+      message: "Verification code sent successfully",
+    };
+  } catch (error) {
+    console.error("Error sending verification code:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+      message: "Failed to send verification code",
+    };
+  }
+}
+
+export async function verifyPhoneCode(phoneNumber: string, code: string) {
+  try {
+    if (code.length !== 6) {
+      return {
+        success: false,
+        error: "Invalid verification code",
+        message: "Verification code must be 6 digits",
+      };
+    }
+
+    const verificationCheck = await client.verify.v2
+      .services(process.env.TWILIO_VERIFY_SERVICE_SID!)
+      .verificationChecks.create({ to: phoneNumber, code: code });
+
+    return {
+      success: verificationCheck.status === "approved",
+      data: {
+        status: verificationCheck.status,
+        sid: verificationCheck.sid,
+      },
+      message:
+        verificationCheck.status === "approved"
+          ? "Phone number verified successfully"
+          : "Verification failed",
+    };
+  } catch (error) {
+    console.error("Error verifying phone code:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+      message: "Failed to verify code",
+    };
+  }
+}

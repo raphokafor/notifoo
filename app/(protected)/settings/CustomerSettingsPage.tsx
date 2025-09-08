@@ -1,6 +1,6 @@
 "use client";
 
-import { updateUser } from "@/app/actions/user-action";
+import { updateUser } from "@/app/actions/user-actions";
 import HeaderComponent from "@/components/header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";

@@ -10,7 +10,7 @@ import {
   updateReminder,
   deleteReminder,
   toggleReminderStatus,
-} from "@/app/actions/reminders";
+} from "@/app/actions/reminder-actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {

@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 import React from "react";
 import RemindersClient from "./RemindersClient";
-import { getReminders } from "@/app/actions/reminders";
+import { getReminders } from "@/app/actions/reminder-actions";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/db-actions";
 

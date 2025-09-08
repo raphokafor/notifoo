@@ -6,9 +6,25 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight, PhoneCall, Sparkles } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Loader2Icon,
+  PhoneCall,
+  Sparkles,
+} from "lucide-react";
 import { User } from "@prisma/client";
 import { toast } from "sonner";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import {
+  sendPhoneVerification,
+  verifyPhoneNumber,
+} from "../actions/user-actions";
 
 export default function OnboardingClient({
   user,
@@ -17,8 +33,13 @@ export default function OnboardingClient({
   user: User;
   currentStep: number;
 }) {
+  const [isLoading, setIsLoading] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(currentStep);
   const [isMonthly, setIsMonthly] = useState(true);
+  const [verifionError, setVerifionError] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [verified, setVerified] = useState(false);
   const [answers, setAnswers] = useState({
     reminderType: "",
     notificationPreference: "",
@@ -27,6 +48,53 @@ export default function OnboardingClient({
     phoneNumber: "",
   });
 
+  const handleVerification = async (value: string) => {
+    try {
+      setIsLoading(true);
+      const result = await verifyPhoneNumber({
+        code: value,
+        phoneNumber: answers.phoneNumber,
+      });
+      if (result.success) {
+        toast.success("Phone number verified!");
+        setVerified(true);
+        setVerificationCode("");
+        setVerificationSent(false);
+        setAnswers({
+          ...answers,
+          phoneNumber: answers.phoneNumber,
+        });
+      } else {
+        setVerifionError(result?.error || "Invalid verification code");
+        toast.error(result?.error || "Invalid verification code");
+      }
+    } catch (error) {
+      setVerifionError("Invalid verification code");
+      toast.error("Invalid verification code");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSendPhoneVerification = async (phoneNumber: string) => {
+    setIsLoading(true);
+    try {
+      const result = await sendPhoneVerification({ phoneNumber });
+      if (result.success) {
+        toast.success("Verification code sent!");
+        setVerificationSent(true);
+      } else {
+        setVerifionError(result?.error || "Failed to send verification code");
+        toast.error(result?.error || "Failed to send verification code");
+      }
+    } catch (error) {
+      setVerifionError("Failed to send verification code");
+      toast.error("Failed to send verification code");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const slides = [
     {
       id: "welcome",
@@ -34,33 +102,116 @@ export default function OnboardingClient({
       subtitle: "Time to master the ancient art of remembering stuff",
       content: (
         <div className="space-y-6 text-center">
-          <div className="text-6xl flex justify-center items-center">
-            <PhoneCall className="w-12 h-12" />
-          </div>
+          {answers.phoneNumber.length < 7 && (
+            <div className="text-6xl flex justify-center items-center">
+              <PhoneCall className="w-12 h-12" />
+            </div>
+          )}
           <p className="text-sm text-muted-foreground">
             We're about to ask you a few questions to customize your reminder
             experience. Don't worry, this is way more fun than filling out tax
             forms!
           </p>
-          <div className="space-y-2">
-            <Label htmlFor="phoneNumber" className="text-center block">
-              What should we call you, future Reminder Champion?
-            </Label>
-            <Input
-              id="phoneNumber"
-              type="tel"
-              placeholder="Enter your phone number"
-              value={answers.phoneNumber}
-              onChange={(e) => {
-                // Only allow numeric characters
-                const numericValue = e.target.value.replace(/\D/g, "");
-                setAnswers({
-                  ...answers,
-                  phoneNumber: numericValue?.toString(),
-                });
-              }}
-              className="text-center"
-            />
+          <div className="space-y-4">
+            <div className="space-y-4">
+              <Label htmlFor="phoneNumber" className="text-center block">
+                What is the best phone number to reach you?{" "}
+                <span className="text-xs text-muted-foreground">
+                  (U.S. phone numbers only please)
+                </span>
+              </Label>
+              <Input
+                id="phoneNumber"
+                type="tel"
+                disabled={verified}
+                placeholder="i.e. 4041231234"
+                value={answers.phoneNumber}
+                onChange={(e) => {
+                  // Only allow numeric characters
+                  const numericValue = e.target.value.replace(/\D/g, "");
+                  setAnswers({
+                    ...answers,
+                    phoneNumber: numericValue?.toString(),
+                  });
+                  // Reset verification state when phone number changes
+                  setVerified(false);
+                  setVerificationCode("");
+                  setVerifionError("");
+                }}
+                className="text-center md:w-[250px] mx-auto placeholder:text-zinc-300"
+              />
+              {answers.phoneNumber.length === 10 && !verified && (
+                <div className="space-y-4">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={isLoading}
+                    onClick={() =>
+                      handleSendPhoneVerification(answers.phoneNumber)
+                    }
+                    className=""
+                  >
+                    Send Verification Code
+                    {isLoading && (
+                      <Loader2Icon className="w-4 h-4 ml-2 animate-spin" />
+                    )}
+                  </Button>
+
+                  {verificationSent && (
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="verificationCode"
+                        className="text-center block text-sm"
+                      >
+                        Enter 6-digit verification code
+                      </Label>
+                      <div className="flex justify-center">
+                        <InputOTP
+                          maxLength={6}
+                          value={verificationCode}
+                          onChange={(value) => {
+                            setVerificationCode(value);
+                            if (value.length === 6) {
+                              handleVerification(value);
+                            }
+                          }}
+                        >
+                          <InputOTPGroup>
+                            <InputOTPSlot index={0} />
+                            <InputOTPSlot index={1} />
+                            <InputOTPSlot index={2} />
+                          </InputOTPGroup>
+                          <InputOTPSeparator />
+                          <InputOTPGroup>
+                            <InputOTPSlot index={3} />
+                            <InputOTPSlot index={4} />
+                            <InputOTPSlot index={5} />
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </div>
+                      {verifionError && (
+                        <p className="text-sm text-red-500 text-center">
+                          {verifionError}
+                        </p>
+                      )}
+                      {verified && (
+                        <p className="text-sm text-green-500 bg-green-500/10 p-2 rounded-md text-center">
+                          ✓ Phone number verified!
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  <div>
+                    {verifionError && (
+                      <p className="text-sm text-red-500 bg-red-400/10 p-2 rounded-md text-center">
+                        {verifionError}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ),
@@ -151,7 +302,7 @@ export default function OnboardingClient({
             <Label htmlFor="both" className="flex-1 cursor-pointer">
               <div className="font-medium">Double Dragon Style 🐉</div>
               <div className="text-sm text-muted-foreground">
-                Both SMS and email - maximum reminder power!
+                All of them! SMS, email, and calls - maximum reminder power!
               </div>
             </Label>
           </div>
@@ -353,9 +504,7 @@ export default function OnboardingClient({
           {/* Compact Summary */}
           <div className="text-center py-2 px-4 bg-accent/30 rounded text-sm">
             <span className="font-medium">✨ 7 days free</span> •{" "}
-            <span className="text-muted-foreground">
-              Cancel anytime before day 7
-            </span>
+            <span className="text-muted-foreground">Cancel anytime</span>
           </div>
         </div>
       ),
@@ -384,7 +533,7 @@ export default function OnboardingClient({
     const slide = slides[currentSlide];
     switch (slide.id) {
       case "welcome":
-        return answers.phoneNumber.trim().length > 0;
+        return answers.phoneNumber.trim().length > 0 && verified;
       case "reminder-type":
         return answers.reminderType !== "";
       case "notification-preference":
@@ -432,7 +581,7 @@ export default function OnboardingClient({
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-accent/20 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl">
-        <CardContent className="flex flex-col justify-between p-8 h-[600px]">
+        <CardContent className="flex flex-col justify-between p-8 h-full min-h-[680px] md:h-[750px]">
           {/* Progress bar */}
           <div className="mb-8">
             <div className="flex justify-between text-sm text-muted-foreground mb-2">

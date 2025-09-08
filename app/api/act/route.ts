@@ -1,4 +1,4 @@
-import { createReminderHook } from "@/app/actions/reminders";
+import { createReminderHook } from "@/app/actions/reminder-actions";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/resend";
 import { getSubscriptionStatus } from "@/lib/stripe";

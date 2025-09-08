@@ -270,11 +270,15 @@ export default function CustomerBillingClient({
                             Subscription Details
                           </h3>
                           <p className="text-sm text-gray-600">
-                            Starter -{" "}
-                            {formatCurrency(subscriptionData.rate, "USD")}/
-                            {subscriptionData.interval === "month"
-                              ? "Monthly"
-                              : "Yearly"}
+                            {subscriptionData.status !== "trialing" && (
+                              <>
+                                Starter -{" "}
+                                {formatCurrency(subscriptionData.rate, "USD")}/
+                                {subscriptionData.interval === "month"
+                                  ? "Monthly"
+                                  : "Yearly"}
+                              </>
+                            )}
                           </p>
                         </div>
                       </div>

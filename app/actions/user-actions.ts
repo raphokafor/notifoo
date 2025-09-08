@@ -2,6 +2,7 @@
 
 import { getCurrentUser } from "@/lib/db-actions";
 import { prisma } from "@/lib/prisma";
+import { sendVerificationCode, verifyPhoneCode } from "@/lib/twilio";
 import { parsePhoneNumber } from "libphonenumber-js";
 
 export const addUserActivity = async (
@@ -153,6 +154,119 @@ export const updateUser = async ({
     return {
       success: false,
       message: "Failed to update user",
+    };
+  }
+};
+
+/**
+ * Takes in a phone number and sends a verification code to the phone number
+ * @param phoneNumber
+ * @returns {success: boolean, message: string, error: string}
+ */
+export const sendPhoneVerification = async ({
+  phoneNumber,
+}: {
+  phoneNumber: string;
+}) => {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        error: "User not found",
+      };
+    }
+
+    // Parse and validate phone number
+    const parsedPhone = parsePhoneNumber(phoneNumber, "US");
+    if (!parsedPhone || !parsedPhone.isValid()) {
+      return {
+        success: false,
+        error:
+          "Invalid phone number provided. Please remember only to use U.S. phone numbers.",
+      };
+    }
+
+    // Send verification code using Twilio
+    const result = await sendVerificationCode(parsedPhone.number);
+
+    if (result.success) {
+      return {
+        success: true,
+        message: "Verification code sent successfully",
+        error: undefined,
+      };
+    } else {
+      return {
+        success: false,
+        message: result.error || "Failed to send verification code",
+        error: result.error || "Failed to send verification code",
+      };
+    }
+  } catch (error) {
+    console.error("Error sending phone verification:", error);
+    return {
+      success: false,
+      message: "Failed to send verification code",
+      error: "Failed to send verification code",
+    };
+  }
+};
+
+/**
+ * Takes in a phone number and a verification code and verifies the phone number
+ * @param phoneNumber
+ * @param code
+ * @returns {success: boolean, message: string, error: string}
+ */
+export const verifyPhoneNumber = async ({
+  phoneNumber,
+  code,
+}: {
+  phoneNumber: string;
+  code: string;
+}) => {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        error: "User not found",
+      };
+    }
+
+    // Parse and validate phone number
+    const parsedPhone = parsePhoneNumber(phoneNumber, "US");
+    if (!parsedPhone || !parsedPhone.isValid()) {
+      return {
+        success: false,
+        error: "Invalid phone number format",
+      };
+    }
+
+    // Verify the code using Twilio
+    const result = await verifyPhoneCode(parsedPhone.number, code);
+
+    if (result.success) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { phone: parsedPhone.number, phoneVerifiedAt: new Date() },
+      });
+    }
+
+    return {
+      success: result.success,
+      message: result.success
+        ? "Phone number verified successfully"
+        : "Incorrect verification code",
+      error: result.success ? undefined : "Incorrect verification code",
+    };
+  } catch (error) {
+    console.error("Error verifying phone number:", error);
+    return {
+      success: false,
+      message: "Failed to verify phone number",
+      error: "Failed to verify phone number",
     };
   }
 };

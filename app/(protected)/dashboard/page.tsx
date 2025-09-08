@@ -2,7 +2,7 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import { getActiveReminders } from "@/app/actions/reminders";
+import { getActiveReminders } from "@/app/actions/reminder-actions";
 import { getUser } from "@/lib/db-actions";
 import { redirect } from "next/navigation";
 import { Dashboard } from "./DashboardClient";

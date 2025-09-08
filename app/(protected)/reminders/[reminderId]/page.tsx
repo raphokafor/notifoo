@@ -1,6 +1,6 @@
 import React from "react";
 import ReminderDetailClient from "./ReminderDetailClient";
-import { getReminderById } from "@/app/actions/reminders";
+import { getReminderById } from "@/app/actions/reminder-actions";
 
 const ReminderDetailPage = async ({
   params,

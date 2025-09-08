@@ -1,7 +1,6 @@
 import { getCurrentUser } from "@/lib/db-actions";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
-import { parsePhoneNumber } from "libphonenumber-js";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -15,18 +14,12 @@ export async function POST(req: NextRequest) {
       isMonthly = true,
     } = await req.json();
 
-    // convert phone number to international format
-    const phoneNumberInternational = parsePhoneNumber(phoneNumber, "US");
-    const isValidPhoneNumber =
-      phoneNumberInternational && phoneNumberInternational.isValid();
-
     // get user
     const user_ = await getCurrentUser();
     const user = await prisma.user.update({
       where: { id: user_?.id as string },
       data: {
         hasOnboarded: true,
-        phone: isValidPhoneNumber ? phoneNumberInternational?.number : null,
       },
     });
     if (!user) {

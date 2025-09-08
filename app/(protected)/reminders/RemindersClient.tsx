@@ -5,7 +5,7 @@ import { TimerData } from "@/types/database";
 import React, { useState } from "react";
 import { Timer } from "../dashboard/Timer";
 import { useRouter } from "next/navigation";
-import { createReminder, deleteReminder } from "@/app/actions/reminders";
+import { createReminder, deleteReminder } from "@/app/actions/reminder-actions";
 import { toast } from "sonner";
 import { TimeProvider } from "@/contexts/TimeContext";
 import { AnimatePresence, motion } from "framer-motion";

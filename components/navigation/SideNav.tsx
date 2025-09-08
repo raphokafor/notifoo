@@ -130,7 +130,7 @@ export default function SideNav({ className, user }: SideNavProps) {
         {!collapsed ? (
           <div className="flex flex-col items-center gap-2">
             <Image src={Logo} alt="Notifoo" width={150} height={150} />
-            <span className="font-bold text-[#3b82f6]">notifoo!</span>
+            <span className="font-bold text-[#3b82f6]">notifoo app!</span>
           </div>
         ) : (
           <div className="flex items-center gap-2">

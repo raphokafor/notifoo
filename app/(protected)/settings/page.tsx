@@ -1,4 +1,4 @@
-import { getActivities } from "@/app/actions/user-action";
+import { getActivities } from "@/app/actions/user-actions";
 import { getUser } from "@/lib/db-actions";
 import { User } from "@prisma/client";
 import { redirect } from "next/navigation";
