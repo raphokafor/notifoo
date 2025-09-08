@@ -62,6 +62,30 @@ const NavHeader = () => {
               </Link>
             )}
           </nav>
+
+          <nav className="flex md:hidden items-center space-x-6">
+            {session?.user ? (
+              <Link href="/dashboard">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-[#3b82f6]"
+                >
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/signin">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-[#3b82f6]"
+                >
+                  Sign In
+                </Button>
+              </Link>
+            )}
+          </nav>
         </div>
       </header>
     </div>
