@@ -460,10 +460,10 @@ export function TimerCreationCard({
                 <Button
                   onClick={handleConfirm}
                   disabled={
-                    !emailNotification &&
-                    !smsNotification &&
-                    !callNotification &&
-                    !recurringNotification &&
+                    (!emailNotification &&
+                      !smsNotification &&
+                      !callNotification &&
+                      !recurringNotification) ||
                     isLoading
                   }
                 >

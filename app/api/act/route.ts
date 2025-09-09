@@ -46,10 +46,11 @@ export async function POST(request: NextRequest) {
     const subscription = await stripe.subscriptions.retrieve(
       reminder?.user?.subscriptionId as string
     );
-    const subscriptionStatus = subscription?.status;
+    const isActiveSubscription =
+      subscription?.status === "active" || subscription?.status === "trialing";
 
     // end early and text the user if their subscription is not active
-    if (subscriptionStatus !== "active") {
+    if (!isActiveSubscription) {
       await textUser({
         phoneNumber: phoneNumber.number,
         reminderName: `${intro} "Your subscription is not active. Please visit https://www.notifoo.io/billing to activate your subscription and start setting reminders."`,
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
     }
 
     // send email if the user has opted in for email notifications
-    if (reminder?.emailNotification && subscriptionStatus === "active") {
+    if (reminder?.emailNotification && isActiveSubscription) {
       await sendEmailToUser({
         email: reminder?.user?.email as string,
         reminderName: reminder.name,
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
       reminder?.smsNotification &&
       reminder?.user?.phone &&
       isValidPhoneNumber &&
-      subscriptionStatus === "active"
+      isActiveSubscription
     ) {
       await textUser({
         phoneNumber: phoneNumber.number,
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
       reminder?.user?.phone &&
       reminder?.callNotification &&
       isValidPhoneNumber &&
-      subscriptionStatus === "active"
+      isActiveSubscription
     ) {
       await callUser({
         phoneNumber: phoneNumber.number,
@@ -126,6 +127,18 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * all the helper functions
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * @param param0
+ */
 const sendEmailToUser = async ({
   email,
   reminderName,
