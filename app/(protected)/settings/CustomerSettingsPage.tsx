@@ -2,6 +2,16 @@
 
 import { updateUser } from "@/app/actions/user-actions";
 import HeaderComponent from "@/components/header";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,6 +71,7 @@ export default function CustomerSettingsPage({
 }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -104,6 +115,10 @@ export default function CustomerSettingsPage({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDeleteModal = () => {
+    setDeleteModalOpen((prev) => !prev);
   };
 
   const handleProfileSave = async () => {
@@ -493,7 +508,7 @@ export default function CustomerSettingsPage({
       <div className="flex w-full justify-center py-10">
         <Button
           disabled={isLoading}
-          onClick={handleDeleteAccount}
+          onClick={handleDeleteModal}
           variant="secondary"
         >
           <Trash className="h-4 w-4 text-red-600" />
@@ -503,6 +518,40 @@ export default function CustomerSettingsPage({
           )}
         </Button>
       </div>
+
+      <AlertDialog open={deleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Whoa there! Are you really sure you want to delete your account?
+              We promise we're not that annoying (okay, maybe a little).
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This is permanent, no take-backs, no do-overs - more final than
+              your New Year's resolutions.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="w-full">
+            <AlertDialogCancel
+              onClick={handleDeleteModal}
+              className="w-full"
+              disabled={isLoading}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAccount}
+              className="bg-red-500 text-white hover:bg-red-600 w-full flex items-center justify-center"
+              disabled={isLoading}
+            >
+              Delete Account{" "}
+              {isLoading && (
+                <Loader2Icon className="w-4 h-4 animate-spin ml-2" />
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

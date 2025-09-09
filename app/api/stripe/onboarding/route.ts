@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     const user = await prisma.user.update({
       where: { id: user_?.id as string },
       data: {
+        status: "pending",
         hasOnboarded: true,
       },
     });

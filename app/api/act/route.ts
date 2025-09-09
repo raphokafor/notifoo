@@ -2,7 +2,7 @@ import { createReminderHook } from "@/app/actions/reminder-actions";
 import { intros } from "@/lib/intros";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/resend";
-import { getSubscriptionStatus, stripe } from "@/lib/stripe";
+import { stripe } from "@/lib/stripe";
 import { sendTwilioTextMessage } from "@/lib/twilio";
 import { NotifyEmailTemplate } from "@/templates/notification/notify-email-template";
 import { Reminder, User } from "@prisma/client";
@@ -47,6 +47,15 @@ export async function POST(request: NextRequest) {
       reminder?.user?.subscriptionId as string
     );
     const subscriptionStatus = subscription?.status;
+
+    // end early and text the user if their subscription is not active
+    if (subscriptionStatus !== "active") {
+      await textUser({
+        phoneNumber: phoneNumber.number,
+        reminderName: `${intro} "Your subscription is not active. Please visit https://www.notifoo.io/billing to activate your subscription and start setting reminders."`,
+      });
+      return NextResponse.json({ message: "Reminder sent successfully" });
+    }
 
     // send email if the user has opted in for email notifications
     if (reminder?.emailNotification && subscriptionStatus === "active") {

@@ -1,20 +1,18 @@
+import { getCurrentUser } from "@/lib/db-actions";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { NextRequest, NextResponse } from "next/server";
 
-// - [ ] When delete account do the following
-//     - [ ] Cancel the subscription
-//     - [ ] Delete all their subscriptions
-
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await req.json();
+    const user_ = await getCurrentUser();
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: user_?.id as string },
     });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+    const userId = user?.id;
 
     // try to delete the account for user
     try {
