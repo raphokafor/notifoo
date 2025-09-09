@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
             appUrl: process.env.NEXT_PUBLIC_APP_URL as string,
           });
           await sendEmail({
-            from: "Successful Subscription <welcome@notifoo.com>",
+            from: "Successful Subscription <welcome@notifoo.io>",
             to: customerEmail,
             subject: "Subscription Success",
             body: successSubscriptionBody,
@@ -112,9 +112,9 @@ export async function POST(req: NextRequest) {
   // Subscription created - new subscription
   if (event.type === "customer.subscription.created") {
     const subscription = event.data.object as Stripe.Subscription;
-    const subscriptionId = subscription.id;
-    const customerId = subscription.customer as string;
-    const pmi = subscription.default_payment_method as string;
+    const subscriptionId = subscription?.id;
+    const customerId = subscription?.customer as string;
+    const pmi = subscription?.default_payment_method as string;
     const isMonthly =
       subscription?.items?.data[0]?.price?.recurring?.interval === "month";
     const startDate = subscription?.start_date;
@@ -126,19 +126,23 @@ export async function POST(req: NextRequest) {
       where: { subscriptionId: subscriptionId },
     });
     if (existingSubscription) {
-      // card details
-      const cardDetails =
-        await getSubscriptionWithPaymentMethod(subscriptionId);
-      if (cardDetails) {
-        await prisma.subscription.update({
-          where: { id: subscriptionId },
-          data: {
-            cardBrand: cardDetails.brand,
-            cardExpirationMonth: cardDetails.exp_month,
-            cardExpirationYear: cardDetails.exp_year,
-            last4Digits: cardDetails.last4,
-          },
-        });
+      try {
+        // card details
+        const cardDetails =
+          await getSubscriptionWithPaymentMethod(subscriptionId);
+        if (cardDetails) {
+          await prisma.subscription.update({
+            where: { id: existingSubscription.id },
+            data: {
+              cardBrand: cardDetails.brand,
+              cardExpirationMonth: cardDetails.exp_month,
+              cardExpirationYear: cardDetails.exp_year,
+              last4Digits: cardDetails.last4,
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Error updating subscription card details:", error);
       }
     }
   }
@@ -147,7 +151,30 @@ export async function POST(req: NextRequest) {
   if (event.type === "customer.subscription.updated") {
     const subscription = event.data.object as Stripe.Subscription;
 
-    console.log("line 109, subscription updated", subscription);
+    try {
+      // get the user
+      const user = await prisma.user.findFirst({
+        where: { stripeCustomerId: subscription.customer as string },
+      });
+
+      // update the user's subscription status
+      if (user) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            subscriptionStatus:
+              subscription.status === "active" ||
+              subscription.status === "trialing"
+                ? "active"
+                : "pending",
+          },
+        });
+      }
+
+      console.log("line 109, subscription updated", subscription);
+    } catch (error) {
+      console.error("Error updating user subscription status:", error);
+    }
   }
 
   // Subscription deleted - cancelled subscription

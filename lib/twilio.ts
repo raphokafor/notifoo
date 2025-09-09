@@ -19,9 +19,9 @@ interface CreatePhoneNumberParams {
 
 export async function createTwilioIncomingPhoneNumber({
   friendlyName,
-  smsUrl = "https://notifoo.com/api/twilio/sms",
-  voiceUrl = "https://notifoo.com/api/twilio/voice",
-  fallbackUrl = "https://notifoo.com/api/twilio/fallback",
+  smsUrl = "https://www.notifoo.io/api/twilio/sms",
+  voiceUrl = "https://www.notifoo.io/api/twilio/voice",
+  fallbackUrl = "https://www.notifoo.io/api/twilio/fallback",
   phoneNumber,
   notificationPhoneNumber,
 }: CreatePhoneNumberParams) {
@@ -36,7 +36,7 @@ export async function createTwilioIncomingPhoneNumber({
       voiceFallbackUrl: fallbackUrl,
       smsMethod: "POST",
       voiceMethod: "POST",
-      statusCallback: "https://notifoo.com/status",
+      statusCallback: "https://www.notifoo.io/status",
       statusCallbackMethod: "POST",
       voiceFallbackMethod: "POST",
     });
@@ -85,11 +85,11 @@ export async function createTwilioIncomingPhoneNumber({
 // Alternative version that purchases a new phone number instead of using existing one
 export async function purchaseAndCreateTwilioPhoneNumber({
   friendlyName,
-  smsUrl = "https://notifoo.com/api/twilio/sms",
-  voiceUrl = "https://notifoo.com/api/twilio/voice",
+  smsUrl = "https://www.notifoo.io/api/twilio/sms",
+  voiceUrl = "https://www.notifoo.io/api/twilio/voice",
   areaCode = "470",
   notificationPhoneNumber,
-  fallbackUrl = "https://notifoo.com/api/twilio/fallback",
+  fallbackUrl = "https://www.notifoo.io/api/twilio/fallback",
 }: Omit<CreatePhoneNumberParams, "phoneNumber"> & { areaCode?: string }) {
   try {
     // First, search for available phone numbers

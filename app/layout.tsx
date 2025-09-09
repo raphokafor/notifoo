@@ -69,7 +69,7 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  generator: "Notifoo.com",
+  generator: "notifoo.io",
 };
 
 export const viewport: Viewport = {

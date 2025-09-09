@@ -6,45 +6,45 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const staticRoutes = [
     {
-      url: "https://www.Notifoo.com/",
+      url: "https://www.notifoo.io/",
       lastModified: new Date(),
     },
     {
-      url: "https://www.Notifoo.com/about",
+      url: "https://www.notifoo.io/about",
       lastModified: new Date(),
     },
     {
-      url: "https://www.Notifoo.com/contact",
+      url: "https://www.notifoo.io/contact",
       lastModified: new Date(),
     },
     {
-      url: "https://www.Notifoo.com/pricing",
+      url: "https://www.notifoo.io/pricing",
       lastModified: new Date(),
     },
     {
-      url: "https://www.Notifoo.com/sign-in",
+      url: "https://www.notifoo.io/sign-in",
       lastModified: new Date(),
     },
     {
-      url: "https://www.Notifoo.com/sign-up",
+      url: "https://www.notifoo.io/sign-up",
       lastModified: new Date(),
     },
     {
-      url: "https://www.Notifoo.com/privacy",
+      url: "https://www.notifoo.io/privacy",
       lastModified: new Date(),
     },
     {
-      url: "https://www.Notifoo.com/terms",
+      url: "https://www.notifoo.io/terms",
       lastModified: new Date(),
     },
     {
-      url: "https://www.Notifoo.com/blog",
+      url: "https://www.notifoo.io/blog",
       lastModified: new Date(),
     },
   ];
 
   const blogRoutes = posts.map((post) => ({
-    url: `https://www.Notifoo.com/blog/${post.slug}`,
+    url: `https://www.notifoo.io/blog/${post.slug}`,
     lastModified: new Date(post.date),
   }));
 
