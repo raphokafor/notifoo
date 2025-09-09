@@ -222,7 +222,7 @@ export default function CustomerBillingClient({
                   {/* Card Number */}
                   <div className="absolute top-32 left-6 right-6">
                     <div className="text-white font-mono text-sm md:text-xl tracking-widest">
-                      •••• •••• •••• 4242
+                      •••• •••• •••• {subscriptionData.last4}
                     </div>
                   </div>
 

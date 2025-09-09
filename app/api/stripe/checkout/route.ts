@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("Stripe error:", err);
     return NextResponse.json(
-      { error: "Unable to create checkout session" },
+      { error: "Unable to create checkout session for stripe" },
       { status: 500 }
     );
   }
