@@ -9,7 +9,6 @@ export default function WelcomeEmailTemplate({ appUrl }: { appUrl: string }) {
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; line-height: 1.6;">
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
         
-         Header 
         <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); padding: 40px 30px; text-align: center;">
             <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Welcome to the Notifoo Dojo!</h1>
             <p style="color: #dbeafe; margin: 10px 0 0; font-size: 16px;">You've just earned your white belt in remembering stuff</p>
