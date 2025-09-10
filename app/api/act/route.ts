@@ -37,6 +37,10 @@ export async function POST(request: NextRequest) {
     // generate a random number between 0 and 29
     const randomNumber = Math.floor(Math.random() * 3);
     const intro = intros[randomNumber];
+    console.log("line 40, intro", {
+      randomNumber: randomNumber,
+      intro: intro,
+    });
 
     // use the user's phone number and convert it to international format
     const phoneNumber = parsePhoneNumber(reminder?.user?.phone as string, "US");
