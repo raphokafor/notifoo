@@ -126,6 +126,7 @@ const RemindersClient = ({
                     handleModal={handleModal}
                     emailNotification={reminder.emailNotification}
                     smsNotification={reminder.smsNotification}
+                    callNotification={reminder.callNotification}
                     recurringNotification={
                       reminder.recurringNotification ?? false
                     }

@@ -19,6 +19,7 @@ import {
   Loader2Icon,
   Mail,
   MessageSquare,
+  PhoneCallIcon,
   Repeat2Icon,
 } from "lucide-react";
 import Link from "next/link";
@@ -42,6 +43,7 @@ export function Timer({
   emailNotification = true,
   smsNotification = false,
   recurringNotification = false,
+  callNotification = false,
   onDelete,
   isLoading,
   isOpen,
@@ -155,6 +157,11 @@ export function Timer({
                     {smsNotification && (
                       <div className="p-1 rounded-full bg-green-100 dark:bg-green-900/30">
                         <MessageSquare className="h-3 w-3 text-green-600 dark:text-green-400" />
+                      </div>
+                    )}
+                    {callNotification && (
+                      <div className="p-1 rounded-full bg-orange-100 dark:bg-orange-900/30">
+                        <PhoneCallIcon className="h-3 w-3 text-orange-600 dark:text-orange-400" />
                       </div>
                     )}
                     {recurringNotification && (

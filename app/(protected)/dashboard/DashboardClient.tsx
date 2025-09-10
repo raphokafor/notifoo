@@ -139,6 +139,7 @@ export function Dashboard({
                     handleModal={handleModal}
                     emailNotification={timer.emailNotification}
                     smsNotification={timer.smsNotification}
+                    callNotification={timer.callNotification}
                     recurringNotification={timer.recurringNotification ?? false}
                   />
                 </motion.div>
