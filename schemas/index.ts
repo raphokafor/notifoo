@@ -12,5 +12,7 @@ export const reminderUpdateSchema = z.object({
     .optional(),
   emailNotification: z.boolean().default(true),
   smsNotification: z.boolean().default(false),
+  callNotification: z.boolean().default(false),
+  recurringNotification: z.boolean().default(false),
   isActive: z.boolean().default(true),
 });

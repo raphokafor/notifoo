@@ -451,3 +451,203 @@ export async function deleteReminder(reminderId: string) {
     };
   }
 }
+
+/**
+ * toggle email notifications
+ * @param reminderId - the id of the reminder
+ * @param isActive - the new status of the email notification
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+export async function toggleEmailNotification({
+  reminderId,
+  isActive,
+}: {
+  reminderId: string;
+  isActive: boolean;
+}) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        message: "Unable to update reminder status",
+      };
+    }
+
+    const reminder = await prisma.reminder.update({
+      where: { id: reminderId, userId: user.id },
+      data: { emailNotification: isActive },
+    });
+
+    return {
+      success: true,
+      message: "Email notification updated successfully",
+    };
+  } catch (error) {
+    console.error("Error updating email notification:", error);
+    return {
+      success: false,
+      message: "Failed to update email notification",
+    };
+  }
+}
+
+/**
+ * toggle sms notifications
+ * @param reminderId - the id of the reminder
+ * @param isActive - the new status of the sms notification
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+export async function toggleSmsNotification({
+  reminderId,
+  isActive,
+}: {
+  reminderId: string;
+  isActive: boolean;
+}) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        message: "Unable to update reminder status",
+      };
+    }
+
+    const reminder = await prisma.reminder.update({
+      where: { id: reminderId, userId: user.id },
+      data: { smsNotification: isActive },
+    });
+
+    return {
+      success: true,
+      message: "Sms notification updated successfully",
+    };
+  } catch (error) {
+    console.error("Error updating sms notification:", error);
+    return {
+      success: false,
+      message: "Failed to update sms notification",
+    };
+  }
+}
+
+/**
+ * toggle call notifications
+ * @param reminderId - the id of the reminder
+ * @param isActive - the new status of the call notification
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+export async function toggleCallNotification({
+  reminderId,
+  isActive,
+}: {
+  reminderId: string;
+  isActive: boolean;
+}) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        message: "Unable to update reminder status",
+      };
+    }
+
+    await prisma.reminder.update({
+      where: { id: reminderId, userId: user.id },
+      data: { callNotification: isActive },
+    });
+
+    return {
+      success: true,
+      message: "Call notification updated successfully",
+    };
+  } catch (error) {
+    console.error("Error updating call notification:", error);
+    return {
+      success: false,
+      message: "Failed to update call notification",
+    };
+  }
+}
+
+/**
+ * toggle recurring notifications
+ * @param reminderId - the id of the reminder
+ * @param isActive - the new status of the recurring notification
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+export async function toggleRecurringNotification({
+  reminderId,
+  isActive,
+}: {
+  reminderId: string;
+  isActive: boolean;
+}) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        message: "Unable to update reminder status",
+      };
+    }
+
+    await prisma.reminder.update({
+      where: { id: reminderId, userId: user.id },
+      data: { repeat: isActive },
+    });
+
+    return {
+      success: true,
+      message: "Recurring notification updated successfully",
+    };
+  } catch (error) {
+    console.error("Error updating recurring notification:", error);
+    return {
+      success: false,
+      message: "Failed to update recurring notification",
+    };
+  }
+}
+
+/**
+ * toggle recurring notifications
+ * @param reminderId - the id of the reminder
+ * @param isActive - the new status of the recurring notification
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+export async function toggleReminderIsActive({
+  reminderId,
+  isActive,
+}: {
+  reminderId: string;
+  isActive: boolean;
+}) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        message: "Unable to update reminder status",
+      };
+    }
+
+    await prisma.reminder.update({
+      where: { id: reminderId, userId: user.id },
+      data: { isActive: isActive },
+    });
+
+    return {
+      success: true,
+      message: "Reminder is active updated successfully",
+    };
+  } catch (error) {
+    console.error("Error updating reminder is active:", error);
+    return {
+      success: false,
+      message: "Failed to update reminder is active",
+    };
+  }
+}

@@ -10,6 +10,11 @@ import {
   updateReminder,
   deleteReminder,
   toggleReminderStatus,
+  toggleEmailNotification,
+  toggleSmsNotification,
+  toggleCallNotification,
+  toggleRecurringNotification,
+  toggleReminderIsActive,
 } from "@/app/actions/reminder-actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -55,6 +60,8 @@ import {
   Loader2Icon,
   PowerIcon,
   PowerOffIcon,
+  PhoneCallIcon,
+  RepeatIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { FormError } from "@/components/form-error";
@@ -76,6 +83,8 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
       description: reminder?.description || "",
       emailNotification: reminder?.emailNotification ?? true,
       smsNotification: reminder?.smsNotification ?? false,
+      callNotification: reminder?.callNotification ?? false,
+      recurringNotification: reminder?.recurringNotification ?? false,
       isActive: reminder?.isActive ?? true,
     },
   });
@@ -87,19 +96,22 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
     setError("");
 
     try {
-      const result = await updateReminder({
-        ...reminder,
-        ...values,
-      });
+      // const result = await updateReminder({
+      //   ...reminder,
+      //   ...values,
+      // });
 
-      if (result.success) {
-        toast.success("Reminder updated successfully!");
-        setIsEditing(false);
-        router.refresh();
-      } else {
-        setError(result.message || "Failed to update reminder");
-        toast.error(result.message || "Failed to update reminder");
-      }
+      console.log("line 97, values", values);
+      console.log("line 97, reminder", reminder);
+
+      // if (result.success) {
+      //   toast.success("Reminder updated successfully!");
+      //   setIsEditing(false);
+      //   router.refresh();
+      // } else {
+      //   setError(result.message || "Failed to update reminder");
+      //   toast.error(result.message || "Failed to update reminder");
+      // }
     } catch (error) {
       setError("An unexpected error occurred");
       toast.error("An unexpected error occurred");
@@ -163,10 +175,134 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
       description: reminder?.description || "",
       emailNotification: reminder?.emailNotification ?? true,
       smsNotification: reminder?.smsNotification ?? false,
+      callNotification: reminder?.callNotification ?? false,
+      recurringNotification: reminder?.recurringNotification ?? false,
       isActive: reminder?.isActive ?? true,
     });
     setIsEditing(false);
     setError("");
+  };
+
+  const handleEmailToggle = async (value: boolean) => {
+    try {
+      setIsUpdating(true);
+      setError("");
+      form.setValue("emailNotification", value);
+      // update the reminder in the database
+      const { success, message } = await toggleEmailNotification({
+        reminderId: reminder.id as string,
+        isActive: value,
+      });
+      if (success) {
+        toast.success(message);
+      } else {
+        form.setValue("emailNotification", !value);
+        toast.error(message);
+      }
+    } catch (error) {
+      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
+      form.setValue("emailNotification", !value);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleSmsToggle = async (value: boolean) => {
+    try {
+      setIsUpdating(true);
+      setError("");
+      form.setValue("smsNotification", value);
+      // update the reminder in the database
+      const { success, message } = await toggleSmsNotification({
+        reminderId: reminder.id as string,
+        isActive: value,
+      });
+      if (success) {
+        toast.success(message);
+      } else {
+        form.setValue("smsNotification", !value);
+        toast.error(message);
+      }
+    } catch (error) {
+      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
+      form.setValue("smsNotification", !value);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleCallToggle = async (value: boolean) => {
+    try {
+      setIsUpdating(true);
+      setError("");
+      form.setValue("callNotification", value);
+      // update the reminder in the database
+      const { success, message } = await toggleCallNotification({
+        reminderId: reminder.id as string,
+        isActive: value,
+      });
+      if (success) {
+        toast.success(message);
+      } else {
+        form.setValue("callNotification", !value);
+        toast.error(message);
+      }
+    } catch (error) {
+      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
+      form.setValue("callNotification", !value);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleRecurringToggle = async (value: boolean) => {
+    try {
+      setIsUpdating(true);
+      setError("");
+      form.setValue("recurringNotification", value);
+      // update the reminder in the database
+      const { success, message } = await toggleRecurringNotification({
+        reminderId: reminder.id as string,
+        isActive: value,
+      });
+      if (success) {
+        toast.success(message);
+      } else {
+        form.setValue("recurringNotification", !value);
+        toast.error(message);
+      }
+    } catch (error) {
+      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
+      form.setValue("recurringNotification", !value);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleIsActiveToggle = async (value: boolean) => {
+    try {
+      setIsUpdating(true);
+      setError("");
+      const { success, message } = await toggleReminderIsActive({
+        reminderId: reminder.id as string,
+        isActive: value,
+      });
+      if (success) {
+        toast.success(message);
+      } else {
+        form.setValue("isActive", !value);
+        toast.error(message);
+      }
+    } catch (error) {
+      setError("An unexpected error occurred");
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   if (!reminder) {
@@ -185,7 +321,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col md:flex-row items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
             Reminder Details
@@ -194,7 +330,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
             View and manage your reminder settings
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex mt-4 md:mt-0 items-center gap-1 px-4 mx-4">
           {!isEditing && (
             <>
               <Button
@@ -272,9 +408,6 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                   {!reminder.isActive && !isEditing && (
                     <Badge variant="secondary">Disabled</Badge>
                   )}
-                  {isPastDue && !isEditing && (
-                    <Badge variant="destructive">Past Due</Badge>
-                  )}
                 </CardTitle>
                 {!isEditing && (
                   <CardDescription>
@@ -308,30 +441,6 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                       </FormItem>
                     )}
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Enter reminder description (optional)"
-                            className="resize-none"
-                            rows={3}
-                            {...field}
-                            disabled={isUpdating}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Provide additional details about this reminder
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   <div className="space-y-4">
                     <FormLabel className="text-base font-semibold text-zinc-700">
                       Reminder Settings
@@ -357,7 +466,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                           <FormControl>
                             <Switch
                               checked={field.value}
-                              onCheckedChange={field.onChange}
+                              onCheckedChange={handleIsActiveToggle}
                               disabled={isUpdating}
                             />
                           </FormControl>
@@ -384,7 +493,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                           <FormControl>
                             <Switch
                               checked={field.value}
-                              onCheckedChange={field.onChange}
+                              onCheckedChange={handleEmailToggle}
                               disabled={isUpdating}
                             />
                           </FormControl>
@@ -411,7 +520,62 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                           <FormControl>
                             <Switch
                               checked={field.value}
-                              onCheckedChange={field.onChange}
+                              onCheckedChange={handleSmsToggle}
+                              disabled={isUpdating}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="callNotification"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-2">
+                              <PhoneCallIcon className="h-4 w-4 text-muted-foreground" />
+                              <FormLabel className="text-base text-zinc-500">
+                                Call Notifications
+                              </FormLabel>
+                            </div>
+                            <FormDescription>
+                              Receive reminder notifications via phone call
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value as boolean}
+                              onCheckedChange={handleCallToggle}
+                              disabled={isUpdating}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="recurringNotification"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-2">
+                              <RepeatIcon className="h-4 w-4 text-muted-foreground" />
+                              <FormLabel className="text-base text-zinc-500">
+                                Recurring Notifications
+                              </FormLabel>
+                            </div>
+                            <FormDescription>
+                              Receive reminder notifications on a recurring
+                              basis
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value as boolean}
+                              onCheckedChange={handleRecurringToggle}
                               disabled={isUpdating}
                             />
                           </FormControl>
@@ -423,13 +587,6 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                   {error && <FormError message={error} />}
 
                   <div className="flex gap-3 pt-4">
-                    <Button
-                      type="submit"
-                      disabled={isUpdating}
-                      className="flex-1"
-                    >
-                      {isUpdating ? "Updating..." : "Update Reminder"}
-                    </Button>
                     <Button
                       type="button"
                       variant="outline"
@@ -506,59 +663,46 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                         {reminder.smsNotification ? "Enabled" : "Disabled"}
                       </Badge>
                     </div>
+                    <div className="flex items-center justify-between rounded-lg border p-3">
+                      <div className="flex items-center gap-2">
+                        <PhoneCallIcon className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">
+                          Call Notifications
+                        </span>
+                      </div>
+                      <Badge
+                        variant={
+                          reminder.callNotification ? "default" : "secondary"
+                        }
+                      >
+                        {reminder.callNotification ? "Enabled" : "Disabled"}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between rounded-lg border p-3">
+                      <div className="flex items-center gap-2">
+                        <RepeatIcon className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">
+                          Recurring Notifications
+                        </span>
+                      </div>
+                      <Badge
+                        variant={
+                          reminder.recurringNotification
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
+                        {reminder.recurringNotification
+                          ? "Enabled"
+                          : "Disabled"}
+                      </Badge>
+                    </div>
                   </div>
                 </div>
               </div>
             )}
           </CardContent>
         </Card>
-
-        {/* Reminder Status Card */}
-        {!isEditing && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Reminder Status</CardTitle>
-              <CardDescription>
-                Current status and information about this reminder
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Status</p>
-                  <Badge
-                    variant={
-                      !reminder.isActive
-                        ? "secondary"
-                        : isPastDue
-                          ? "destructive"
-                          : "default"
-                    }
-                    className="w-fit"
-                  >
-                    {!reminder.isActive
-                      ? "Disabled"
-                      : isPastDue
-                        ? "Past Due"
-                        : "Active"}
-                  </Badge>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Type</p>
-                  <Badge variant="outline" className="w-fit">
-                    {reminder.type === "till" ? "Countdown" : "Count Up"}
-                  </Badge>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Reminder ID</p>
-                  <p className="text-sm text-muted-foreground font-mono">
-                    {reminder.id}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
