@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // generate a random number between 0 and 29
-    const randomNumber = Math.floor(Math.random() * 3);
+    const randomNumber = Math.floor(Math.random() * intros.length);
     const intro = intros[randomNumber];
     console.log("line 40, intro", {
       randomNumber: randomNumber,
