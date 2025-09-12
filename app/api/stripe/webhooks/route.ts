@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
             appUrl: process.env.NEXT_PUBLIC_APP_URL as string,
           });
           await sendEmail({
-            from: "Successful Subscription <welcome@notifoo.io>",
+            from: "Successful Subscription <welcome@notifications.notifoo.io>",
             to: customerEmail,
             subject: "Subscription Success",
             body: successSubscriptionBody,

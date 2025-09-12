@@ -127,7 +127,7 @@ export const auth = betterAuth({
             });
             // send welcome email
             await sendEmail({
-              from: "Notifoo <ralph@notifoo.io>",
+              from: "Notifoo <ralph@notifications.notifoo.io>",
               to: user?.email as string,
               subject: "Welcome aboard 👋",
               body: welcomeEmailTemplate,

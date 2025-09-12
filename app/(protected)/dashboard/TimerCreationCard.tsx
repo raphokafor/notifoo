@@ -146,6 +146,7 @@ export function TimerCreationCard({
         callNotification,
         recurringNotification,
       });
+      clearState();
     }
   };
 

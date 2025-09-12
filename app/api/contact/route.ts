@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
 
     // send email to admin
     await sendEmail({
-      from: "Application Contact Form <noreply@notifoo.io>",
+      from: "Application Contact Form <noreply@support.notifoo.io>",
       to: process.env.ADMIN_EMAIL as string,
       subject: "Contact form submitted",
       body: `Name: ${name}\nEmail: ${email}\nMessage: ${message}\nSubject: ${subject}`,
