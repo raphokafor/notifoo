@@ -70,10 +70,12 @@ const BillingNoSubscription: React.FC<BillingNoSubscriptionProps> = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <HeaderComponent
-        title="Lets get you started"
-        description="We like to keep things simple with billing."
-      />
+      <div className="flex justify-between items-center pr-4 h-28 w-full bg-white sticky top-0 z-50">
+        <HeaderComponent
+          title="Lets get you started"
+          description="We like to keep things simple with billing."
+        />
+      </div>
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* No Subscription Alert */}
         <Alert className="mb-8 border-amber-200 bg-amber-50">

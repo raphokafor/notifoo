@@ -11,6 +11,8 @@ import { TimeProvider } from "@/contexts/TimeContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { TimerCreationCard } from "../dashboard/TimerCreationCard";
 import { User } from "@prisma/client";
+import { Button } from "@/components/ui/button";
+import { PlusIcon } from "lucide-react";
 
 const RemindersClient = ({
   reminders,
@@ -102,10 +104,29 @@ const RemindersClient = ({
   return (
     <TimeProvider>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <HeaderComponent
-          title="Reminders"
-          description="Create, edit, and delete your reminders"
-        />
+        <div className="flex justify-between items-center pr-4 h-28 w-full bg-white sticky top-0 z-50">
+          <HeaderComponent
+            title="Reminders"
+            description="Create, edit, and delete your reminders"
+          />
+
+          <Button
+            variant="default"
+            className="hidden md:flex items-center gap-2"
+            onClick={() => handleModalState(true)}
+          >
+            <PlusIcon />
+            Add Reminder
+          </Button>
+
+          <Button
+            variant="default"
+            className="md:hidden flex items-center gap-2"
+            onClick={() => handleModalState(true)}
+          >
+            <PlusIcon />
+          </Button>
+        </div>
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 justify-items-start content-start p-4 md:p-8"
           layout

@@ -217,10 +217,12 @@ export default function CustomerSettingsPage({
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 ">
       {/* Header */}
-      <HeaderComponent
-        title="Account Settings"
-        description="Manage your profile and security preferences"
-      />
+      <div className="flex justify-between items-center pr-4 h-28 w-full bg-white sticky top-0 z-50">
+        <HeaderComponent
+          title="Account Settings"
+          description="Manage your profile and security preferences"
+        />
+      </div>
       <div className="mx-auto max-w-4xl space-y-8 p-4 md:p-8">
         <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-3">
           {/* Profile Card */}

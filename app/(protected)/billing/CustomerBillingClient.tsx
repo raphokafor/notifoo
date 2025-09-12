@@ -186,10 +186,12 @@ export default function CustomerBillingClient({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <HeaderComponent
-        title="Manage Your Subscription"
-        description="Upgrade or downgrade your plan anytime"
-      />
+      <div className="flex justify-between items-center pr-4 h-28 w-full bg-white sticky top-0 z-50">
+        <HeaderComponent
+          title="Billing"
+          description="Manage your subscription and billing information"
+        />
+      </div>
       <div className="max-w-4xl mx-auto space-y-8 p-4 md:p-8">
         {/* Payment Method - Credit Card */}
         <Card>
