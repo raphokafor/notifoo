@@ -22,6 +22,7 @@ import {
   Repeat2Icon,
   ChevronLeft,
   ChevronRight,
+  GhostIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -506,10 +507,11 @@ export function Dashboard({
               </div>
             ) : (
               <div className="text-center py-12">
+                <GhostIcon className="h-10 w-10 mx-auto mb-4" />
                 <p className="text-muted-foreground text-lg">
                   No reminders scheduled for this day.
                 </p>
-                <Button
+                {/* <Button
                   variant="outline"
                   className="mt-4"
                   onClick={() => {
@@ -519,7 +521,7 @@ export function Dashboard({
                 >
                   <PlusIcon className="h-4 w-4 mr-2" />
                   Add Reminder
-                </Button>
+                </Button> */}
               </div>
             )}
           </div>
