@@ -291,6 +291,8 @@ export function Dashboard({
   // Custom Calendar Grid Component
   const CustomCalendarGrid = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [calendarView, setCalendarView] = useState<"month" | "day">("month");
+    const [selectedDate, setSelectedDate] = useState(new Date());
 
     // Get reminders for a specific date
     const getRemindersForDate = (date: Date) => {
@@ -362,115 +364,318 @@ export function Dashboard({
       return date.getMonth() === currentDate.getMonth();
     };
 
+    const navigateDay = (direction: number) => {
+      const newDate = new Date(selectedDate);
+      newDate.setDate(newDate.getDate() + direction);
+      setSelectedDate(newDate);
+      setCurrentDate(newDate); // Keep month in sync
+    };
+
+    const handleDayClick = (date: Date) => {
+      setSelectedDate(date);
+      setCalendarView("day");
+    };
+
+    // Day View Component
+    const DayView = () => {
+      const dayReminders = getRemindersForDate(selectedDate);
+      const { now } = useTime();
+
+      return (
+        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold">
+                {selectedDate.toLocaleDateString(undefined, {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </h3>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCalendarView("month")}
+              >
+                Back to Month
+              </Button>
+            </div>
+
+            {dayReminders.length > 0 ? (
+              <div className="space-y-4">
+                {dayReminders.map((timer) => {
+                  const timeLeft = formatTimeDifference(
+                    timer.dueDate,
+                    timer.type,
+                    now
+                  );
+                  const isExpired =
+                    timer.type === "till" && timeLeft.total <= 0;
+
+                  return (
+                    <div
+                      key={timer.id}
+                      className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => {
+                        window.location.href = `/reminders/${timer.id}`;
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div
+                            className={`w-4 h-4 rounded-full ${
+                              !timer.isActive
+                                ? "bg-red-600"
+                                : timer.type === "till"
+                                  ? "bg-green-500"
+                                  : "bg-zinc-500"
+                            }`}
+                          />
+                          <div>
+                            <h4 className="font-semibold text-lg">
+                              {timer.name}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              {timer.dueDate.toLocaleTimeString(undefined, {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </p>
+                            {isExpired ? (
+                              <Badge variant="destructive" className="mt-1">
+                                EXPIRED
+                              </Badge>
+                            ) : (
+                              <div className="font-mono text-sm mt-1">
+                                {timeLeft.days > 0 && `${timeLeft.days}d `}
+                                {timeLeft.hours > 0 &&
+                                  `${timeLeft.hours.toString().padStart(2, "0")}h `}
+                                {`${timeLeft.minutes.toString().padStart(2, "0")}m `}
+                                {`${timeLeft.seconds.toString().padStart(2, "0")}s`}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
+                            {timer.emailNotification && (
+                              <div className="p-1 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                                <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                              </div>
+                            )}
+                            {timer.smsNotification && (
+                              <div className="p-1 rounded-full bg-green-100 dark:bg-green-900/30">
+                                <MessageSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
+                              </div>
+                            )}
+                            {timer.callNotification && (
+                              <div className="p-1 rounded-full bg-orange-100 dark:bg-orange-900/30">
+                                <PhoneCallIcon className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                              </div>
+                            )}
+                            {timer.recurringNotification && (
+                              <div className="p-1 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                                <Repeat2Icon className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                              </div>
+                            )}
+                          </div>
+
+                          <Button
+                            variant={timer.isActive ? "default" : "ghost"}
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteTimer(timer.id!);
+                            }}
+                            disabled={isLoading}
+                            className={cn(
+                              "text-red-600 hover:text-red-700 hover:bg-red-50",
+                              timer.isActive &&
+                                "bg-green-500 text-white hover:bg-green-600 hover:text-white"
+                            )}
+                          >
+                            {timer.isActive ? "Done" : "Delete"}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground text-lg">
+                  No reminders scheduled for this day.
+                </p>
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => {
+                    // You could trigger the add reminder modal here
+                    handleModalState(true);
+                  }}
+                >
+                  <PlusIcon className="h-4 w-4 mr-2" />
+                  Add Reminder
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
     return (
       <div className="min-h-[calc(100vh-7rem)] p-4 md:p-8">
         <div className="w-full h-full flex flex-col">
           {/* Calendar Header */}
           <div className="flex items-center justify-between mb-4 p-4 bg-white rounded-lg shadow">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigateMonth(-1)}
-              className="p-2"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <h2 className="text-xl font-semibold">
-              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-            </h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigateMonth(1)}
-              className="p-2"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  calendarView === "month" ? navigateMonth(-1) : navigateDay(-1)
+                }
+                className="p-2"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
 
-          {/* Calendar Grid */}
-          <div className="flex-1 bg-white rounded-lg shadow overflow-hidden">
-            {/* Day Headers */}
-            <div className="grid grid-cols-7 bg-gray-50 border-b">
-              {dayNames.map((day) => (
-                <div
-                  key={day}
-                  className="p-3 text-center font-medium text-gray-700 border-r last:border-r-0"
-                >
-                  {day}
-                </div>
-              ))}
+              <h2 className="text-xl font-semibold">
+                {calendarView === "month"
+                  ? `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`
+                  : selectedDate.toLocaleDateString(undefined, {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+              </h2>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  calendarView === "month" ? navigateMonth(1) : navigateDay(1)
+                }
+                className="p-2"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
 
-            {/* Calendar Days */}
-            <div
-              className="grid grid-cols-7"
-              style={{ gridTemplateRows: "repeat(6, 1fr)" }}
-            >
-              {calendarDays.map((date, index) => {
-                const dayReminders = getRemindersForDate(date);
-                const isCurrentMonthDay = isCurrentMonth(date);
-                const isTodayDate = isToday(date);
+            <div className="flex items-center gap-2">
+              <Button
+                variant={calendarView === "month" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setCalendarView("month")}
+              >
+                Month
+              </Button>
+              <Button
+                variant={calendarView === "day" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setCalendarView("day")}
+              >
+                Day
+              </Button>
+            </div>
+          </div>
 
-                return (
+          {/* Calendar Content */}
+          {calendarView === "day" ? (
+            <DayView />
+          ) : (
+            <div className="flex-1 bg-white rounded-lg shadow overflow-hidden">
+              {/* Day Headers */}
+              <div className="grid grid-cols-7 bg-gray-50 border-b">
+                {dayNames.map((day) => (
                   <div
-                    key={index}
-                    className={cn(
-                      "border-r border-b last-in-row:border-r-0 p-2 min-h-[120px] flex flex-col",
-                      !isCurrentMonthDay && "bg-gray-50 text-gray-400",
-                      isTodayDate && "bg-blue-50 border-blue-200"
-                    )}
+                    key={day}
+                    className="p-3 text-center font-medium text-gray-700 border-r last:border-r-0"
                   >
-                    {/* Day Number */}
-                    <div
-                      className={cn(
-                        "text-sm font-medium mb-2",
-                        isTodayDate && "text-blue-600 font-bold",
-                        !isCurrentMonthDay && "text-gray-400"
-                      )}
-                    >
-                      {date.getDate()}
-                    </div>
-
-                    {/* Reminders */}
-                    <div className="flex-1 space-y-1 overflow-hidden">
-                      {dayReminders.slice(0, 4).map((timer) => (
-                        <div
-                          key={timer.id}
-                          className="text-xs px-2 py-1 rounded text-white truncate cursor-pointer hover:opacity-80 transition-opacity"
-                          style={{
-                            backgroundColor: !timer.isActive
-                              ? "#dc2626"
-                              : timer.type === "till"
-                                ? "#059669"
-                                : "#6b7280",
-                          }}
-                          title={`${timer.name} - ${timer.dueDate.toLocaleTimeString(
-                            undefined,
-                            {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}`}
-                          onClick={() => {
-                            // Navigate to reminder detail or show popup
-                            window.location.href = `/reminders/${timer.id}`;
-                          }}
-                        >
-                          {timer.name}
-                        </div>
-                      ))}
-                      {dayReminders.length > 4 && (
-                        <div className="text-xs text-gray-500 text-center font-medium">
-                          +{dayReminders.length - 4} more
-                        </div>
-                      )}
-                    </div>
+                    {day}
                   </div>
-                );
-              })}
+                ))}
+              </div>
+
+              {/* Calendar Days */}
+              <div
+                className="grid grid-cols-7"
+                style={{ gridTemplateRows: "repeat(6, 1fr)" }}
+              >
+                {calendarDays.map((date, index) => {
+                  const dayReminders = getRemindersForDate(date);
+                  const isCurrentMonthDay = isCurrentMonth(date);
+                  const isTodayDate = isToday(date);
+
+                  return (
+                    <div
+                      key={index}
+                      className={cn(
+                        "border-r border-b last-in-row:border-r-0 p-2 min-h-[120px] flex flex-col cursor-pointer hover:bg-gray-50 transition-colors",
+                        !isCurrentMonthDay && "bg-gray-50 text-gray-400",
+                        isTodayDate && "bg-blue-50 border-blue-200",
+                        selectedDate.toDateString() === date.toDateString() &&
+                          "ring-2 ring-blue-300"
+                      )}
+                      onClick={() => handleDayClick(date)}
+                    >
+                      {/* Day Number */}
+                      <div
+                        className={cn(
+                          "text-sm font-medium mb-2",
+                          isTodayDate && "text-blue-600 font-bold",
+                          !isCurrentMonthDay && "text-gray-400"
+                        )}
+                      >
+                        {date.getDate()}
+                      </div>
+
+                      {/* Reminders */}
+                      <div className="flex-1 space-y-1 overflow-hidden">
+                        {dayReminders.slice(0, 4).map((timer) => (
+                          <div
+                            key={timer.id}
+                            className="text-xs px-2 py-1 rounded text-white truncate cursor-pointer hover:opacity-80 transition-opacity"
+                            style={{
+                              backgroundColor: !timer.isActive
+                                ? "#dc2626"
+                                : timer.type === "till"
+                                  ? "#059669"
+                                  : "#6b7280",
+                            }}
+                            title={`${timer.name} - ${timer.dueDate.toLocaleTimeString(
+                              undefined,
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Navigate to reminder detail or show popup
+                              window.location.href = `/reminders/${timer.id}`;
+                            }}
+                          >
+                            {timer.name}
+                          </div>
+                        ))}
+                        {dayReminders.length > 4 && (
+                          <div className="text-xs text-gray-500 text-center font-medium">
+                            +{dayReminders.length - 4} more
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     );
