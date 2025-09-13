@@ -215,6 +215,7 @@ model Reminder {
   type     String   @default("till") // till or from
   dueDate  DateTime // when the reminder is due
   isActive Boolean  @default(true) // is the reminder active?
+  isDone   Boolean  @default(false) // is the reminder marked as done by the user?
   repeat   Boolean  @default(false) // should the reminder be repeated? if true automatically create another reminder right before executing the notifications
 
   // notification settings

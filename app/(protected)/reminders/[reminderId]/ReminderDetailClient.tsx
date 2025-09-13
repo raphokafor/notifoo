@@ -62,6 +62,7 @@ import {
   PowerOffIcon,
   PhoneCallIcon,
   RepeatIcon,
+  CheckCheck,
 } from "lucide-react";
 import { format } from "date-fns";
 import { FormError } from "@/components/form-error";
@@ -331,34 +332,25 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
           </p>
         </div>
         <div className="flex mt-4 md:mt-0 items-center gap-1 px-4 mx-4">
-          {!isEditing && (
-            <>
-              <Button
-                variant={reminder.isActive ? "outline" : "default"}
-                onClick={handleToggleStatus}
-                disabled={isTogglingStatus}
-                className={`flex items-center gap-2 ${reminder.isActive ? "text-red-500" : "text-green-500"}`}
-              >
-                {reminder.isActive ? (
-                  <PowerIcon className="h-4 w-4" color="red" />
-                ) : (
-                  <PowerIcon className="h-4 w-4" color="green" />
-                )}
-                {isTogglingStatus
-                  ? "Updating..."
-                  : reminder.isActive
-                    ? "Disable"
-                    : "Enable"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2"
-              >
-                <EditIcon className="h-4 w-4" />
-                Edit
-              </Button>
-            </>
+          {reminder.isActive && (
+            <Button
+              onClick={handleToggleStatus}
+              disabled={isTogglingStatus}
+              className={`flex items-center gap-2 text-white bg-green-500 hover:bg-green-400`}
+            >
+              <CheckCheck />
+              Done
+            </Button>
+          )}
+          {!isEditing && reminder.isActive && (
+            <Button
+              variant="outline"
+              onClick={() => setIsEditing(true)}
+              className="flex items-center gap-2"
+            >
+              <EditIcon className="h-4 w-4" />
+              Edit
+            </Button>
           )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -405,9 +397,6 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   {isEditing ? "Edit Reminder" : reminder.name}
-                  {!reminder.isActive && !isEditing && (
-                    <Badge variant="secondary">Disabled</Badge>
-                  )}
                 </CardTitle>
                 {!isEditing && (
                   <CardDescription>
@@ -434,45 +423,66 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                           <Input
                             placeholder="Enter reminder name"
                             {...field}
-                            disabled={isUpdating}
+                            disabled={isUpdating || !reminder.isActive}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Reminder Description</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Enter reminder notes for yourself"
+                            {...field}
+                            disabled={isUpdating || !reminder.isActive}
+                            rows={3}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <div className="space-y-4">
                     <FormLabel className="text-base font-semibold text-zinc-700">
                       Reminder Settings
                     </FormLabel>
 
-                    <FormField
-                      control={form.control}
-                      name="isActive"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                          <div className="space-y-0.5">
-                            <div className="flex items-center gap-2">
-                              <PowerIcon className="h-4 w-4 text-muted-foreground" />
-                              <FormLabel className="text-base text-zinc-500">
-                                Enable Reminder
-                              </FormLabel>
+                    {reminder.isActive && isEditing && (
+                      <FormField
+                        control={form.control}
+                        name="isActive"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-2">
+                                <PowerIcon className="h-4 w-4 text-muted-foreground" />
+                                <FormLabel className="text-base text-zinc-500">
+                                  Enable Reminder
+                                </FormLabel>
+                              </div>
+                              <FormDescription>
+                                When disabled, this reminder will not send
+                                notifications
+                              </FormDescription>
                             </div>
-                            <FormDescription>
-                              When disabled, this reminder will not send
-                              notifications
-                            </FormDescription>
-                          </div>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={handleIsActiveToggle}
-                              disabled={isUpdating}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={handleIsActiveToggle}
+                                disabled={isUpdating || !reminder.isActive}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    )}
 
                     <FormField
                       control={form.control}
@@ -494,7 +504,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                             <Switch
                               checked={field.value}
                               onCheckedChange={handleEmailToggle}
-                              disabled={isUpdating}
+                              disabled={isUpdating || !reminder.isActive}
                             />
                           </FormControl>
                         </FormItem>
@@ -521,7 +531,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                             <Switch
                               checked={field.value}
                               onCheckedChange={handleSmsToggle}
-                              disabled={isUpdating}
+                              disabled={isUpdating || !reminder.isActive}
                             />
                           </FormControl>
                         </FormItem>
@@ -548,7 +558,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                             <Switch
                               checked={field.value as boolean}
                               onCheckedChange={handleCallToggle}
-                              disabled={isUpdating}
+                              disabled={isUpdating || !reminder.isActive}
                             />
                           </FormControl>
                         </FormItem>
@@ -576,7 +586,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                             <Switch
                               checked={field.value as boolean}
                               onCheckedChange={handleRecurringToggle}
-                              disabled={isUpdating}
+                              disabled={isUpdating || !reminder.isActive}
                             />
                           </FormControl>
                         </FormItem>

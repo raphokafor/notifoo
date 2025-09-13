@@ -212,7 +212,6 @@ const RemindersClient = ({
 
                   <TableCell>
                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Calendar className="w-3 h-3" />
                       {reminder.dueDate.toLocaleDateString(undefined, {
                         year: "numeric",
                         month: "short",
@@ -268,15 +267,6 @@ const RemindersClient = ({
             })}
           </TableBody>
         </Table>
-
-        <TimerCreationCard
-          onCreateTimer={handleCreateTimer}
-          handleModalState={handleModalState}
-          modalState={modalState}
-          error={error}
-          isLoading={isLoading}
-          user={user}
-        />
       </div>
     );
   };
