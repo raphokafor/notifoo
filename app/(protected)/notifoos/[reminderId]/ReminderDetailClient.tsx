@@ -157,7 +157,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
 
       if (result.success) {
         toast.success("Reminder deleted successfully!");
-        router.push("/reminders");
+        router.back();
       } else {
         setError(result.message || "Failed to delete reminder");
         toast.error(result.message || "Failed to delete reminder");

@@ -23,6 +23,8 @@ import {
   ChevronLeft,
   ChevronRight,
   GhostIcon,
+  TrashIcon,
+  CheckIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -206,7 +208,7 @@ export function Dashboard({
 
                   <TableCell className="font-medium">
                     <Link
-                      href={`/reminders/${timer.id}`}
+                      href={`/notifoos/${timer.id}`}
                       className={`hover:underline ${
                         !timer.isActive ? "line-through" : ""
                       }`}
@@ -421,7 +423,7 @@ export function Dashboard({
                       key={timer.id}
                       className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
                       onClick={() => {
-                        window.location.href = `/reminders/${timer.id}`;
+                        window.location.href = `/notifoos/${timer.id}`;
                       }}
                     >
                       <div className="flex flex-col md:flex-row items-center justify-between">
@@ -432,7 +434,7 @@ export function Dashboard({
                         </div>
 
                         {/* Right Side */}
-                        <div className="w-full flex items-center">
+                        <div className="w-full flex justify-between items-center mt-2">
                           <div className="flex items-center gap-4">
                             <div
                               className={`w-4 h-4 rounded-full ${
@@ -477,12 +479,16 @@ export function Dashboard({
                               }}
                               disabled={isLoading}
                               className={cn(
-                                "text-red-600 hover:text-red-700 hover:bg-red-50",
+                                "text-red-600 hover:text-red-700 hover:bg-red-500",
                                 timer.isActive &&
                                   "bg-green-500 text-white hover:bg-green-600 hover:text-white"
                               )}
                             >
-                              {timer.isActive ? "Done" : "Delete"}
+                              {timer.isActive ? (
+                                <CheckIcon color="white" className="h-4 w-4" />
+                              ) : (
+                                <TrashIcon className="h-4 w-4" color="white" />
+                              )}
                             </Button>
 
                             <div className="flex items-center gap-2">
@@ -658,7 +664,7 @@ export function Dashboard({
                             onClick={(e) => {
                               e.stopPropagation();
                               // Navigate to reminder detail or show popup
-                              window.location.href = `/reminders/${timer.id}`;
+                              window.location.href = `/notifoos/${timer.id}`;
                             }}
                           >
                             {timer.name}
@@ -784,7 +790,7 @@ export function Dashboard({
               onClick={() => handleModalState(true)}
             >
               <PlusIcon />
-              Add Reminder
+              Add a Notifoo
             </Button>
 
             <Button

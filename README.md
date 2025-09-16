@@ -15,7 +15,7 @@ TWILIO_PHONE_NUMBER=your_twilio_phone_number
 
 ## Pricing Thoughts
 
-- $2.99
+- $1.99
   - simple email notifications of reminder
 - $4.99
   - emails and SMS notifications for U.S. phone numbers

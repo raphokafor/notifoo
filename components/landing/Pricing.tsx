@@ -65,7 +65,7 @@ export function PricingSection({ user }: { user?: User }) {
           Pricing
         </p>
         <h1 className="text-xl md:text-2xl font-bold text-zinc-600 mb-8 leading-tight">
-          For $4.99/month, ditch your forgetfulness and the bad phone apps.
+          For $1.99/month, ditch your forgetfulness and the bad phone apps.
         </h1>
       </div>
 

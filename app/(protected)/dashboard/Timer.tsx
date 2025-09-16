@@ -122,7 +122,7 @@ export function Timer({
       className="rounded-3xl"
     >
       <AnimatePresence>
-        <Link href={`/reminders/${id}`}>
+        <Link href={`/notifoos/${id}`}>
           <Card
             className={`w-[280px] h-[280px] relative ${isExpired && !isHovered ? "opacity-50" : ""} transition-opacity duration-200`}
             onMouseEnter={() => {

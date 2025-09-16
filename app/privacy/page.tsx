@@ -43,11 +43,11 @@ export default function PrivacyPolicy() {
                 </li>
                 <li>
                   <strong>Contact Details:</strong> Phone number for SMS
-                  reminders (we won't spam you, promise)
+                  reminders/notifoos (we won't spam you, promise)
                 </li>
                 <li>
-                  <strong>Reminder Data:</strong> The actual reminders you set
-                  (we need to know what to remind you about!)
+                  <strong>Reminder Data:</strong> The actual reminders/notifoos
+                  you set (we need to know what to remind you about!)
                 </li>
                 <li>
                   <strong>Usage Analytics:</strong> How you use the app (to make
@@ -98,12 +98,12 @@ export default function PrivacyPolicy() {
               <p>We use your information to:</p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>
-                  Send you the reminders you've set up (that's literally our
-                  job)
+                  Send you the reminders/notifoos you've set up (that's
+                  literally our job)
                 </li>
                 <li>Improve our service and add new features</li>
                 <li>Provide customer support when you need help</li>
-                <li>Send important account and service updates</li>
+                <li>Send important account and service updates/notifoos</li>
                 <li>
                   Comply with legal requirements (the boring but necessary
                   stuff)
@@ -128,15 +128,15 @@ export default function PrivacyPolicy() {
               <ul className="list-disc pl-6 space-y-2">
                 <li>
                   <strong>SMS Providers:</strong> To send your text message
-                  reminders
+                  reminders/notifoos
                 </li>
                 <li>
                   <strong>Email Services:</strong> To deliver email
-                  notifications
+                  notifications/notifoos
                 </li>
                 <li>
                   <strong>Analytics Tools:</strong> To understand how to improve
-                  Notifoo
+                  Notifoo/reminder
                 </li>
                 <li>
                   <strong>Payment Processors:</strong> To handle subscriptions
@@ -165,7 +165,7 @@ export default function PrivacyPolicy() {
               </ul>
               <p className="text-sm text-muted-foreground mt-4">
                 To exercise any of these rights, just contact us. We'll handle
-                it faster than you can say "Notifoo!"
+                it faster than you can say "Notifoo/reminder!"
               </p>
             </CardContent>
           </Card>

@@ -49,7 +49,7 @@ export const NotifyEmailTemplate = ({
                             
                             <!-- Action Button -->
                             <div style="text-align: center; margin: 30px 0;">
-                                <a href="https://www.notifoo.io/reminders" style="display: inline-block; background-color: #3b82f6; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3); transition: all 0.2s;">
+                                <a href="https://www.notifoo.io/notifoos" style="display: inline-block; background-color: #3b82f6; color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3); transition: all 0.2s;">
                                     Set Another Reminder
                                 </a>
                             </div>

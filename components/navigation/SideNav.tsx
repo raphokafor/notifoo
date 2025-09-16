@@ -29,8 +29,8 @@ const navigation = [
     icon: LayoutDashboard,
   },
   {
-    name: "Reminders",
-    href: "/reminders",
+    name: "Notifoos",
+    href: "/notifoos",
     icon: CalendarIcon,
   },
   {
@@ -149,12 +149,18 @@ export default function SideNav({ className, user }: SideNavProps) {
       <Button
         size="sm"
         onClick={handleToggleCollapse}
-        className="absolute top-11 -right-4 z-10 p-2 bg-white border border-slate-200 hover:bg-slate-50 rounded-full shadow-sm"
+        className="absolute top-11 -right-4 z-10 p-2 bg-white border border-slate-200 hover:bg-white rounded-full shadow-sm"
       >
         {collapsed ? (
-          <ChevronRight className="w-4 h-4" color="black" />
+          <ChevronRight
+            className="w-4 h-4 hover:bg-white hover:text-white"
+            color="black"
+          />
         ) : (
-          <ChevronLeft className="w-4 h-4" color="black" />
+          <ChevronLeft
+            className="w-4 h-4 hover:bg-white hover:text-white"
+            color="black"
+          />
         )}
       </Button>
 

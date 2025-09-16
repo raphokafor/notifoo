@@ -187,7 +187,7 @@ const RemindersClient = ({
 
                   <TableCell className="font-medium">
                     <Link
-                      href={`/reminders/${reminder.id}`}
+                      href={`/notifoos/${reminder.id}`}
                       className={`hover:underline ${
                         !reminder.isActive ? "line-through" : ""
                       }`}
@@ -304,7 +304,7 @@ const RemindersClient = ({
               onClick={() => handleModalState(true)}
             >
               <PlusIcon />
-              Add Reminder
+              Add a Notifoo
             </Button>
 
             <Button
