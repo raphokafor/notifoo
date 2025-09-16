@@ -2,14 +2,13 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import React from "react";
-import RemindersClient from "./RemindersClient";
 import { getReminders } from "@/app/actions/reminder-actions";
+import { getUser } from "@/lib/db-actions";
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/db-actions";
+import RemindersClient from "./RemindersClient";
 
 const RemindersPage = async () => {
-  const user = await getCurrentUser();
+  const user = await getUser();
   if (!user) {
     redirect("/signin");
   }

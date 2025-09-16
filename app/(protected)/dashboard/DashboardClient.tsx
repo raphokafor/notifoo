@@ -69,6 +69,7 @@ export function Dashboard({
   );
 
   const handleModalState = (state: boolean) => {
+    console.log("handleModalState", state);
     setModalState(state);
   };
 
@@ -386,7 +387,7 @@ export function Dashboard({
         <div className="flex-1 bg-white rounded-lg shadow overflow-hidden">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold">
+              <h3 className="md:text-2xl hidden font-bold">
                 {selectedDate.toLocaleDateString(undefined, {
                   weekday: "long",
                   year: "numeric",
@@ -398,6 +399,7 @@ export function Dashboard({
                 variant="outline"
                 size="sm"
                 onClick={() => setCalendarView("month")}
+                className="w-full"
               >
                 Back to Month
               </Button>
@@ -422,83 +424,90 @@ export function Dashboard({
                         window.location.href = `/reminders/${timer.id}`;
                       }}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div
-                            className={`w-4 h-4 rounded-full ${
-                              !timer.isActive
-                                ? "bg-red-600"
-                                : timer.type === "till"
-                                  ? "bg-green-500"
-                                  : "bg-zinc-500"
-                            }`}
-                          />
-                          <div>
-                            <h4 className="font-semibold text-lg">
-                              {timer.name}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">
-                              {timer.dueDate.toLocaleTimeString(undefined, {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </p>
-                            {isExpired ? (
-                              <Badge variant="destructive" className="mt-1">
-                                EXPIRED
-                              </Badge>
-                            ) : (
-                              <div className="font-mono text-sm mt-1">
-                                {timeLeft.days > 0 && `${timeLeft.days}d `}
-                                {timeLeft.hours > 0 &&
-                                  `${timeLeft.hours.toString().padStart(2, "0")}h `}
-                                {`${timeLeft.minutes.toString().padStart(2, "0")}m `}
-                                {`${timeLeft.seconds.toString().padStart(2, "0")}s`}
-                              </div>
-                            )}
-                          </div>
+                      <div className="flex flex-col md:flex-row items-center justify-between">
+                        <div className="w-full bg-red-500">
+                          <h4 className="font-semibold text-lg">
+                            {timer.name}
+                          </h4>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-2">
-                            {timer.emailNotification && (
-                              <div className="p-1 rounded-full bg-blue-100 dark:bg-blue-900/30">
-                                <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                              </div>
-                            )}
-                            {timer.smsNotification && (
-                              <div className="p-1 rounded-full bg-green-100 dark:bg-green-900/30">
-                                <MessageSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
-                              </div>
-                            )}
-                            {timer.callNotification && (
-                              <div className="p-1 rounded-full bg-orange-100 dark:bg-orange-900/30">
-                                <PhoneCallIcon className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                              </div>
-                            )}
-                            {timer.recurringNotification && (
-                              <div className="p-1 rounded-full bg-purple-100 dark:bg-purple-900/30">
-                                <Repeat2Icon className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                              </div>
-                            )}
+                        {/* Right Side */}
+                        <div className="w-full flex items-center">
+                          <div className="flex items-center gap-4">
+                            <div
+                              className={`w-4 h-4 rounded-full ${
+                                !timer.isActive
+                                  ? "bg-red-600"
+                                  : timer.type === "till"
+                                    ? "bg-green-500"
+                                    : "bg-zinc-500"
+                              }`}
+                            />
+
+                            <div>
+                              <p className="md:text-sm text-xs text-muted-foreground">
+                                {timer.dueDate.toLocaleTimeString(undefined, {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </p>
+                              {isExpired ? (
+                                <Badge variant="destructive" className="mt-1">
+                                  EXPIRED
+                                </Badge>
+                              ) : (
+                                <div className="font-mono md:text-sm text-xs mt-1">
+                                  {timeLeft.days > 0 && `${timeLeft.days}d `}
+                                  {timeLeft.hours > 0 &&
+                                    `${timeLeft.hours.toString().padStart(2, "0")}h `}
+                                  {`${timeLeft.minutes.toString().padStart(2, "0")}m `}
+                                  {`${timeLeft.seconds.toString().padStart(2, "0")}s`}
+                                </div>
+                              )}
+                            </div>
                           </div>
 
-                          <Button
-                            variant={timer.isActive ? "default" : "ghost"}
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteTimer(timer.id!);
-                            }}
-                            disabled={isLoading}
-                            className={cn(
-                              "text-red-600 hover:text-red-700 hover:bg-red-50",
-                              timer.isActive &&
-                                "bg-green-500 text-white hover:bg-green-600 hover:text-white"
-                            )}
-                          >
-                            {timer.isActive ? "Done" : "Delete"}
-                          </Button>
+                          <div className="flex md:flex-row flex-col items-center gap-3">
+                            <Button
+                              variant={timer.isActive ? "default" : "ghost"}
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteTimer(timer.id!);
+                              }}
+                              disabled={isLoading}
+                              className={cn(
+                                "text-red-600 hover:text-red-700 hover:bg-red-50",
+                                timer.isActive &&
+                                  "bg-green-500 text-white hover:bg-green-600 hover:text-white"
+                              )}
+                            >
+                              {timer.isActive ? "Done" : "Delete"}
+                            </Button>
+
+                            <div className="flex items-center gap-2">
+                              {timer.emailNotification && (
+                                <div className="p-1 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                                  <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                </div>
+                              )}
+                              {timer.smsNotification && (
+                                <div className="p-1 rounded-full bg-green-100 dark:bg-green-900/30">
+                                  <MessageSquare className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                </div>
+                              )}
+                              {timer.callNotification && (
+                                <div className="p-1 rounded-full bg-orange-100 dark:bg-orange-900/30">
+                                  <PhoneCallIcon className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                                </div>
+                              )}
+                              {timer.recurringNotification && (
+                                <div className="p-1 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                                  <Repeat2Icon className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -511,17 +520,6 @@ export function Dashboard({
                 <p className="text-muted-foreground text-lg">
                   No reminders scheduled for this day.
                 </p>
-                {/* <Button
-                  variant="outline"
-                  className="mt-4"
-                  onClick={() => {
-                    // You could trigger the add reminder modal here
-                    handleModalState(true);
-                  }}
-                >
-                  <PlusIcon className="h-4 w-4 mr-2" />
-                  Add Reminder
-                </Button> */}
               </div>
             )}
           </div>
@@ -546,7 +544,7 @@ export function Dashboard({
                 <ChevronLeft className="h-4 w-4" />
               </Button>
 
-              <h2 className="text-xl font-semibold">
+              <h2 className="md:text-xl text-xs font-semibold">
                 {calendarView === "month"
                   ? `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`
                   : selectedDate.toLocaleDateString(undefined, {
@@ -731,14 +729,6 @@ export function Dashboard({
                   </motion.div>
                 ))}
             </AnimatePresence>
-            <TimerCreationCard
-              onCreateTimer={handleCreateTimer}
-              handleModalState={handleModalState}
-              modalState={modalState}
-              error={error}
-              isLoading={isLoading}
-              user={user}
-            />
           </motion.div>
         );
     }
@@ -808,6 +798,17 @@ export function Dashboard({
         </div>
 
         {renderContent()}
+
+        {/* Move TimerCreationCard outside renderContent so the modal is always available */}
+        <TimerCreationCard
+          onCreateTimer={handleCreateTimer}
+          handleModalState={handleModalState}
+          modalState={modalState}
+          error={error}
+          isLoading={isLoading}
+          user={user}
+          hideCard={viewMode !== "cards"} // Add this prop to hide the card visual in non-cards view
+        />
       </div>
     </TimeProvider>
   );
