@@ -426,8 +426,8 @@ export function Dashboard({
                         window.location.href = `/notifoos/${timer.id}`;
                       }}
                     >
-                      <div className="flex flex-col md:flex-row items-center justify-between">
-                        <div className="w-full bg-red-500">
+                      <div className="flex flex-col  items-center justify-between">
+                        <div className="w-full">
                           <h4 className="font-semibold text-lg">
                             {timer.name}
                           </h4>
@@ -479,7 +479,7 @@ export function Dashboard({
                               }}
                               disabled={isLoading}
                               className={cn(
-                                "text-red-600 hover:text-red-700 hover:bg-red-500",
+                                "text-red-600 hover:text-red-700 bg-red-500",
                                 timer.isActive &&
                                   "bg-green-500 text-white hover:bg-green-600 hover:text-white"
                               )}

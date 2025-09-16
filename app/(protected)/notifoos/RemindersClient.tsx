@@ -339,7 +339,7 @@ const RemindersClient = ({
                               }}
                               disabled={isLoading}
                               className={cn(
-                                "text-red-600 hover:text-red-700 hover:bg-red-500",
+                                "text-red-600 hover:text-red-700 bg-red-500",
                                 timer.isActive &&
                                   "bg-green-500 text-white hover:bg-green-600 hover:text-white"
                               )}

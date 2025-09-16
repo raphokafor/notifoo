@@ -234,7 +234,7 @@ export function TimerCreationCard({
                         onChange={(e) =>
                           handleTimeChange("hours", e.target.value)
                         }
-                        className="w-full text-center font-mono text-sm"
+                        className="w-full text-center font-mono text-base md:text-sm"
                       />
                     </div>
                     <div className="text-2xl font-bold text-muted-foreground mt-6">
@@ -253,7 +253,7 @@ export function TimerCreationCard({
                         onChange={(e) =>
                           handleTimeChange("minutes", e.target.value)
                         }
-                        className="w-full text-center font-mono text-sm"
+                        className="w-full text-center font-mono text-base md:text-sm"
                       />
                     </div>
                     <div className="flex flex-col items-center gap-1 flex-1 max-w-[70px]">
