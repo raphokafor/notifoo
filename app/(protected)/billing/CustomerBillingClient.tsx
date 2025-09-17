@@ -325,7 +325,7 @@ export default function CustomerBillingClient({
                       <p className="text-sm text-gray-500 mt-1">
                         {subscriptionData.status === "trialing"
                           ? `${moment(subscriptionData.trial_end).diff(moment(), "days")} days left`
-                          : `in ${moment(subscriptionData.current_period_start).diff(moment(), "days")} days`}
+                          : ``}
                       </p>
                     </div>
                   </div>

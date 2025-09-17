@@ -5,18 +5,32 @@ export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
   // Enable React 19 features
   fetchOptions: {
-    onError: (context) => {
-      console.error("Auth error:", context);
+    onError: (context: any) => {
+      // console.error("Auth error:", context);
       // Optional: Add toast notification here
+      Analytics.track("auth_error", {
+        sessionError: context?.error,
+        userId: context?.user?.id,
+        email: context?.user?.email,
+        name: context?.user?.name,
+        ipAddress: context?.session?.ipAddress,
+        userAgent: context?.session?.userAgent,
+        userCreated: context?.user?.createdAt,
+        userRole: context?.user?.role,
+      });
     },
-    onSuccess: (context) => {
-      console.log("Auth success:", context);
+    onSuccess: (context: any) => {
+      // console.log("Auth success:", context);
       // add vercel analytics
-      // Analytics.track("auth_success", {
-      //   userId: context?.session?.user?.id,
-      //   email: context?.session?.user?.email,
-      //   name: context?.session?.user?.name,
-      // });
+      Analytics.track("auth_success", {
+        userId: context?.user?.id,
+        email: context?.user?.email,
+        name: context?.user?.name,
+        ipAddress: context?.session?.ipAddress,
+        userAgent: context?.session?.userAgent,
+        userCreated: context?.user?.createdAt,
+        userRole: context?.user?.role,
+      });
     },
   },
 });

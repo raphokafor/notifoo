@@ -181,16 +181,16 @@ export function TimerCreationCard({
   return (
     <>
       {/* Only show the card visual in cards view */}
-      {!hideCard && (
+      {/* {!hideCard && (
         <Card
-          className="w-[280px] h-[280px] rounded-3xl bg-transparent hover:bg-card/10 border border-dashed border-muted-foreground/30 hover:opacity-100 cursor-pointer transition-all duration-200"
+          className="w-[280px] h-[280px] rounded-xl bg-transparent hover:bg-card/10 border border-dashed border-muted-foreground/30 hover:opacity-100 cursor-pointer transition-all duration-200 ml-8"
           onClick={() => handleModalState(true)}
         >
           <CardContent className="p-4 h-full flex flex-col items-center justify-center">
             <Plus className="w-12 h-12 text-muted-foreground/50" />
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       {/* Modal is always available */}
       <Dialog open={modalState} onOpenChange={handleOpenChange}>
