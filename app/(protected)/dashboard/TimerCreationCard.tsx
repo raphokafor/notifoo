@@ -33,6 +33,7 @@ import { FormError } from "@/components/form-error";
 import { User } from "@prisma/client";
 import Link from "next/link";
 import { track } from "@vercel/analytics/react";
+import { useRouter } from "next/navigation";
 
 interface TimerCreationCardProps {
   onCreateTimer: (timer: Omit<TimerData, "id">) => void;
@@ -53,6 +54,7 @@ export function TimerCreationCard({
   isLoading,
   hideCard = false, // Add this with default value
 }: TimerCreationCardProps) {
+  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState({
     hours: 12,
@@ -161,7 +163,8 @@ export function TimerCreationCard({
     setSmsNotification(false);
     setCallNotification(false);
     setRecurringNotification(false);
-    setStep("date");
+    // setStep("date");
+    router.refresh();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -234,7 +237,7 @@ export function TimerCreationCard({
                         onChange={(e) =>
                           handleTimeChange("hours", e.target.value)
                         }
-                        className="w-full text-center font-mono text-base md:text-sm"
+                        className="w-full text-center font-mono text-base md:text-lg"
                       />
                     </div>
                     <div className="text-2xl font-bold text-muted-foreground mt-6">
@@ -253,7 +256,7 @@ export function TimerCreationCard({
                         onChange={(e) =>
                           handleTimeChange("minutes", e.target.value)
                         }
-                        className="w-full text-center font-mono text-base md:text-sm"
+                        className="w-full text-center font-mono text-base md:text-lg"
                       />
                     </div>
                     <div className="flex flex-col items-center gap-1 flex-1 max-w-[70px]">
@@ -264,7 +267,7 @@ export function TimerCreationCard({
                           handlePeriodChange(value)
                         }
                       >
-                        <SelectTrigger className="w-full font-mono text-sm">
+                        <SelectTrigger className="w-full font-mono text-base md:text-lg   ">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
