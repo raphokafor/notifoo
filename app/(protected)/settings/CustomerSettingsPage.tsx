@@ -127,7 +127,7 @@ export default function CustomerSettingsPage({
       console.log("line 49, profileData", profileData);
       const { success, message } = await updateUser({
         name: profileData.name,
-        phone: normalizePhoneNumber(profileData.phone ?? ""), // Convert back to international format
+        // phone: normalizePhoneNumber(profileData.phone ?? ""), // Convert back to international format
       });
       if (success) {
         toast({
@@ -296,12 +296,13 @@ export default function CustomerSettingsPage({
                 >
                   Phone Number{" "}
                   <span className="text-xs text-slate-500">
-                    (Optional for SMS notifications)
+                    (for SMS notifications)
                   </span>
                 </Label>
                 <Input
                   id="phone"
                   type="tel"
+                  disabled={true}
                   placeholder="(404)-123-1234"
                   value={profileData.phone ?? ""}
                   onChange={handlePhoneChange}

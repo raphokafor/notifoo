@@ -98,14 +98,14 @@ export const getUserLogins = async () => {
 
 export const updateUser = async ({
   name,
-  phone,
+  // phone,
 }: {
   name: string;
-  phone: string | null;
+  // phone: string | null;
 }) => {
   try {
     console.log("line 101, name", name);
-    console.log("line 102, phone", phone);
+    // console.log("line 102, phone", phone);
     const user = await getCurrentUser();
     if (!user) {
       return {
@@ -115,21 +115,22 @@ export const updateUser = async ({
     }
 
     // if phone is passed in, format it to international format
-    let formattedPhone = phone ?? null;
-    if (phone) {
-      const phoneNumber = parsePhoneNumber(phone, "US");
-      if (!phoneNumber || !phoneNumber.isValid()) {
-        return {
-          success: false,
-          error: "Invalid phone number",
-        };
-      }
-      formattedPhone = phoneNumber.formatInternational().replace(/\s/g, "");
-    }
+    // let formattedPhone = phone ?? null;
+    // if (phone) {
+    //   const phoneNumber = parsePhoneNumber(phone, "US");
+    //   if (!phoneNumber || !phoneNumber.isValid()) {
+    //     return {
+    //       success: false,
+    //       error: "Invalid phone number",
+    //     };
+    //   }
+    //   formattedPhone = phoneNumber.formatInternational().replace(/\s/g, "");
+    // }
 
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
-      data: { name, phone: formattedPhone?.trim() ?? null },
+      data: { name },
+      // data: { name, phone: formattedPhone?.trim() ?? null },
     });
 
     console.log("line 115, user updated", updatedUser);
@@ -138,7 +139,8 @@ export const updateUser = async ({
     await prisma.activity.create({
       data: {
         type: "User Profile Updated",
-        description: `User profile updated: ${name} ${phone ? `and ${phone}` : null}`,
+        description: `User profile updated: ${name}`,
+        // description: `User profile updated: ${name} ${phone ? `and ${phone}` : null}`,
         userId: user.id,
       },
     });

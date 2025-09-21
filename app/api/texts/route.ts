@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (!dueDate) {
-        console.log("line 168, no due date");
+        console.log("line 187, no due date");
         return new Response(
           createTwiMLResponse(
             `I understand you want to be reminded about "${llmResult.reminderName}", but I need to know when. Please specify a date and time for your reminder.`

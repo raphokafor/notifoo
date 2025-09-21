@@ -45,6 +45,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { trackEvent } from "@/lib/analytics";
 
 const RemindersClient = ({
   reminders,
@@ -74,6 +75,11 @@ const RemindersClient = ({
   };
 
   const handleViewModeChange = (mode: "cards" | "table" | "calendar") => {
+    trackEvent("dashboard_view_changed", {
+      email: user.email,
+      viewMode: mode,
+      location: "notifoos",
+    });
     setViewMode(mode);
     localStorage.setItem("reminders-view-mode", mode);
   };
@@ -85,11 +91,15 @@ const RemindersClient = ({
   const handleDeleteTimer = async (id: string) => {
     try {
       setIsLoading(true);
+      trackEvent("reminder_deleted", {
+        email: user.email,
+        viewMode: viewMode,
+        location: "notifoos",
+        reminderId: id,
+      });
       const { success, message } = await deleteReminder(id);
       if (success) {
-        toast(message, {
-          position: "top-right",
-        });
+        toast.success(message);
 
         setTimers((prevTimers) => {
           const updatedTimers = prevTimers.filter((timer) => timer.id !== id);
@@ -100,12 +110,11 @@ const RemindersClient = ({
         router.refresh();
         handleModal();
       } else {
-        toast(message, {
-          position: "top-right",
-        });
+        toast.error(message);
         setError(message);
       }
     } catch (error) {
+      toast.error("Error deleting timer");
       console.error("Error deleting timer:", error);
       setError("Error deleting timer");
     } finally {
@@ -117,6 +126,18 @@ const RemindersClient = ({
     try {
       setIsLoading(true);
       setError("");
+      trackEvent("reminder_created", {
+        email: user.email,
+        viewMode: viewMode,
+        location: "notifoos",
+        reminderId: newTimer.id,
+        notificationMethods: [
+          newTimer.emailNotification ? "email" : "",
+          newTimer.smsNotification ? "sms" : "",
+          newTimer.callNotification ? "call" : "",
+          newTimer.recurringNotification ? "recurring" : "",
+        ],
+      });
       const { success, message } = await createReminder(newTimer);
       if (success) {
         setTimers((prevTimers) => {
@@ -124,22 +145,16 @@ const RemindersClient = ({
           return updatedTimers;
         });
 
-        toast(message, {
-          position: "top-right",
-        });
+        toast.success(message);
 
         router.refresh();
         handleModalState(false);
       } else {
-        toast(message, {
-          position: "top-right",
-        });
+        toast.error(message);
         setError(message);
       }
     } catch (error) {
-      toast("Error creating timer", {
-        position: "top-right",
-      });
+      toast.error("Error creating timer");
       console.error("Error creating timer:", error);
       setError("Error creating timer");
     } finally {
@@ -783,7 +798,14 @@ const RemindersClient = ({
             <Button
               variant="default"
               className="hidden md:flex items-center gap-2"
-              onClick={() => handleModalState(true)}
+              onClick={() => {
+                trackEvent("timer_created", {
+                  email: user.email,
+                  viewMode: viewMode,
+                  location: "notifoos",
+                });
+                handleModalState(true);
+              }}
             >
               <PlusIcon />
               Add a Notifoo

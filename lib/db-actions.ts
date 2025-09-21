@@ -42,7 +42,7 @@ export async function getUser() {
 
     return user;
   } catch (error) {
-    console.error("line 16, Error getting user", error);
+    console.error("line 45, Error getting user", error);
     return null;
   }
 }

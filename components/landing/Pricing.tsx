@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/analytics";
 import { User } from "@prisma/client";
 import {
   Check,
@@ -31,6 +32,10 @@ export function PricingSection({ user }: { user?: User }) {
   const onConnect = async () => {
     try {
       setIsLoading(true);
+      trackEvent("subscription_upgraded", {
+        userId: user?.id,
+        location: "pricing_page_no_subscription",
+      });
       if (user) {
         const res = await fetch("/api/stripe/checkout", {
           method: "POST",

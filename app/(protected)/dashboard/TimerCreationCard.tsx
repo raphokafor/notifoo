@@ -393,6 +393,7 @@ export function TimerCreationCard({
                         checked={emailNotification}
                         onCheckedChange={setEmailNotification}
                         className="flex-shrink-0 ml-2"
+                        disabled={isLoading}
                       />
                     </div>
 
@@ -415,7 +416,7 @@ export function TimerCreationCard({
                         id="call-toggle"
                         checked={callNotification}
                         onCheckedChange={setCallNotification}
-                        disabled={!user.phone}
+                        disabled={!user.phone || isLoading}
                         className="flex-shrink-0 ml-2"
                       />
                     </div>
@@ -439,7 +440,7 @@ export function TimerCreationCard({
                         id="sms-toggle"
                         checked={smsNotification}
                         onCheckedChange={setSmsNotification}
-                        disabled={!user.phone}
+                        disabled={!user.phone || isLoading}
                         className="flex-shrink-0 ml-2"
                       />
                     </div>
@@ -463,7 +464,7 @@ export function TimerCreationCard({
                         id="recurring-toggle"
                         checked={recurringNotification}
                         onCheckedChange={setRecurringNotification}
-                        disabled={!user.phone}
+                        disabled={!user.phone || isLoading}
                         className="flex-shrink-0 ml-2"
                       />
                     </div>

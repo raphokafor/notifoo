@@ -1,3 +1,7 @@
+// no cache
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import React from "react";
 import ReminderDetailClient from "./ReminderDetailClient";
 import { getReminderById } from "@/app/actions/reminder-actions";

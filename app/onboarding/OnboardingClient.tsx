@@ -26,6 +26,7 @@ import {
   verifyPhoneNumber,
 } from "../actions/user-actions";
 import { track } from "@vercel/analytics/react";
+import { trackEvent } from "@/lib/analytics";
 
 export default function OnboardingClient({
   user,
@@ -62,6 +63,10 @@ export default function OnboardingClient({
           location: "onboarding_client",
           email: user.email,
         });
+        trackEvent("phone_verification_completed", {
+          userId: user.id,
+          location: "onboarding_client",
+        });
         toast.success("Phone number verified!");
         setVerified(true);
         setVerificationCode("");
@@ -94,6 +99,10 @@ export default function OnboardingClient({
 
   const handleSendPhoneVerification = async (phoneNumber: string) => {
     setIsLoading(true);
+    trackEvent("phone_number_verification_started", {
+      userId: user.id,
+      location: "onboarding_client",
+    });
     try {
       const result = await sendPhoneVerification({ phoneNumber });
       if (result.success) {
@@ -572,9 +581,9 @@ export default function OnboardingClient({
 
   const onConnectStripe = async () => {
     try {
-      track("onboarding_connect_stripe", {
+      trackEvent("user_onboarded", {
+        userId: user.id,
         location: "onboarding_client",
-        email: user.email,
       });
       const res = await fetch("/api/stripe/onboarding", {
         method: "POST",

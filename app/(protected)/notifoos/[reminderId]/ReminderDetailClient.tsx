@@ -1,23 +1,28 @@
 "use client";
 
-import { TimerData } from "@/types/database";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { reminderUpdateSchema } from "@/schemas";
 import {
-  updateReminder,
   deleteReminder,
-  toggleReminderStatus,
-  toggleEmailNotification,
-  toggleSmsNotification,
   toggleCallNotification,
+  toggleEmailNotification,
   toggleRecurringNotification,
   toggleReminderIsActive,
+  toggleReminderStatus,
+  toggleSmsNotification,
 } from "@/app/actions/reminder-actions";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { FormError } from "@/components/form-error";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -35,43 +40,39 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { trackEvent } from "@/lib/analytics";
+import { reminderUpdateSchema } from "@/schemas";
+import { TimerData } from "@/types/database";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
 import {
   CalendarIcon,
+  CheckCheck,
+  CheckCheckIcon,
   ClockIcon,
-  MailIcon,
-  MessageSquareIcon,
-  Trash2Icon,
   EditIcon,
   Loader2Icon,
-  PowerIcon,
-  PowerOffIcon,
+  MailIcon,
+  MessageSquareIcon,
   PhoneCallIcon,
+  PowerIcon,
   RepeatIcon,
-  CheckCheck,
+  Trash2Icon,
 } from "lucide-react";
-import { format } from "date-fns";
-import { FormError } from "@/components/form-error";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 type FormValues = z.infer<typeof reminderUpdateSchema>;
 
 const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
@@ -89,6 +90,17 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
       isActive: reminder?.isActive ?? true,
     },
   });
+
+  useEffect(() => {
+    if (reminder.isActive) {
+      // check if the reminder has expired
+      if (reminder?.dueDate && new Date(reminder.dueDate) < new Date()) {
+        setIsExpired(true);
+      } else {
+        setIsExpired(false);
+      }
+    }
+  }, []);
 
   const onSubmit = async (values: FormValues) => {
     if (!reminder?.id) return;
@@ -124,19 +136,30 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
   const handleToggleStatus = async () => {
     if (!reminder?.id) return;
 
-    setIsTogglingStatus(true);
+    setIsTogglingStatus((prev) => !prev);
     setError("");
 
-    try {
-      const newStatus = !reminder.isActive;
-      const result = await toggleReminderStatus(reminder.id, newStatus);
+    const newStatus = !reminder.isActive;
 
-      if (result.success) {
-        toast.success(result.message);
+    trackEvent("reminder_completed", {
+      userId: reminder.userId,
+      location: "notifoos_detail",
+      reminderId: reminder.id,
+      reminderStatus: newStatus === true ? "active" : "inactive",
+    });
+
+    try {
+      const { success, message } = await toggleReminderStatus(
+        reminder.id,
+        newStatus
+      );
+
+      if (success) {
+        toast.success(message);
         router.refresh();
       } else {
-        setError(result.message || "Failed to update reminder status");
-        toast.error(result.message || "Failed to update reminder status");
+        setError(message || "Failed to update reminder status");
+        toast.error(message || "Failed to update reminder status");
       }
     } catch (error) {
       setError("An unexpected error occurred");
@@ -151,6 +174,12 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
 
     setIsDeleting(true);
     setError("");
+
+    trackEvent("reminder_deleted", {
+      userId: reminder.userId,
+      location: "notifoos_detail",
+      reminderId: reminder.id,
+    });
 
     try {
       const result = await deleteReminder(reminder.id);
@@ -188,6 +217,12 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
     try {
       setIsUpdating(true);
       setError("");
+      trackEvent("notification_settings_changed", {
+        userId: reminder.userId,
+        location: "notifoos_detail",
+        reminderId: reminder.id,
+        notificationMethod: "email",
+      });
       form.setValue("emailNotification", value);
       // update the reminder in the database
       const { success, message } = await toggleEmailNotification({
@@ -213,6 +248,12 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
     try {
       setIsUpdating(true);
       setError("");
+      trackEvent("notification_settings_changed", {
+        userId: reminder.userId,
+        location: "notifoos_detail",
+        reminderId: reminder.id,
+        notificationMethod: "sms",
+      });
       form.setValue("smsNotification", value);
       // update the reminder in the database
       const { success, message } = await toggleSmsNotification({
@@ -238,6 +279,12 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
     try {
       setIsUpdating(true);
       setError("");
+      trackEvent("notification_settings_changed", {
+        userId: reminder.userId,
+        location: "notifoos_detail",
+        reminderId: reminder.id,
+        notificationMethod: "call",
+      });
       form.setValue("callNotification", value);
       // update the reminder in the database
       const { success, message } = await toggleCallNotification({
@@ -263,6 +310,12 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
     try {
       setIsUpdating(true);
       setError("");
+      trackEvent("notification_settings_changed", {
+        userId: reminder.userId,
+        location: "notifoos_detail",
+        reminderId: reminder.id,
+        notificationMethod: "recurring",
+      });
       form.setValue("recurringNotification", value);
       // update the reminder in the database
       const { success, message } = await toggleRecurringNotification({
@@ -288,12 +341,23 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
     try {
       setIsUpdating(true);
       setError("");
+      trackEvent("reminder_edited", {
+        userId: reminder.userId,
+        location: "notifoos_detail",
+        reminderId: reminder.id,
+        reminderStatus: value === true ? "active" : "inactive",
+      });
       const { success, message } = await toggleReminderIsActive({
         reminderId: reminder.id as string,
         isActive: value,
       });
       if (success) {
         toast.success(message);
+
+        // update the value in the form
+        form.setValue("isActive", value);
+
+        router.refresh();
       } else {
         form.setValue("isActive", !value);
         toast.error(message);
@@ -340,6 +404,16 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
             >
               <CheckCheck />
               Done
+            </Button>
+          )}
+          {!reminder.isActive && !isExpired && (
+            <Button
+              onClick={handleToggleStatus}
+              disabled={isTogglingStatus}
+              className={`flex items-center gap-2 text-white bg-green-500 hover:bg-green-400`}
+            >
+              <CheckCheckIcon className="h-4 w-4" />
+              Re-Activate
             </Button>
           )}
           {!isEditing && reminder.isActive && (
@@ -464,11 +538,22 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                               <div className="flex items-center gap-2">
                                 <PowerIcon className="h-4 w-4 text-muted-foreground" />
                                 <FormLabel className="text-base text-zinc-500">
-                                  Enable Reminder
+                                  Reminder Status{" "}
+                                  <span
+                                    className={
+                                      field.value === true
+                                        ? "text-green-500 bg-green-500/10 px-2 py-1 rounded ml-2 text-sm"
+                                        : "text-red-500 bg-red-500/10 px-2 py-1 rounded ml-2 text-sm"
+                                    }
+                                  >
+                                    {field.value === true
+                                      ? "Active"
+                                      : "Inactive"}
+                                  </span>
                                 </FormLabel>
                               </div>
                               <FormDescription>
-                                When disabled, this reminder will not send
+                                If inactive, this reminder will not send
                                 notifications
                               </FormDescription>
                             </div>
@@ -476,7 +561,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
                               <Switch
                                 checked={field.value}
                                 onCheckedChange={handleIsActiveToggle}
-                                disabled={isUpdating || !reminder.isActive}
+                                disabled={isUpdating}
                               />
                             </FormControl>
                           </FormItem>

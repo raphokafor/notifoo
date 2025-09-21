@@ -46,6 +46,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { trackEvent } from "@/lib/analytics";
 
 export function Dashboard({
   reminders,
@@ -76,6 +77,10 @@ export function Dashboard({
   };
 
   const handleViewModeChange = (mode: "cards" | "table" | "calendar") => {
+    trackEvent("dashboard_view_changed", {
+      email: user.email,
+      viewMode: mode,
+    });
     setViewMode(mode);
     localStorage.setItem("dashboard-view-mode", mode);
   };
@@ -98,22 +103,16 @@ export function Dashboard({
           return updatedTimers;
         });
 
-        toast(message, {
-          position: "top-right",
-        });
+        toast.success(message);
 
-        router.refresh();
         handleModalState(false);
+        router.refresh();
       } else {
-        toast(message, {
-          position: "top-right",
-        });
+        toast.error(message);
         setError(message);
       }
     } catch (error) {
-      toast("Error creating timer", {
-        position: "top-right",
-      });
+      toast.error("Error creating timer");
       console.error("Error creating timer:", error);
       setError("Error creating timer");
     } finally {
@@ -128,11 +127,15 @@ export function Dashboard({
   const handleDeleteTimer = async (id: string) => {
     try {
       setIsLoading(true);
+      trackEvent("reminder_deleted", {
+        email: user.email,
+        viewMode: viewMode,
+        location: "dashboard",
+        reminderId: id,
+      });
       const { success, message } = await deleteReminder(id);
       if (success) {
-        toast(message, {
-          position: "top-right",
-        });
+        toast.success(message);
 
         setTimers((prevTimers) => {
           const updatedTimers = prevTimers.filter((timer) => timer.id !== id);
@@ -143,12 +146,11 @@ export function Dashboard({
         router.refresh();
         handleModal();
       } else {
-        toast(message, {
-          position: "top-right",
-        });
+        toast.error(message);
         setError(message);
       }
     } catch (error) {
+      toast.error("Error deleting timer");
       console.error("Error deleting timer:", error);
       setError("Error deleting timer");
     } finally {
@@ -786,7 +788,16 @@ export function Dashboard({
             <Button
               variant="default"
               className="hidden md:flex items-center gap-2"
-              onClick={() => handleModalState(true)}
+              onClick={() => {
+                trackEvent("timer_created", {
+                  userId: user.id,
+                  email: user.email,
+                  name: user.name,
+                  viewMode: viewMode,
+                  location: "dashboard",
+                });
+                handleModalState(true);
+              }}
             >
               <PlusIcon />
               Add a Notifoo

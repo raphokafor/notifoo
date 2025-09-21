@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { trackEvent } from "@/lib/analytics";
 import { User } from "@/lib/auth";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -160,6 +161,10 @@ export default function CustomerBillingClient({
   const handleManagePayment = async () => {
     try {
       setIsProcessing(true);
+      trackEvent("manage_payment", {
+        userId: user.id,
+        location: "billing_page",
+      });
       const res = await fetch("/api/stripe/manage", {
         method: "POST",
       });

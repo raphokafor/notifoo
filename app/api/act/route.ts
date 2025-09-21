@@ -205,8 +205,7 @@ const callUser = async ({
   //   </Say>
   // </Response>
 
-  const expressiveVoice = `// <?xml version="1.0" encoding="UTF-8"?>
-  // <Response>
+  // const expressiveVoice = `<Response>
   // <Say voice="Google.en-US-Chirp3-HD-Aoede" language="en-US">
   //     <prosody rate="110%" pitch="+7st" volume="+2dB">
   //       Whoa—<emphasis level="strong">${intro}</emphasis>!
@@ -219,6 +218,22 @@ const callUser = async ({
   //   </Say>
   // </Response>`;
 
+  const expressiveVoice = `<?xml version="1.0" encoding="UTF-8"?>
+  <Response>
+  <Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">
+      <prosody rate="110%" pitch="+7st" volume="+2dB">
+        Whoa—<emphasis level="strong">${intro}</emphasis>!
+      </prosody>
+      <break time="200ms"/>
+      <prosody rate="112%" pitch="+5st">
+        ${reminderName}
+      </prosody>
+      <break time="180ms"/>
+    </Say>
+  </Response>`;
+
+  const expressiveVoice_ = `<Response><Pause length="1"/><Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">"${reminderName}"</Say></Response>`;
+
   try {
     await client.calls.create({
       to: phoneNumber, // <-- replace with the recipient's number
@@ -227,7 +242,7 @@ const callUser = async ({
 
       // TODO: possibly wait for the answer to say something before talking or 2 seconds, which ever comes first
     });
-    console.log("line 167, call has been made");
+    console.log("line 245, call has been made");
   } catch (error) {
     console.error("Error calling user phone:::::::::::::::::", error);
   }

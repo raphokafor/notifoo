@@ -15,59 +15,6 @@ interface BillingNoSubscriptionProps {
 const BillingNoSubscription: React.FC<BillingNoSubscriptionProps> = ({
   user,
 }) => {
-  // const plans = [
-  //   {
-  //     name: "Starter",
-  //     monthlyPrice: 2.99,
-  //     yearlyPrice: 19.99,
-  //     features: [
-  //       "Up to 50 reminders (perfect for memory rookies)",
-  //       "Email notifications (digital nudges to your inbox)",
-  //       "Basic recurring reminders (because some things need repeating)",
-  //       "Mobile app access (pocket-sized memory dojo)",
-  //     ],
-  //     popular: false,
-  //     monthlyPriceId: process.env
-  //       .NEXT_PUBLIC_MONTHLY_STRIPE_STARTER_PRICE_ID as string,
-  //     yearlyPriceId: process.env
-  //       .NEXT_PUBLIC_YEARLY_STRIPE_STARTER_PRICE_ID as string,
-  //   },
-  //   {
-  //     name: "Pro",
-  //     monthlyPrice: 9.99,
-  //     yearlyPrice: 79.99,
-  //     features: [
-  //       "Unlimited reminders (memory black belt status)",
-  //       "SMS & email notifications (double-tap reminder strikes)",
-  //       "Advanced recurring patterns (master-level scheduling kung fu)",
-  //       "Team collaboration (assemble your memory warriors)",
-  //       "Priority support (VIP treatment from the Notifoo ninjas)",
-  //     ],
-  //     popular: true,
-  //     monthlyPriceId: process.env
-  //       .NEXT_PUBLIC_MONTHLY_STRIPE_PRO_PRICE_ID as string,
-  //     yearlyPriceId: process.env
-  //       .NEXT_PUBLIC_YEARLY_STRIPE_PRO_PRICE_ID as string,
-  //   },
-  //   {
-  //     name: "Premium Pro",
-  //     monthlyPrice: 19.99,
-  //     yearlyPrice: 199.99,
-  //     features: [
-  //       "Unlimited everything (notification grandmaster level)",
-  //       "Custom notification channels (build your own reminder dojo)",
-  //       "Advanced analytics & reporting (track your memory victories)",
-  //       "API access & integrations (connect all your digital weapons)",
-  //       "24/7 dedicated support (personal memory sensei on speed dial)",
-  //     ],
-  //     popular: false,
-  //     monthlyPriceId: process.env
-  //       .NEXT_PUBLIC_MONTHLY_STRIPE_PREMIUM_PRO_PRICE_ID as string,
-  //     yearlyPriceId: process.env
-  //       .NEXT_PUBLIC_YEARLY_STRIPE_PREMIUM_PRO_PRICE_ID as string,
-  //   },
-  // ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="flex justify-between items-center pr-4 h-28 w-full bg-white sticky top-0 z-50">
