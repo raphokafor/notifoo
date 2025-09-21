@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
-import { sendEmail } from "./resend";
+import { addToResendContactList, sendEmail } from "./resend";
 import WelcomeEmailTemplate from "@/templates/welcome/welcome-email-template";
 
 // Simple ObjectId-like string generator for edge runtime
@@ -121,6 +121,13 @@ export const auth = betterAuth({
               console.log("line 99, user has no email");
               return;
             }
+
+            // Optionally mark welcomed=true in your own users table/extra column
+            await prisma.user.update({
+              where: { id: user?.id as string },
+              data: { welcomeEmailSent: true },
+            });
+
             // generate welcome email template
             const welcomeEmailTemplate = WelcomeEmailTemplate({
               appUrl: "https://www.notifoo.io/dashboard",
@@ -134,10 +141,10 @@ export const auth = betterAuth({
               textBody: `<p>Hey ${user?.name ?? "there"}, welcome to Notifoo!</p>`,
             });
 
-            // Optionally mark welcomed=true in your own users table/extra column
-            await prisma.user.update({
-              where: { id: user?.id as string },
-              data: { welcomeEmailSent: true },
+            // add to resend contact list
+            await addToResendContactList({
+              email: user?.email as string,
+              name: user?.name as string,
             });
           } catch (err) {
             console.error("Welcome email failed", err);

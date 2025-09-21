@@ -239,12 +239,22 @@ export async function getReminders() {
         userId: user.id,
       },
       orderBy: {
-        dueDate: "desc",
+        dueDate: "asc",
       },
     });
+
+    // separate the reminders that have expired from the reminders that have not expired
+    const expiredReminders = reminders.filter(
+      (reminder) => reminder.dueDate < new Date()
+    );
+    const upcomingReminders = reminders.filter(
+      (reminder) => reminder.dueDate >= new Date()
+    );
+    const allReminders = [...upcomingReminders, ...expiredReminders];
+
     return {
       success: true,
-      data: reminders,
+      data: allReminders,
     };
   } catch (error) {
     console.error("Error getting reminders:", error);
@@ -269,7 +279,7 @@ export async function getActiveReminders() {
     const reminders = await prisma.reminder.findMany({
       where: { userId: user.id, isActive: true },
       orderBy: {
-        dueDate: "desc",
+        dueDate: "asc",
       },
     });
     return {

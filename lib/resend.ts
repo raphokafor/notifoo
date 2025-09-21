@@ -55,13 +55,29 @@ export const addToResendContactList = async ({
   email: string;
   name: string;
 }) => {
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-  resend.contacts.create({
-    email: email,
-    firstName: name?.split(" ")[0],
-    lastName: name?.split(" ")[1],
-    unsubscribed: false,
-    audienceId: process.env.RESEND_AUDIENCE_ID as string,
-  });
+    const contact = await resend.contacts.create({
+      email: email,
+      firstName: name?.split(" ")[0],
+      lastName: name?.split(" ")[1],
+      unsubscribed: false,
+      audienceId: process.env.RESEND_AUDIENCE_ID as string,
+    });
+
+    return {
+      success: true,
+      message: "Contact added to resend contact list successfully",
+      data: contact,
+    };
+  } catch (error) {
+    console.error("Error adding to resend contact list:", error);
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Unknown error occurred",
+      data: null,
+    };
+  }
 };

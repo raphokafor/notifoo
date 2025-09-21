@@ -157,12 +157,12 @@ export function TimerCreationCard({
   const clearState = () => {
     // clear state for the form
     setSelectedDate(undefined);
-    setSelectedTime({ hours: 12, minutes: 0, period: "PM" });
-    setTimerName("");
-    setEmailNotification(true);
-    setSmsNotification(false);
-    setCallNotification(false);
-    setRecurringNotification(false);
+    // setSelectedTime({ hours: 12, minutes: 0, period: "PM" });
+    // setTimerName("");
+    // setEmailNotification(true);
+    // setSmsNotification(false);
+    // setCallNotification(false);
+    // setRecurringNotification(false);
     // setStep("date");
     router.refresh();
   };

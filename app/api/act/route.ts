@@ -178,11 +178,52 @@ const callUser = async ({
   reminderName: string;
   intro: string;
 }) => {
+  // <Response>
+  // <Say voice="Google.en-US-Chirp3-HD-Aoede" language="en-US">
+  //     <prosody rate="110%" pitch="+7st" volume="+2dB">
+  //       Whoa—<emphasis level="strong">${intro}</emphasis>!
+  //     </prosody>
+  //     <break time="200ms"/>
+  //     <prosody rate="112%" pitch="+5st">
+  //       ${reminderName}
+  //     </prosody>
+  //     <break time="180ms"/>
+  //   </Say>
+  // </Response>
+
+  // <?xml version="1.0" encoding="UTF-8"?>
+  // <Response>
+  // <Say voice="Google.en-US-Chirp3-HD-Aoede" language="en-US">
+  //     <prosody rate="110%" pitch="+7st" volume="+2dB">
+  //       Whoa—<emphasis level="strong">${intro}</emphasis>!
+  //     </prosody>
+  //     <break time="200ms"/>
+  //     <prosody rate="112%" pitch="+5st">
+  //       ${reminderName}
+  //     </prosody>
+  //     <break time="180ms"/>
+  //   </Say>
+  // </Response>
+
+  const expressiveVoice = `// <?xml version="1.0" encoding="UTF-8"?>
+  // <Response>
+  // <Say voice="Google.en-US-Chirp3-HD-Aoede" language="en-US">
+  //     <prosody rate="110%" pitch="+7st" volume="+2dB">
+  //       Whoa—<emphasis level="strong">${intro}</emphasis>!
+  //     </prosody>
+  //     <break time="200ms"/>
+  //     <prosody rate="112%" pitch="+5st">
+  //       ${reminderName}
+  //     </prosody>
+  //     <break time="180ms"/>
+  //   </Say>
+  // </Response>`;
+
   try {
     await client.calls.create({
       to: phoneNumber, // <-- replace with the recipient's number
       from: process.env.TWILIO_PHONE_NUMBER!, // <-- replace with your Twilio number
-      twiml: `<Response><Pause length="1"/><Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">"${reminderName}"</Say></Response>`,
+      twiml: expressiveVoice,
 
       // TODO: possibly wait for the answer to say something before talking or 2 seconds, which ever comes first
     });
