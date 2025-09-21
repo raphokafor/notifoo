@@ -275,8 +275,7 @@ const RemindersClient = ({
                     timer.type,
                     now
                   );
-                  const isExpired =
-                    timer.type === "till" && timeLeft.total <= 0;
+                  const isExpired = timer.isActive === false;
 
                   return (
                     <div
@@ -576,7 +575,7 @@ const RemindersClient = ({
                 reminder.type,
                 now
               );
-              const isExpired = reminder.type === "till" && timeLeft.total <= 0;
+              const isExpired = reminder.isActive === false;
 
               return (
                 <TableRow

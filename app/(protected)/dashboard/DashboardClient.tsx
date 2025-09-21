@@ -180,7 +180,7 @@ export function Dashboard({
                 timer.type,
                 now
               );
-              const isExpired = timer.type === "till" && timeLeft.total <= 0;
+              const isExpired = timer.isActive === false;
 
               return (
                 <TableRow
@@ -415,8 +415,7 @@ export function Dashboard({
                     timer.type,
                     now
                   );
-                  const isExpired =
-                    timer.type === "till" && timeLeft.total <= 0;
+                  const isExpired = timer.isActive === false;
 
                   return (
                     <div
