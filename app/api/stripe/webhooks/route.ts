@@ -182,6 +182,23 @@ export async function POST(req: NextRequest) {
     const sub = event.data.object as Stripe.Subscription;
     // Revoke access, schedule grace period, etc.
 
+    try {
+      // find the user using stripe customer id
+      const user = await prisma.user.findFirst({
+        where: { stripeCustomerId: sub.customer as string },
+      });
+      if (user) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            subscriptionStatus: "inactive",
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Error updating user subscription status:", error);
+    }
+
     console.log("line 113, subscription deleted", sub);
   }
 
@@ -195,7 +212,14 @@ export async function POST(req: NextRequest) {
     const periodStart = invoice.period_end;
     const periodEnd = invoice.period_end;
 
-    console.log("line 125, invoice payment succeeded");
+    console.log("line 125, invoice payment succeeded", {
+      customerId,
+      customerEmail,
+      customerName,
+      invoiceId,
+      periodStart,
+      periodEnd,
+    });
   }
 
   if (event.type === "invoice.payment_failed") {

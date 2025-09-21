@@ -218,7 +218,7 @@ const callUser = async ({
   //   </Say>
   // </Response>`;
 
-  const expressiveVoice = `<?xml version="1.0" encoding="UTF-8"?>
+  const expressiveVoice_ = `<?xml version="1.0" encoding="UTF-8"?>
   <Response>
   <Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">
       <prosody rate="110%" pitch="+7st" volume="+2dB">
@@ -232,7 +232,7 @@ const callUser = async ({
     </Say>
   </Response>`;
 
-  const expressiveVoice_ = `<Response><Pause length="1"/><Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">"${reminderName}"</Say></Response>`;
+  const expressiveVoice = `<Response><Pause length="1"/><Say voice="Google.en-US-Chirp3-HD-Leda" language="en-US">"${reminderName}"</Say></Response>`;
 
   try {
     await client.calls.create({
