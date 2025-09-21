@@ -412,6 +412,43 @@ export async function toggleReminderStatus(
   }
 }
 
+export async function markReminderAsDone(reminderId: string, isDone: boolean) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        message: "Unable to update reminder status",
+      };
+    }
+
+    const reminder = await prisma.reminder.update({
+      where: { id: reminderId, userId: user.id },
+      data: { isDone: isDone },
+    });
+
+    // create activity
+    await prisma.activity.create({
+      data: {
+        type: "Reminder Status Changed to " + (isDone ? "Done" : "Not Done"),
+        description: `Reminder ${isDone ? "marked as done" : "marked as not done"}: ${reminder.name}`,
+        userId: user.id,
+      },
+    });
+
+    return {
+      success: true,
+      message: `Reminder ${isDone ? "marked as done" : "marked as not done"} successfully`,
+    };
+  } catch (error) {
+    console.error("Error toggling reminder status:", error);
+    return {
+      success: false,
+      message: "Failed to update reminder status",
+    };
+  }
+}
+
 export async function deleteReminder(reminderId: string) {
   try {
     const user = await getCurrentUser();

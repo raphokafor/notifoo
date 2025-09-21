@@ -186,6 +186,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
 
       if (result.success) {
         toast.success("Reminder deleted successfully!");
+        router.refresh();
         router.back();
       } else {
         setError(result.message || "Failed to delete reminder");
@@ -400,7 +401,7 @@ const ReminderDetailClient = ({ reminder }: { reminder: TimerData }) => {
             <Button
               onClick={handleToggleStatus}
               disabled={isTogglingStatus}
-              className={`flex items-center gap-2 text-white bg-green-500 hover:bg-green-400`}
+              className={`flex items-center gap-2 text-white ${reminder.isDone ? "bg-zinc-300 hover:bg-zinc-300" : "bg-green-500 hover:bg-green-400"}`}
             >
               <CheckCheck />
               Done

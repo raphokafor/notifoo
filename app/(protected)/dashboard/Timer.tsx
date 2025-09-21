@@ -57,7 +57,8 @@ export function Timer({
     () => formatTimeDifference(dueDate, type, now),
     [dueDate, type, now]
   );
-  const isExpired = type === "till" && timeLeft.total <= 0;
+  const isExpired = timeLeft.total <= 0;
+  const isDone = !isActive;
 
   const renderTimeUnit = (value: number, label: string) => {
     return (
@@ -140,7 +141,15 @@ export function Timer({
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center flex-1 min-w-0">
                     <div
-                      className={`w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0 ${!isActive ? "bg-red-600" : type === "till" ? "bg-green-500" : "bg-zinc-500"}`}
+                      className={`w-1.5 h-1.5 rounded-full mr-2 flex-shrink-0 ${
+                        isActive && !isExpired
+                          ? "bg-green-500"
+                          : !isActive && isExpired
+                            ? "bg-red-600"
+                            : isExpired
+                              ? "bg-red-600"
+                              : "bg-zinc-400"
+                      }`}
                     ></div>
                     <h2 className="text-xs text-muted-foreground truncate font-mono capitalize">
                       {name}

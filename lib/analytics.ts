@@ -5,6 +5,7 @@ export type AnalyticsEvent =
   | "reminder_created"
   | "reminder_deleted"
   | "reminder_completed"
+  | "reminder_done"
   | "reminder_edited"
   | "dashboard_view_changed"
   | "settings_updated"

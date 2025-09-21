@@ -133,6 +133,7 @@ export interface TimerData {
   description?: string;
   isActive?: boolean;
   endDate?: Date;
+  isDone?: boolean;
   id?: string;
   emailNotification?: boolean;
   smsNotification?: boolean;

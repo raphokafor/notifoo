@@ -5,7 +5,12 @@ import { TimerData } from "@/types/database";
 import React, { useState } from "react";
 import { Timer } from "../dashboard/Timer";
 import { useRouter } from "next/navigation";
-import { createReminder, deleteReminder } from "@/app/actions/reminder-actions";
+import {
+  createReminder,
+  deleteReminder,
+  markReminderAsDone,
+  toggleReminderStatus,
+} from "@/app/actions/reminder-actions";
 import { toast } from "sonner";
 import { TimeProvider } from "@/contexts/TimeContext";
 import { AnimatePresence, motion } from "framer-motion";
@@ -88,16 +93,16 @@ const RemindersClient = ({
     setModalState(state);
   };
 
-  const handleDeleteTimer = async (id: string) => {
+  const handleDoneTimer = async (id: string) => {
     try {
       setIsLoading(true);
-      trackEvent("reminder_deleted", {
+      trackEvent("reminder_done", {
         email: user.email,
         viewMode: viewMode,
         location: "notifoos",
         reminderId: id,
       });
-      const { success, message } = await deleteReminder(id);
+      const { success, message } = await markReminderAsDone(id, true);
       if (success) {
         toast.success(message);
 
@@ -108,7 +113,7 @@ const RemindersClient = ({
         });
 
         router.refresh();
-        handleModal();
+        // handleModal();
       } else {
         toast.error(message);
         setError(message);
@@ -278,6 +283,7 @@ const RemindersClient = ({
                 onClick={() => setCalendarView("month")}
                 className="w-full"
               >
+                <ChevronLeft className="h-4 w-4" />
                 Back to Month
               </Button>
             </div>
@@ -290,7 +296,8 @@ const RemindersClient = ({
                     timer.type,
                     now
                   );
-                  const isExpired = timer.isActive === false;
+                  const isExpired =
+                    timer.isActive === false || timeLeft.total <= 0;
 
                   return (
                     <div
@@ -302,7 +309,9 @@ const RemindersClient = ({
                     >
                       <div className="flex flex-col  items-center justify-between">
                         <div className="w-full">
-                          <h4 className="font-semibold text-lg">
+                          <h4
+                            className={`${timer.isDone ? "line-through" : isExpired ? "text-zinc-400" : ""} font-semibold text-lg`}
+                          >
                             {timer.name}
                           </h4>
                         </div>
@@ -312,11 +321,13 @@ const RemindersClient = ({
                           <div className="flex items-center gap-4">
                             <div
                               className={`w-4 h-4 rounded-full ${
-                                !timer.isActive
-                                  ? "bg-red-600"
-                                  : timer.type === "till"
-                                    ? "bg-green-500"
-                                    : "bg-zinc-500"
+                                timer.isActive && !isExpired && !timer.isDone
+                                  ? "bg-green-500"
+                                  : !timer.isActive && timer.isDone
+                                    ? "bg-red-600"
+                                    : !timer.isActive && !timer.isDone
+                                      ? "bg-red-600"
+                                      : "bg-zinc-300"
                               }`}
                             />
 
@@ -328,7 +339,7 @@ const RemindersClient = ({
                                 })}
                               </p>
                               {isExpired ? (
-                                <Badge variant="destructive" className="mt-1">
+                                <Badge className="bg-zinc-300 text-white">
                                   EXPIRED
                                 </Badge>
                               ) : (
@@ -349,7 +360,7 @@ const RemindersClient = ({
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDeleteTimer(timer.id!);
+                                handleDoneTimer(timer.id!);
                               }}
                               disabled={isLoading}
                               className={cn(
@@ -520,13 +531,13 @@ const RemindersClient = ({
                         {dayReminders.slice(0, 4).map((timer) => (
                           <div
                             key={timer.id}
-                            className="text-xs px-2 py-1 rounded text-white truncate cursor-pointer hover:opacity-80 transition-opacity"
+                            className="text-xs px-2 py-1 rounded text-white truncate cursor-pointer transition-opacity"
                             style={{
                               backgroundColor: !timer.isActive
-                                ? "#dc2626"
-                                : timer.type === "till"
-                                  ? "#059669"
-                                  : "#6b7280",
+                                ? "#a1a1aa"
+                                : !timer.isDone
+                                  ? "#a1a1aa"
+                                  : "#059669",
                             }}
                             title={`${timer.name} - ${timer.dueDate.toLocaleTimeString(
                               undefined,
@@ -566,6 +577,28 @@ const RemindersClient = ({
     return <CustomCalendarGrid />;
   };
 
+  const renderStatusColor = (reminder: TimerData, isExpired: boolean) => {
+    // if the reminder is active and not expired and not done, return green
+    if (reminder.isActive && !isExpired && !reminder.isDone)
+      return "bg-green-500";
+
+    // if the reminder is not expired and not done, return green
+    if (!reminder.isDone && !reminder.isActive && !isExpired)
+      return "bg-zinc-300";
+
+    // if the reminder is not done and not active, return red
+    if (!reminder.isDone && !reminder.isActive) return "bg-zinc-300";
+
+    // if the reminder is done, return red
+    if (reminder.isDone) return "bg-red-600";
+
+    // if the reminder is expired, return red
+    if (isExpired) return "bg-red-600";
+
+    // if the reminder is active, return green
+    return "bg-zinc-500";
+  };
+
   // Inner component that can use useTime hook
   const TableViewComponent = () => {
     const { now } = useTime();
@@ -590,29 +623,42 @@ const RemindersClient = ({
                 reminder.type,
                 now
               );
-              const isExpired = reminder.isActive === false;
+              const isExpired =
+                reminder.isActive === false || timeLeft.total <= 0;
 
               return (
                 <TableRow
                   key={reminder.id}
                   className={isExpired ? "opacity-60" : ""}
                 >
-                  <TableCell>
+                  <TableCell align="center" className="pl-8">
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-2 h-2 rounded-full ${
-                          !reminder.isActive
-                            ? "bg-red-600"
-                            : reminder.type === "till"
-                              ? "bg-green-500"
-                              : "bg-zinc-500"
+                          reminder.isActive && !isExpired && !reminder.isDone
+                            ? "bg-green-500"
+                            : !reminder.isActive && reminder.isDone
+                              ? "bg-red-600"
+                              : !reminder.isActive && !reminder.isDone
+                                ? "bg-red-600"
+                                : "bg-zinc-400"
                         }`}
                       />
-                      <Badge
-                        variant={reminder.isActive ? "default" : "destructive"}
+                      {/* <Badge
+                        variant={
+                          reminder.isActive || !isExpired
+                            ? "default"
+                            : "destructive"
+                        }
                       >
-                        {reminder.isActive ? "Active" : "Inactive"}
-                      </Badge>
+                        {reminder?.isDone
+                          ? "Done"
+                          : reminder.isActive && !isExpired
+                            ? "Not Done"
+                            : reminder.isActive
+                              ? "Active"
+                              : "Inactive"}
+                      </Badge> */}
                     </div>
                   </TableCell>
 
@@ -620,16 +666,16 @@ const RemindersClient = ({
                     <Link
                       href={`/notifoos/${reminder.id}`}
                       className={`hover:underline ${
-                        !reminder.isActive ? "line-through" : ""
+                        reminder.isDone ? "line-through" : ""
                       }`}
                     >
                       {reminder.name}
                     </Link>
                   </TableCell>
 
-                  <TableCell>
+                  <TableCell className="pl-8">
                     {isExpired ? (
-                      <Badge variant="destructive">EXPIRED</Badge>
+                      <Badge className="bg-zinc-300 text-white">EXPIRED</Badge>
                     ) : (
                       <div className="font-mono text-sm">
                         {timeLeft.days > 0 && `${timeLeft.days}d `}
@@ -682,15 +728,11 @@ const RemindersClient = ({
                     <Button
                       variant={reminder.isActive ? "default" : "ghost"}
                       size="sm"
-                      onClick={() => handleDeleteTimer(reminder.id!)}
-                      disabled={isLoading}
-                      className={cn(
-                        "text-red-600 hover:text-red-700 hover:bg-red-50",
-                        reminder.isActive &&
-                          "bg-green-500 text-white hover:bg-green-600 hover:text-white"
-                      )}
+                      onClick={() => handleDoneTimer(reminder.id!)}
+                      disabled={isLoading || reminder.isDone}
+                      className={`${!reminder.isDone ? "bg-green-500 hover:bg-green-400" : "bg-zinc-400 hover:text-white hover:bg-zinc-400"}`}
                     >
-                      {reminder.isActive ? "Done" : "Delete"}
+                      {!reminder.isDone ? "Done?" : "Done!"}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -732,7 +774,7 @@ const RemindersClient = ({
                       dueDate={reminder.dueDate}
                       type={reminder.type}
                       isActive={reminder.isActive}
-                      onDelete={handleDeleteTimer}
+                      onDelete={handleDoneTimer}
                       isLoading={isLoading}
                       isOpen={isOpen}
                       handleModal={handleModal}

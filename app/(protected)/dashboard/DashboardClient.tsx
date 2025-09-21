@@ -182,7 +182,7 @@ export function Dashboard({
                 timer.type,
                 now
               );
-              const isExpired = timer.isActive === false;
+              const isExpired = timer.isActive === false || timeLeft.total <= 0;
 
               return (
                 <TableRow
@@ -276,13 +276,9 @@ export function Dashboard({
                       size="sm"
                       onClick={() => handleDeleteTimer(timer.id!)}
                       disabled={isLoading}
-                      className={cn(
-                        "text-red-600 hover:text-red-700 hover:bg-red-50",
-                        timer.isActive &&
-                          "bg-green-500 text-white hover:bg-green-600 hover:text-white"
-                      )}
+                      className={`${!timer.isDone ? "bg-green-500 hover:bg-green-400" : "bg-zinc-400 hover:text-white hover:bg-zinc-400"}`}
                     >
-                      {timer.isActive ? "Done" : "Delete"}
+                      {!timer.isDone ? "Done?" : "Done!"}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -417,7 +413,8 @@ export function Dashboard({
                     timer.type,
                     now
                   );
-                  const isExpired = timer.isActive === false;
+                  const isExpired =
+                    timer.isActive === false || timeLeft.total <= 0;
 
                   return (
                     <div
