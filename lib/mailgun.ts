@@ -31,7 +31,7 @@ export const sendEmailMailgun = async ({
 }) => {
   try {
     const emailData = {
-      from: fromEmail ?? "Ralph at Notifoo <ralph@notifications.notifoo.io>",
+      from: fromEmail ?? "Ralph at Notifoo <ralph@notifoo.io>",
       to: email,
       subject,
       name,

@@ -157,7 +157,7 @@ const sendEmailToUser = async ({
       reminderName: reminderName,
     });
     const emailResponse = await sendEmail({
-      from: "Notifoo <no-reply@notifications.notifoo.io>",
+      from: "Notifoo <no-reply@notifoo.io>",
       to: email,
       subject: reminderName,
       body: template,
