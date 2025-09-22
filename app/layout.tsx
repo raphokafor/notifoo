@@ -1,13 +1,13 @@
 import type React from "react";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Nunito } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const inter = Nunito({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-nunito",
 });
 
 export const metadata: Metadata = {
