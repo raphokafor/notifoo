@@ -193,11 +193,7 @@ export function Dashboard({
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-2 h-2 rounded-full ${
-                          !timer.isActive
-                            ? "bg-red-600"
-                            : timer.type === "till"
-                              ? "bg-green-500"
-                              : "bg-zinc-500"
+                          timer.isActive ? "bg-green-500" : "bg-zinc-500"
                         }`}
                       />
                       <Badge
@@ -436,11 +432,7 @@ export function Dashboard({
                           <div className="flex items-center gap-4">
                             <div
                               className={`w-4 h-4 rounded-full ${
-                                !timer.isActive
-                                  ? "bg-red-600"
-                                  : timer.type === "till"
-                                    ? "bg-green-500"
-                                    : "bg-zinc-500"
+                                timer.isActive ? "bg-green-500" : "bg-zinc-500"
                               }`}
                             />
 
@@ -477,9 +469,9 @@ export function Dashboard({
                               }}
                               disabled={isLoading}
                               className={cn(
-                                "text-red-600 hover:text-red-700 bg-red-500",
-                                timer.isActive &&
-                                  "bg-green-500 text-white hover:bg-green-600 hover:text-white"
+                                "text-green-600 hover:text-green-700 bg-green-500",
+                                !timer.isActive &&
+                                  "bg-red-500 text-white hover:bg-red-600 hover:text-white"
                               )}
                             >
                               {timer.isActive ? (
