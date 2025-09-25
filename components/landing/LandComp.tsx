@@ -40,13 +40,10 @@ export default function LandComp() {
             We get Remembering stuff
           </Badge>
           <h1 className="text-5xl md:text-7xl font-black text-balance mb-6 text-zinc-600">
-            Never Forget Again with{" "}
-            <span className="text-[#3b82f6]">Notifoo!</span>
+            Just getting that reminder alert 4 days later?
           </h1>
           <p className="text-xl text-muted-foreground text-balance mb-8 max-w-2xl mx-auto text-zinc-600">
-            Channel your inner reminder ninja! Set it, forget it, then get
-            notified exactly when you need it. SMS, email, or carrier pigeon* -
-            we've got you covered.
+            We get it. It's annoying. That's why we're here.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             {!session?.user && (
