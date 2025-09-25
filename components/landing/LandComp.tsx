@@ -75,7 +75,7 @@ export default function LandComp() {
 
         <div className="container mx-auto relative">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl py-2 font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="text-xl md:text-3xl py-2 font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Why Notifoo is the Real MVP
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
