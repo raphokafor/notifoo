@@ -39,7 +39,7 @@ export default function LandComp() {
           <Badge variant="secondary" className="mb-4">
             We get Remembering stuff
           </Badge>
-          <h1 className="text-5xl md:text-7xl font-black text-balance mb-6 text-zinc-600">
+          <h1 className="text-2xl md:text-4xl font-black text-balance mb-6 text-zinc-600">
             Just getting that reminder alert 4 days later?
           </h1>
           <p className="text-xl text-muted-foreground text-balance mb-8 max-w-2xl mx-auto text-zinc-600">
