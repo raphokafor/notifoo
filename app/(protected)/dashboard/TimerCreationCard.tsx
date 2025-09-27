@@ -337,7 +337,7 @@ export function TimerCreationCard({
             )}
             {step === "name" && (
               <>
-                {getCombinedDateTime() && (
+                {getCombinedDateTime() && !isLoading && (
                   <p className="text-sm text-muted-foreground text-center mb-4 font-mono px-2 leading-relaxed">
                     {getCombinedDateTime()?.toLocaleString(undefined, {
                       year: "numeric",
