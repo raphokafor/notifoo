@@ -18,14 +18,14 @@ const qstash = new Client({
 
 // TODO: if reminder has a recurring schedule, create cron instead of delay
 export async function createReminder(reminder: TimerData) {
-  console.log("creating reminder", reminder);
+  console.log("creating notifoo", reminder);
   try {
     const user = await getCurrentUser();
     if (!user) {
       console.error("User not found error");
       return {
         success: false,
-        message: "Unable to create reminder",
+        message: "Unable to create notifoo",
       };
     }
 
@@ -33,7 +33,7 @@ export async function createReminder(reminder: TimerData) {
       console.error("no due date provided");
       return {
         success: false,
-        message: "Please provide a valid due date for your reminder",
+        message: "Please provide a valid due date for your notifoo",
       };
     }
 
@@ -41,7 +41,7 @@ export async function createReminder(reminder: TimerData) {
       console.error("no description provided");
       return {
         success: false,
-        message: "Please provide a description for your reminder",
+        message: "Please provide a description for your notifoo",
       };
     }
 
@@ -71,7 +71,7 @@ export async function createReminder(reminder: TimerData) {
     if (delaySeconds <= 0) {
       return {
         success: false,
-        message: "Cannot schedule reminder in the past",
+        message: "Cannot schedule Notifoo in the past",
       };
     }
 
@@ -89,14 +89,14 @@ export async function createReminder(reminder: TimerData) {
         data: { stashId: res.messageId },
       });
     } else {
-      console.error("Error creating reminder:", res);
+      console.error("Error creating Notifoo:", res);
       // delete the reminder
       await prisma.reminder.delete({
         where: { id: newReminder.id },
       });
       return {
         success: false,
-        message: "Failed to create reminder",
+        message: "Failed to create Notifoo",
       };
     }
 
@@ -105,7 +105,7 @@ export async function createReminder(reminder: TimerData) {
     // create activity
     await prisma.activity.create({
       data: {
-        type: "Reminder Created",
+        type: "Notifoo Created",
         description: `Reminder created: ${newReminder.name}`,
         userId: user.id,
       },
@@ -113,19 +113,19 @@ export async function createReminder(reminder: TimerData) {
 
     return {
       success: true,
-      message: "Reminder created successfully",
+      message: "Notifoo created successfully",
     };
   } catch (error) {
     console.error("Error creating reminder:", error);
     return {
       success: false,
-      message: "Failed to create reminder",
+      message: "Failed to create Notifoo",
     };
   }
 }
 
 export async function createReminderHook(reminder: TimerData & { user: User }) {
-  console.log("creating reminder", reminder);
+  console.log("creating notifoo", reminder);
   try {
     const user = reminder.user;
 
@@ -133,7 +133,7 @@ export async function createReminderHook(reminder: TimerData & { user: User }) {
       console.error("no due date provided");
       return {
         success: false,
-        message: "Please provide a valid due date for your reminder",
+        message: "Please provide a valid due date for your notifoo",
       };
     }
 
@@ -141,7 +141,7 @@ export async function createReminderHook(reminder: TimerData & { user: User }) {
       console.error("no description provided");
       return {
         success: false,
-        message: "Please provide a description for your reminder",
+        message: "Please provide a description for your notifoo",
       };
     }
 
@@ -196,7 +196,7 @@ export async function createReminderHook(reminder: TimerData & { user: User }) {
       });
       return {
         success: false,
-        message: "Failed to create reminder",
+        message: "Failed to create notifoo",
       };
     }
 
@@ -219,7 +219,7 @@ export async function createReminderHook(reminder: TimerData & { user: User }) {
     console.error("Error creating reminder:", error);
     return {
       success: false,
-      message: "Failed to create reminder",
+      message: "Failed to create notifoo",
     };
   }
 }
@@ -330,7 +330,7 @@ export async function updateReminder(reminder: TimerData) {
     if (!user) {
       return {
         success: false,
-        message: "Unable to update reminder",
+        message: "Unable to update notifoo",
       };
     }
 
@@ -365,7 +365,7 @@ export async function updateReminder(reminder: TimerData) {
     console.error("Error updating reminder:", error);
     return {
       success: false,
-      message: "Failed to update reminder",
+      message: "Failed to update notifoo",
     };
   }
 }
@@ -455,7 +455,7 @@ export async function deleteReminder(reminderId: string) {
     if (!user) {
       return {
         success: false,
-        message: "Unable to delete reminder",
+        message: "Unable to delete notifoo",
       };
     }
 
@@ -494,7 +494,7 @@ export async function deleteReminder(reminderId: string) {
     console.error("Error deleting reminder:", error);
     return {
       success: false,
-      message: "Failed to delete reminder",
+      message: "Failed to delete notifoo",
     };
   }
 }
