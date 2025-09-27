@@ -1,7 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { FormError } from "@/components/form-error";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -11,29 +16,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { TimerData } from "@/types/database";
+import { User } from "@prisma/client";
+import { track } from "@vercel/analytics/react";
 import {
-  Plus,
   Clock,
   Loader2Icon,
   Mail,
   MessageSquare,
-  RefreshCcwDotIcon,
   PhoneCallIcon,
+  RefreshCcwDotIcon,
 } from "lucide-react";
-import { TimerData } from "@/types/database";
-import { FormError } from "@/components/form-error";
-import { User } from "@prisma/client";
 import Link from "next/link";
-import { track } from "@vercel/analytics/react";
 import { useRouter } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
 
 interface TimerCreationCardProps {
   onCreateTimer: (timer: Omit<TimerData, "id">) => void;
@@ -132,7 +129,7 @@ export function TimerCreationCard({
     } else if (step === "notifications" && timerName && combinedDateTime) {
       const now = new Date();
       const timerType = combinedDateTime > now ? "till" : "from";
-      track("Timer Created", {
+      track("timer_created", {
         name: timerName,
         type: timerType,
         emailNotification,
