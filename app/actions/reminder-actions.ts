@@ -16,7 +16,7 @@ const qstash = new Client({
   },
 });
 
-// TODO: if reminder has a recurring schedule, create cron instead of delay
+// TODO: if notifoo has a recurring schedule, create cron instead of delay
 export async function createReminder(reminder: TimerData) {
   console.log("creating notifoo", reminder);
   try {
@@ -100,13 +100,13 @@ export async function createReminder(reminder: TimerData) {
       };
     }
 
-    console.log("reminder created", newReminder);
+    console.log("notifoo created", newReminder);
 
     // create activity
     await prisma.activity.create({
       data: {
         type: "Notifoo Created",
-        description: `Reminder created: ${newReminder.name}`,
+        description: `notifoo created: ${newReminder.name}`,
         userId: user.id,
       },
     });
@@ -171,7 +171,7 @@ export async function createReminderHook(reminder: TimerData & { user: User }) {
     if (delaySeconds <= 0) {
       return {
         success: false,
-        message: "Cannot schedule reminder in the past",
+        message: "Cannot schedule notifoo in the past",
       };
     }
 
@@ -200,20 +200,20 @@ export async function createReminderHook(reminder: TimerData & { user: User }) {
       };
     }
 
-    console.log("reminder created", newReminder);
+    console.log("notifoo created", newReminder);
 
     // create activity
     await prisma.activity.create({
       data: {
-        type: "Reminder Created",
-        description: `Reminder created: ${newReminder.name}`,
+        type: "Notifoo Created",
+        description: `notifoo created: ${newReminder.name}`,
         userId: user.id,
       },
     });
 
     return {
       success: true,
-      message: "Reminder created successfully",
+      message: "Notifoo created successfully",
     };
   } catch (error) {
     console.error("Error creating reminder:", error);
@@ -315,10 +315,10 @@ export async function getReminderById(reminderId: string) {
       data: reminder,
     };
   } catch (error) {
-    console.error("Error getting reminder by id:", error);
+    console.error("Error getting notifoo by id:", error);
     return {
       success: false,
-      message: "Failed to get reminder by id",
+      message: "Failed to get notifoo by id",
       data: null,
     };
   }
@@ -351,18 +351,18 @@ export async function updateReminder(reminder: TimerData) {
     // create activity
     await prisma.activity.create({
       data: {
-        type: "Reminder Updated",
-        description: `Reminder updated: ${reminder.name}${reminder.isActive === false ? " (Disabled)" : ""}`,
+        type: "Notifoo Updated",
+        description: `notifoo updated: ${reminder.name}${reminder.isActive === false ? " (Disabled)" : ""}`,
         userId: user.id,
       },
     });
 
     return {
       success: true,
-      message: "Reminder updated successfully",
+      message: "Notifoo updated successfully",
     };
   } catch (error) {
-    console.error("Error updating reminder:", error);
+    console.error("Error updating notifoo:", error);
     return {
       success: false,
       message: "Failed to update notifoo",
@@ -380,7 +380,7 @@ export async function toggleReminderStatus(
     if (!user) {
       return {
         success: false,
-        message: "Unable to update reminder status",
+        message: "Unable to update notifoo status",
       };
     }
 
@@ -392,22 +392,21 @@ export async function toggleReminderStatus(
     // create activity
     await prisma.activity.create({
       data: {
-        type:
-          "Reminder Status Changed to " + (isActive ? "Active" : "Inactive"),
-        description: `Reminder ${isActive ? "enabled" : "disabled"}: ${reminder.name}`,
+        type: "Notifoo Status Changed to " + (isActive ? "Active" : "Inactive"),
+        description: `notifoo ${isActive ? "enabled" : "disabled"}: ${reminder.name}`,
         userId: user.id,
       },
     });
 
     return {
       success: true,
-      message: `Reminder ${isActive ? "enabled" : "disabled"} successfully`,
+      message: `Notifoo ${isActive ? "enabled" : "disabled"} successfully`,
     };
   } catch (error) {
-    console.error("Error toggling reminder status:", error);
+    console.error("Error toggling notifoo status:", error);
     return {
       success: false,
-      message: "Failed to update reminder status",
+      message: "Failed to update notifoo status",
     };
   }
 }
@@ -418,7 +417,7 @@ export async function markReminderAsDone(reminderId: string, isDone: boolean) {
     if (!user) {
       return {
         success: false,
-        message: "Unable to update reminder status",
+        message: "Unable to update notifoo status",
       };
     }
 
@@ -430,21 +429,21 @@ export async function markReminderAsDone(reminderId: string, isDone: boolean) {
     // create activity
     await prisma.activity.create({
       data: {
-        type: "Reminder Status Changed to " + (isDone ? "Done" : "Not Done"),
-        description: `Reminder ${isDone ? "marked as done" : "marked as not done"}: ${reminder.name}`,
+        type: "Notifoo Status Changed to " + (isDone ? "Done" : "Not Done"),
+        description: `notifoo ${isDone ? "marked as done" : "marked as not done"}: ${reminder.name}`,
         userId: user.id,
       },
     });
 
     return {
       success: true,
-      message: `Reminder ${isDone ? "marked as done" : "marked as not done"} successfully`,
+      message: `notifoo ${isDone ? "marked as done" : "marked as not done"} successfully`,
     };
   } catch (error) {
-    console.error("Error toggling reminder status:", error);
+    console.error("Error toggling notifoo status:", error);
     return {
       success: false,
-      message: "Failed to update reminder status",
+      message: "Failed to update notifoo status",
     };
   }
 }
@@ -480,15 +479,15 @@ export async function deleteReminder(reminderId: string) {
     // create activity
     await prisma.activity.create({
       data: {
-        type: "Reminder Deleted",
-        description: `Reminder deleted: ${reminder.name}`,
+        type: "Notifoo Deleted",
+        description: `Notifoo deleted: ${reminder.name}`,
         userId: user.id,
       },
     });
 
     return {
       success: true,
-      message: "Reminder deleted successfully",
+      message: "Notifoo deleted successfully",
     };
   } catch (error) {
     console.error("Error deleting reminder:", error);
@@ -517,7 +516,7 @@ export async function toggleEmailNotification({
     if (!user) {
       return {
         success: false,
-        message: "Unable to update reminder status",
+        message: "Unable to update notifoo status",
       };
     }
 
@@ -557,7 +556,7 @@ export async function toggleSmsNotification({
     if (!user) {
       return {
         success: false,
-        message: "Unable to update reminder status",
+        message: "Unable to update notifoo status",
       };
     }
 
@@ -597,7 +596,7 @@ export async function toggleCallNotification({
     if (!user) {
       return {
         success: false,
-        message: "Unable to update reminder status",
+        message: "Unable to update notifoo status",
       };
     }
 
@@ -637,7 +636,7 @@ export async function toggleRecurringNotification({
     if (!user) {
       return {
         success: false,
-        message: "Unable to update reminder status",
+        message: "Unable to update notifoo status",
       };
     }
 
@@ -677,7 +676,7 @@ export async function toggleReminderIsActive({
     if (!user) {
       return {
         success: false,
-        message: "Unable to update reminder status",
+        message: "Unable to update notifoo status",
       };
     }
 
@@ -688,13 +687,13 @@ export async function toggleReminderIsActive({
 
     return {
       success: true,
-      message: "Reminder is active updated successfully",
+      message: "Notifoo is active updated successfully",
     };
   } catch (error) {
-    console.error("Error updating reminder is active:", error);
+    console.error("Error updating notifoo is active:", error);
     return {
       success: false,
-      message: "Failed to update reminder is active",
+      message: "Failed to update notifoo is active",
     };
   }
 }
