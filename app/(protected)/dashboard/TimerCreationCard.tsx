@@ -54,8 +54,8 @@ export function TimerCreationCard({
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState({
-    hours: 12,
-    minutes: 0,
+    hours: "" as string, // Changed from number to string to allow empty state
+    minutes: "00", // Changed to string but default to "0"
     period: "PM" as "AM" | "PM",
   });
   const [timerName, setTimerName] = useState("");
@@ -78,7 +78,7 @@ export function TimerCreationCard({
       // Reset state when modal closes
       setStep("date");
       setSelectedDate(undefined);
-      setSelectedTime({ hours: 12, minutes: 0, period: "PM" });
+      setSelectedTime({ hours: "", minutes: "00", period: "PM" }); // Reset hours to empty string
       setTimerName("");
       setEmailNotification(true);
       setSmsNotification(false);
@@ -92,11 +92,23 @@ export function TimerCreationCard({
   };
 
   const handleTimeChange = (type: "hours" | "minutes", value: string) => {
-    const numValue = parseInt(value) || 0;
-    if (type === "hours" && numValue >= 1 && numValue <= 12) {
-      setSelectedTime((prev) => ({ ...prev, hours: numValue }));
-    } else if (type === "minutes" && numValue >= 0 && numValue <= 59) {
-      setSelectedTime((prev) => ({ ...prev, minutes: numValue }));
+    // Allow empty string for hours to enable clearing the field
+    if (type === "hours") {
+      // Only allow integers, empty string, or valid hour values
+      if (
+        value === "" ||
+        (/^\d+$/.test(value) && parseInt(value) >= 1 && parseInt(value) <= 12)
+      ) {
+        setSelectedTime((prev) => ({ ...prev, hours: value }));
+      }
+    } else if (type === "minutes") {
+      // Only allow integers and valid minute values
+      if (
+        value === "" ||
+        (/^\d+$/.test(value) && parseInt(value) >= 0 && parseInt(value) <= 59)
+      ) {
+        setSelectedTime((prev) => ({ ...prev, minutes: value }));
+      }
     }
   };
 
@@ -105,18 +117,22 @@ export function TimerCreationCard({
   };
 
   const getCombinedDateTime = () => {
-    if (!selectedDate) return undefined;
+    if (!selectedDate || !selectedTime.hours || selectedTime.hours === "")
+      return undefined;
     const combined = new Date(selectedDate);
 
     // Convert 12-hour to 24-hour format
-    let hours24 = selectedTime.hours;
-    if (selectedTime.period === "AM" && selectedTime.hours === 12) {
+    const hoursNum = parseInt(selectedTime.hours);
+    const minutesNum = parseInt(selectedTime.minutes) || 0;
+
+    let hours24 = hoursNum;
+    if (selectedTime.period === "AM" && hoursNum === 12) {
       hours24 = 0; // 12 AM = 0 hours
-    } else if (selectedTime.period === "PM" && selectedTime.hours !== 12) {
-      hours24 = selectedTime.hours + 12; // PM hours (except 12 PM)
+    } else if (selectedTime.period === "PM" && hoursNum !== 12) {
+      hours24 = hoursNum + 12; // PM hours (except 12 PM)
     }
 
-    combined.setHours(hours24, selectedTime.minutes, 0, 0);
+    combined.setHours(hours24, minutesNum, 0, 0);
     return combined;
   };
 
@@ -227,14 +243,17 @@ export function TimerCreationCard({
                       </Label>
                       <Input
                         id="hours"
-                        type="number"
-                        min="1"
-                        max="12"
-                        value={selectedTime.hours.toString()}
-                        onChange={(e) =>
-                          handleTimeChange("hours", e.target.value)
-                        }
-                        className="w-full text-center font-mono text-base md:text-lg"
+                        type="text" // Changed from "number" to "text" for better control
+                        inputMode="numeric" // Still shows numeric keypad on mobile
+                        pattern="[1-9]|1[0-2]" // HTML5 pattern for 1-12
+                        placeholder="12"
+                        value={selectedTime.hours}
+                        onChange={(e) => {
+                          // Only allow digits and prevent non-numeric input
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          handleTimeChange("hours", value);
+                        }}
+                        className="w-full text-center font-mono text-base md:text-lg placeholder:text-zinc-300"
                       />
                     </div>
                     <div className="text-2xl font-bold text-muted-foreground mt-6">
@@ -246,14 +265,17 @@ export function TimerCreationCard({
                       </Label>
                       <Input
                         id="minutes"
-                        type="number"
-                        min="0"
-                        max="59"
-                        value={selectedTime.minutes.toString().padStart(2, "0")}
-                        onChange={(e) =>
-                          handleTimeChange("minutes", e.target.value)
-                        }
-                        className="w-full text-center font-mono text-base md:text-lg"
+                        type="text" // Changed from "number" to "text" for better control
+                        inputMode="numeric"
+                        pattern="[0-5]?[0-9]" // HTML5 pattern for 0-59
+                        value={selectedTime.minutes}
+                        placeholder="00"
+                        onChange={(e) => {
+                          // Only allow digits and prevent non-numeric input
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          handleTimeChange("minutes", value);
+                        }}
+                        className="w-full text-center font-mono text-base md:text-lg placeholder:text-zinc-300"
                       />
                     </div>
                     <div className="flex flex-col items-center gap-1 flex-1 max-w-[70px]">
@@ -274,19 +296,21 @@ export function TimerCreationCard({
                       </Select>
                     </div>
                   </div>
-                  {selectedDate && (
-                    <p className="text-xs text-center text-muted-foreground font-mono px-2 leading-relaxed">
-                      {getCombinedDateTime()?.toLocaleString(undefined, {
-                        weekday: "short",
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                        hour12: true,
-                      })}
-                    </p>
-                  )}
+                  <div className="h-[20px]">
+                    {selectedDate && (
+                      <p className="text-xs text-center text-muted-foreground font-mono px-2 leading-relaxed">
+                        {getCombinedDateTime()?.toLocaleString(undefined, {
+                          weekday: "short",
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex justify-between w-full gap-3">
@@ -299,7 +323,11 @@ export function TimerCreationCard({
                   </Button>
                   <Button
                     onClick={handleConfirm}
-                    disabled={!selectedDate}
+                    disabled={
+                      !selectedDate ||
+                      !selectedTime.hours ||
+                      selectedTime.hours === ""
+                    } // Added hours validation
                     className="flex-1"
                   >
                     Next
@@ -328,7 +356,7 @@ export function TimerCreationCard({
                   value={timerName}
                   onChange={(e) => setTimerName(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full font-mono"
+                  className="w-full font-mono placeholder:text-zinc-300"
                 />
                 <div className="flex justify-between w-full gap-3">
                   <Button

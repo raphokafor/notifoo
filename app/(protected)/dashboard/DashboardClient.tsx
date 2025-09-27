@@ -96,6 +96,18 @@ export function Dashboard({
     try {
       setIsLoading(true);
       setError("");
+      trackEvent("reminder_created", {
+        email: user.email,
+        viewMode: viewMode,
+        location: "notifoos",
+        reminderId: newTimer.id,
+        notificationMethods: [
+          newTimer.emailNotification ? "email" : "",
+          newTimer.smsNotification ? "sms" : "",
+          newTimer.callNotification ? "call" : "",
+          newTimer.recurringNotification ? "recurring" : "",
+        ],
+      });
       const { success, message } = await createReminder(newTimer);
       if (success) {
         setTimers((prevTimers) => {
